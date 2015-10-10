@@ -19,10 +19,13 @@ $jsonapiBaseResource = new Object(
             ],
             ['type', 'id']
         ),
-        'links' => new Object([
-            'self' => new String(),
-            'related' => new String()
-        ])
+        'links' => new Object(
+            [
+                'self' => new String(),
+                'related' => new String()
+            ],
+            ['self']
+        )
     ],
     ['data']
 );

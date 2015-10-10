@@ -49,7 +49,8 @@ class Testphase
         $url,
         $method = Phramework::METHOD_GET,
         $headers = [],
-        $requestBody = null
+        $requestBody = null,
+        $ruleJSON = false
     ) {
         $this->url = $url;
 
@@ -63,13 +64,21 @@ class Testphase
 
         //not for GET
         $this->requestBody = $requestBody;
-        $o = new Object();
+
+        $this->ruleJSON = $ruleJSON;
     }
 
     private $responseStatusCode;
     private $responseHeaders;
     private $responseBody;
 
+    /**
+     * Handle renspose
+     * @param  [type] $responseStatusCode [description]
+     * @param  [type] $responseHeaders    [description]
+     * @param  [type] $responseBody       [description]
+     * @return [type]                     [description]
+     */
     private function handle($responseStatusCode, $responseHeaders, $responseBody)
     {
         if ($responseStatusCode != $this->ruleStatusCode) {
@@ -98,21 +107,27 @@ class Testphase
             }
         }
 
-        if ($this->ruleJSON && !$this->isJSON($responseBody)) {
+        if ($this->ruleJSON && !TestPhrase::isJSON($responseBody)) {
             throw new \Exception(sprintf(
                 'Expected valid JSON response Body'
             ));
         }
+        //extra rules ??
+        if ($this->ruleJSON) {
+            $responseBodyObject = json_decode($responseBody, true);
 
-        $responseBodyObject = json_decode($responseBody, true);
-
-        foreach ($this->ruleObjects as $ruleObject) {
-            $ruleObject->parse($responseBodyObject);
+            foreach ($this->ruleObjects as $ruleObject) {
+                $ruleObject->parse($responseBodyObject);
+            }
         }
 
         echo 'Success!' . PHP_EOL;
     }
 
+    /**
+     * Run testphase
+     * Will execute the request and apply all defined rules to validate the response
+     */
     public function run($flags = self::REQUEST_EMPTY_FLAG)
     {
         //Construct request url
@@ -132,8 +147,8 @@ class Testphase
         curl_setopt($curl, CURLOPT_HEADER, true);
         //curl_setopt($curl, CURLOPT_VERBOSE, true);
         //Set timeout values ( in seconds )
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $this->settings[self::SETTING_CURLOPT_CONNECTTIMEOUT]);
-        curl_setopt($curl, CURLOPT_TIMEOUT, $this->settings[self::SETTING_CURLOPT_TIMEOUT]);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, static::$SETTING_CURLOPT_CONNECTTIMEOUT);
+        curl_setopt($curl, CURLOPT_TIMEOUT, static::$SETTING_CURLOPT_TIMEOUT);
         curl_setopt($curl, CURLOPT_NOSIGNAL, 1);
 
         //Security options
@@ -181,12 +196,10 @@ class Testphase
         $responseStatusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-        $responseHeadersTemp = str_replace("\r","", substr($response, 0, $headerSize));
+        $responseHeadersTemp = str_replace("\r", "", substr($response, 0, $headerSize));
         $responseHeaders = [];
         foreach (explode("\n", $responseHeadersTemp) as $i => $line) {
-            if ($i === 0 || empty($line)) {
-
-            } else {
+            if ($i !== 0 && !empty($line)) {
                 list($key, $value) = explode(': ', $line);
 
                 $responseHeaders[$key] = $value;
@@ -204,6 +217,12 @@ class Testphase
         $this->handle($responseStatusCode, $responseHeaders, $responseBody);
     }
 
+    /**
+     * Set expected HTTP response Status Code
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+     * @param  Integer $statusCode
+     * @return Testphase Return's $this object
+     */
     public function expectStatusCode($statusCode)
     {
         $this->ruleStatusCode = $statusCode;
@@ -211,8 +230,16 @@ class Testphase
         return $this;
     }
 
+    /**
+     * Add expected response header
+     * @param  array[] $ruleHeaders
+     * @return Testphase Return's $this object
+     */
     public function expectResponseHeader($ruleHeaders)
     {
+        if (!is_array($ruleHeaders)) {
+            throw new \Exception('Expecting array for method expectResponseHeader')
+        }
         $this->ruleHeaders = array_merge(
             $this->ruleHeaders,
             $ruleHeaders
@@ -228,17 +255,24 @@ class Testphase
         return $this;
     }
 
-    public function expectObject(\Phramework\Validate\Object $object) {
-
+    /**
+     * Object validator, used to validate the response
+     * @param  PhrameworkValidateObject $object Validator object
+     * @return Testphase Return's $this object
+     */
+    public function expectObject(\Phramework\Validate\Object $object)
+    {
         $this->ruleObjects[] = $object;
 
         return $this;
     }
 
 
-    function isJSON($string){
-       return is_string($string) && is_object(json_decode($string))
-            && (json_last_error() == JSON_ERROR_NONE) ? true : false;
+    public static function isJSON($string)
+    {
+        return (s_string($string)
+            && is_object(json_decode($string))
+            && (json_last_error() == JSON_ERROR_NONE)) ? true : false;
     }
 
     const REQUEST_EMPTY_FLAG = 0;
@@ -255,7 +289,8 @@ class Testphase
      * @see CURLOPT_CONNECTTIMEOUT
      * @var integer
      */
-    const SETTING_CURLOPT_CONNECTTIMEOUT = CURLOPT_CONNECTTIMEOUT;
+    public static $SETTING_CURLOPT_CONNECTTIMEOUT = 300;
+
     /**
      * Setting CURLOPT_TIMEOUT - set maximum time the request is allowed to take
      *
@@ -268,14 +303,5 @@ class Testphase
      * @see CURLOPT_TIMEOUT
      * @var integer
      */
-    const SETTING_CURLOPT_TIMEOUT = CURLOPT_TIMEOUT;
-
-    /**
-     * SDK settings
-     * @var array
-     */
-    private $settings = [
-        self::SETTING_CURLOPT_CONNECTTIMEOUT => 300,
-        self::SETTING_CURLOPT_TIMEOUT => 0
-    ];
+    public static $SETTING_CURLOPT_TIMEOUT = 0;
 }
