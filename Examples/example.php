@@ -44,4 +44,20 @@ $t = (new Testphase('account', Phramework::METHOD_GET, $requestHeaders))
     ->expectJSON()
     ->expectObject($jsonapiBaseResource);
 
-$t->run();
+$t->run(function (
+    $responseStatusCode,
+    $responseHeaders,
+    $responseBody,
+    $responseBodyObject
+) {
+    echo 'Response Status Code:' . PHP_EOL;
+    echo $responseStatusCode . PHP_EOL;
+    echo 'Response Headers:' . PHP_EOL;
+    print_r($responseHeaders);
+    echo PHP_EOL;
+    echo 'Response Body:' . PHP_EOL;
+    echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
+
+
+    echo 'Success!' . PHP_EOL;
+});

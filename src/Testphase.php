@@ -79,7 +79,7 @@ class Testphase
      * @param  [type] $responseBody       [description]
      * @return [type]                     [description]
      */
-    private function handle($responseStatusCode, $responseHeaders, $responseBody)
+    private function handle($responseStatusCode, $responseHeaders, $responseBody, $callback)
     {
         if ($responseStatusCode != $this->ruleStatusCode) {
             throw new \Exception(sprintf(
@@ -107,7 +107,7 @@ class Testphase
             }
         }
 
-        if ($this->ruleJSON && !TestPhrase::isJSON($responseBody)) {
+        if ($this->ruleJSON && !Testphase::isJSON($responseBody)) {
             throw new \Exception(sprintf(
                 'Expected valid JSON response Body'
             ));
@@ -121,15 +121,36 @@ class Testphase
             }
         }
 
-        echo 'Success!' . PHP_EOL;
+        if ($callback) {
+            if ($this->ruleJSON) {
+                call_user_func(
+                    $callback,
+                    $responseStatusCode,
+                    $responseHeaders,
+                    $responseBody,
+                    $responseBodyObject
+                );
+            } else {
+                call_user_func(
+                    $callback,
+                    $responseStatusCode,
+                    $responseHeaders,
+                    $responseBody
+                );
+            }
+        }
+
+        return true;
     }
 
     /**
      * Run testphase
      * Will execute the request and apply all defined rules to validate the response
      */
-    public function run($flags = self::REQUEST_EMPTY_FLAG)
+    public function run($callback = null)
     {
+        $flags = self::REQUEST_EMPTY_FLAG;
+
         //Construct request url
         $url = static::$base . $this->url;
 
@@ -214,7 +235,7 @@ class Testphase
         $this->responseHeaders = $responseHeaders;
         $this->responseBody = $responseBody;
 
-        $this->handle($responseStatusCode, $responseHeaders, $responseBody);
+        return $this->handle($responseStatusCode, $responseHeaders, $responseBody, $callback);
     }
 
     /**
@@ -238,8 +259,9 @@ class Testphase
     public function expectResponseHeader($ruleHeaders)
     {
         if (!is_array($ruleHeaders)) {
-            throw new \Exception('Expecting array for method expectResponseHeader')
+            throw new \Exception('Expecting array for method expectResponseHeader');
         }
+
         $this->ruleHeaders = array_merge(
             $this->ruleHeaders,
             $ruleHeaders
@@ -270,9 +292,16 @@ class Testphase
 
     public static function isJSON($string)
     {
-        return (s_string($string)
+        return (is_string($string)
             && is_object(json_decode($string))
             && (json_last_error() == JSON_ERROR_NONE)) ? true : false;
+    }
+
+    public static function setAuthorizationBasic($username, $password)
+    {
+        throw new \Phramework\Exceptions\NotImplementedExceptions();
+
+        return $this;
     }
 
     const REQUEST_EMPTY_FLAG = 0;
