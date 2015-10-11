@@ -30,6 +30,8 @@ $jsonapiBaseResource = new Object(
     ['data']
 );
 
+Testphase::setBase('http://localhost/ostomate/api/');
+
 $requestHeaders = [
     'Authorization: Basic bm9ocG9uZXhAZ21haWwuY29tOjEyMzQ1Njc4eFg=',
     'Content-Type: application/vnd.api+json',

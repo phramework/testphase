@@ -25,12 +25,28 @@ use \Phramework\Validate\Object;
  */
 class Testphase
 {
+    /**
+     * Base API url
+     * @var string
+     */
     private static $base = 'http://localhost/ostomate/api/';
 
+    /**
+     * Request url, not including the base part
+     * @var string
+     */
     private $url;
 
+    /**
+     * Request HTTP headers
+     * @var array
+     */
     private $headers;
 
+    /**
+     * Request HTTP method
+     * @var string
+     */
     private $method;
 
     private $requestBody;
@@ -77,6 +93,7 @@ class Testphase
      * @param  [type] $responseStatusCode [description]
      * @param  [type] $responseHeaders    [description]
      * @param  [type] $responseBody       [description]
+     * @param  callable|null
      * @return [type]                     [description]
      */
     private function handle($responseStatusCode, $responseHeaders, $responseBody, $callback)
@@ -112,7 +129,8 @@ class Testphase
                 'Expected valid JSON response Body'
             ));
         }
-        //extra rules ??
+
+        //Add extra rules ??
         if ($this->ruleJSON) {
             $responseBodyObject = json_decode($responseBody, true);
 
@@ -146,6 +164,9 @@ class Testphase
     /**
      * Run testphase
      * Will execute the request and apply all defined rules to validate the response
+     * @param  callable|null $callback [Optional] Callback to execute after
+     * completing the test rules
+     * @return true On success
      */
     public function run($callback = null)
     {
@@ -333,4 +354,22 @@ class Testphase
      * @var integer
      */
     public static $SETTING_CURLOPT_TIMEOUT = 0;
+
+    /**
+     * Set base API url
+     * @param string $base
+     */
+    public static function setBase($base)
+    {
+        static::$base = $base;
+    }
+
+    /**
+     * GEt base API url
+     * @return string
+     */
+    public static function getBase()
+    {
+        return static::$base;
+    }
 }
