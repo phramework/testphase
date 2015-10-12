@@ -53,6 +53,7 @@ $specs->add('b|bootstrap:', 'Optional, bootstrap file path')
 
 $specs->add('debug', 'debug message.')->defaultValue(false);
 $specs->add('h|help', 'Show help')->defaultValue(false);
+$specs->add('no-colors', 'No colors')->defaultValue(false);
 
 $parser = new OptionParser($specs);
 $result = $parser->parse($argv);
@@ -86,6 +87,13 @@ $files = Util::directoryToArray(
     false
 );
 
+$files = array_map(
+    function ($f) {
+        return str_replace('//', '/', $f);
+    },
+    $files
+);
+
 Testphase::setBase('http://localhost/ostomate/api/');
 
 print_r($files);
@@ -93,7 +101,7 @@ print_r($files);
 $stats = (object)['tests' => 0, 'success' => 0, 'error' => 0];
 
 foreach ($files as $filename) {
-    $p = new TestParser(str_replace('//', '/', $filename));
+    $p = new TestParser($filename);
     //todo sort files by order
     $stats->tests += 1;
     try {
@@ -103,27 +111,56 @@ foreach ($files as $filename) {
             $responseBody,
             $responseBodyObject
         ) {
-            echo 'Response Status Code:' . PHP_EOL;
-            echo $responseStatusCode . PHP_EOL;
-            echo 'Response Headers:' . PHP_EOL;
-            print_r($responseHeaders);
-            echo PHP_EOL;
-            echo 'Response Body:' . PHP_EOL;
-            echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
+            global $result;
+            if ($result['debug']->value) {
 
-
-            echo 'Success!' . PHP_EOL;
+                echo 'Response Status Code:' . PHP_EOL;
+                echo $responseStatusCode . PHP_EOL;
+                echo 'Response Headers:' . PHP_EOL;
+                print_r($responseHeaders);
+                echo PHP_EOL;
+                echo 'Response Body:' . PHP_EOL;
+                echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
+            }
         });
         $stats->success += 1;
     }catch(\Exception $e) {
-        echo sprintf(
-            'test %s failed with message ' . PHP_EOL,
-            $filename,
-            $e->getMessage()
+        //if verbose show more details (trace)
+        output(sprintf(
+                'test %s failed with message %s' . PHP_EOL,
+                $filename,
+                $e->getMessage()
+            ),
+            'red'
         );
-        
+
         $stats->error += 1;
     }
 }
 echo 'Complete!' . PHP_EOL;
-print_r($stats);
+echo 'tests:' . $stats->tests . PHP_EOL;
+output('-successful tests: ' . $stats->success, 'green');
+output('-error tests: ' . $stats->error, 'red');
+
+
+function output($text, $color) {
+    $colors = [
+        'black' => '0;30',
+        'red' => '0;31',
+        'green' => '0;32',
+        'blue' => '1;34'
+    ];
+
+    $c = array_key_exists($color, $colors) ? $colors[$color] : $colors['black'];
+    global $result;
+    if ($result['debug']->value) {
+        echo $text . PHP_EOL;
+    } else {
+        echo "\033[". $c . "m" . $text . "\033[0m" . PHP_EOL;
+    }
+}
+
+if ($stats->error > 0) {
+    return (1);
+}
+return 0;
