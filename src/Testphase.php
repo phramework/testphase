@@ -240,7 +240,7 @@ class Testphase
         $responseStatusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-        $responseHeadersTemp = str_replace("\r", "", substr($response, 0, $headerSize));
+        $responseHeadersTemp = str_replace("\r", '', substr($response, 0, $headerSize));
         $responseHeaders = [];
         foreach (explode("\n", $responseHeadersTemp) as $i => $line) {
             if ($i !== 0 && !empty($line)) {
@@ -258,7 +258,12 @@ class Testphase
         $this->responseHeaders = $responseHeaders;
         $this->responseBody = $responseBody;
 
-        return $this->handle($responseStatusCode, $responseHeaders, $responseBody, $callback);
+        return $this->handle(
+            $responseStatusCode,
+            $responseHeaders,
+            $responseBody,
+            $callback
+        );
     }
 
     /**
@@ -278,11 +283,14 @@ class Testphase
      * Add expected response header
      * @param  array[] $ruleHeaders
      * @return Testphase Return's $this object
+     * @throws Exception When $ruleHeaders is not an array
      */
     public function expectResponseHeader($ruleHeaders)
     {
         if (!is_array($ruleHeaders)) {
-            throw new \Exception('Expecting array for method expectResponseHeader');
+            throw new \Exception(
+                'Expecting array for method expectResponseHeader'
+            );
         }
 
         $this->ruleHeaders = array_merge(
@@ -293,6 +301,13 @@ class Testphase
         return $this;
     }
 
+    /**
+     * Set expect JSON flag rule value,
+     * when true it will throw an error if the response is not a valid JSON.
+     * Also ruleObjects only works with this flag set to true
+     * @param  boolean $flag [Optional] Value of the flag, default is true
+     * @return Testphase Return's $this object
+     */
     public function expectJSON($flag = true)
     {
         $this->ruleJSON = $flag;
@@ -312,7 +327,11 @@ class Testphase
         return $this;
     }
 
-
+    /**
+     * Check if given string is valid JSON
+     * @param  string  $string
+     * @return boolean
+     */
     public static function isJSON($string)
     {
         return (is_string($string)
@@ -367,7 +386,7 @@ class Testphase
     }
 
     /**
-     * GEt base API url
+     * Get base API url
      * @return string
      */
     public static function getBase()

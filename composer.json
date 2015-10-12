@@ -19,7 +19,7 @@
   }],
   "require": {
     "php": ">=5.6",
-    "phramework/phramework": "1.0.0-alpha.11",
+    "phramework/phramework": "1.0.0-alpha.12",
     "ext-curl": "*",
     "ext-json": "*",
     "corneltek/getoptionkit": "~2"
@@ -46,7 +46,7 @@
   },
   "scripts": {
     "test": [
-      "echo \"$(tput setaf 1) $(tput setab 7)\\ntestphase test routine\\n$(tput sgr 0)\"",
+      "echo \"$(tput setaf 1)testphase test routine$(tput sgr 0)\"",
       "find src/ -name '*.php' -print0 | xargs -0 -L 1 php -l",
       "find tests/ -name '*.php' -print0 | xargs -0 -L 1 php -l",
       "find Examples/ -name '*.php' -print0 | xargs -0 -L 1 php -l",
