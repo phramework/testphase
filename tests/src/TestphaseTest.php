@@ -8,6 +8,9 @@ use \Phramework\Validate\Object;
 use \Phramework\Validate\String;
 use \Phramework\Validate\Integer;
 
+/**
+ * @todo Make $requestHeaders settings
+ */
 class TestphaseTest extends \PHPUnit_Framework_TestCase
 {
     private $requestHeaders = [
@@ -133,8 +136,6 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             Testphase::isJSON('{"object" : "OK"}warning')
         );
     }
-
-
 
     /**
      * @dataProvider validateFailureProvider

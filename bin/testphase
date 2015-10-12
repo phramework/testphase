@@ -40,8 +40,7 @@ use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
 echo 'testphase v' . Testphase::VERSION . PHP_EOL;
 
 $cwd = getcwd();
-echo "cdw: $cwd" . PHP_EOL;
-echo PHP_EOL;
+//echo "cdw: $cwd" . PHP_EOL;
 
 $specs = new OptionCollection;
 $specs->add('d|dir:', 'Tests directory path')
@@ -67,14 +66,15 @@ if ($result['help']->value) {
 } elseif ($result['debug']->value) {
     echo 'Enabled options: ' . PHP_EOL;
 
-    foreach($result as $key => $spec) {
+    foreach ($result as $key => $spec) {
         echo $spec . PHP_EOL;
     }
 }
+
 $dir = $result['dir']->value;
 $bootstrap = $result['bootstrap']->value;
-echo 'dir :'       . $dir . PHP_EOL;
-echo 'bootstrap: ' . $bootstrap . PHP_EOL;
+//echo 'dir :'       . $dir . PHP_EOL;
+//echo 'bootstrap: ' . $bootstrap . PHP_EOL;
 
 //Get all .json files in directory
 $files = Util::directoryToArray(
@@ -96,9 +96,13 @@ $files = array_map(
 
 Testphase::setBase('http://localhost/ostomate/api/');
 
-print_r($files);
-//aggregate
-$stats = (object)['tests' => 0, 'success' => 0, 'error' => 0];
+//aggregate statistics
+$stats = (object)[
+    'tests' => 0,
+    'success' => 0,
+    'error' => 0,
+    'errors' => []
+];
 
 foreach ($files as $filename) {
     $p = new TestParser($filename);
@@ -113,7 +117,6 @@ foreach ($files as $filename) {
         ) {
             global $result;
             if ($result['debug']->value) {
-
                 echo 'Response Status Code:' . PHP_EOL;
                 echo $responseStatusCode . PHP_EOL;
                 echo 'Response Headers:' . PHP_EOL;
@@ -124,26 +127,36 @@ foreach ($files as $filename) {
             }
         });
         $stats->success += 1;
-    }catch(\Exception $e) {
-        //if verbose show more details (trace)
-        output(sprintf(
-                'test %s failed with message %s' . PHP_EOL,
-                $filename,
-                $e->getMessage()
-            ),
-            'red'
+        //Echo successful char
+        echo '.';
+    } catch (\Exception $e) {
+        //@todo if verbose show more details (trace)
+        $stats->errors[] = sprintf(
+            'Test "%s" failed with message %s' . PHP_EOL,
+            $filename,
+            $e->getMessage()
         );
 
+        //Echo unsuccessful char
+        echo 'E';
         $stats->error += 1;
     }
 }
+echo PHP_EOL;
+
+foreach ($stats->errors as $e) {
+    output($e . PHP_EOL, 'red');
+}
+
 echo 'Complete!' . PHP_EOL;
-echo 'tests:' . $stats->tests . PHP_EOL;
-output('-successful tests: ' . $stats->success, 'green');
-output('-error tests: ' . $stats->error, 'red');
+echo 'Tests:' . $stats->tests . ', ';
+output('Successful: ' . $stats->success, 'green');
+echo ', ';
+output('Unsuccessful: ' . $stats->error . PHP_EOL, 'red');
 
 
-function output($text, $color) {
+function output($text, $color)
+{
     $colors = [
         'black' => '0;30',
         'red' => '0;31',
@@ -154,9 +167,9 @@ function output($text, $color) {
     $c = array_key_exists($color, $colors) ? $colors[$color] : $colors['black'];
     global $result;
     if ($result['debug']->value) {
-        echo $text . PHP_EOL;
+        echo $text;
     } else {
-        echo "\033[". $c . "m" . $text . "\033[0m" . PHP_EOL;
+        echo "\033[". $c . "m" . $text . "\033[0m";
     }
 }
 

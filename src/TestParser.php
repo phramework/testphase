@@ -47,6 +47,10 @@ class TestParser
         return $this->test;
     }
 
+    /**
+     * @param String $filename
+     * @todo Set $validatorRequest header's subtype
+     */
     public function __construct($filename)
     {
         if (!file_exists($filename)) {
@@ -66,16 +70,18 @@ class TestParser
             ));
         }
 
-
+        //Decode test file
         $contentsObject = json_decode($contents);
+
+        //Setup validator, to validate and parse the test file
 
         $validatorRequest = new Object(
             [
                 'url' => new String(1, 1024),
                 'method' => (new Enum(Phramework::$methodWhitelist, true))
                     ->setDefault(Phramework::METHOD_GET),
-                /*'headers' => (new ArrayValidator())
-                    ->setDefault([])*/
+                'headers' => (new ArrayValidator())
+                    ->setDefault([])
             ],
             ['url']
         );
@@ -100,37 +106,11 @@ class TestParser
             ],
             ['request', 'response']
         );
-        //var_export($validator);
 
-        //echo 'validator:' . PHP_EOL;
-        //echo $validator->toJSON(true);
-        //echo PHP_EOL;
-
+        //Parse test file, using validator's rules
         $contentsParsed = $validator->parse($contentsObject);
-        //echo 'parsed:' . PHP_EOL;
 
-        /*$jsonapiBaseResource = new Object(
-            [
-                'data' => new Object(
-                    [
-                        'type' => new String(),
-                        'id'  => new UnsignedInteger(),
-                        'attributes'  => new Object()
-                    ],
-                    ['type', 'id']
-                ),
-                'links' => new Object(
-                    [
-                        'self' => new URL(),
-                        'related' => new URL()
-                    ],
-                    ['self']
-                )
-            ],
-            ['data']
-        );*/
-
-        //create a testphase object with parsed
+        //Create a Testphase object using parsed rule
         $test = (new Testphase(
             $contentsParsed->request->url,
             $contentsParsed->request->method,
@@ -141,9 +121,8 @@ class TestParser
         ->expectStatusCode($contentsParsed->response->statusCode)
         ->expectResponseHeader($contentsParsed->response->headers)
         ->expectJSON();
-        //->expectObject($jsonapiBaseResource);
 
-        //add rules
+        //Add rule objects to validate body
         foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
             $test->expectObject(Object::createFromObject($ruleObject));
         }
