@@ -1,0 +1,72 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Copyright 2015 Spafaridis Xenofon
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+$autoload = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php' //When used from vendor/bin
+];
+
+if (file_exists($autoload[0])) {
+    include $autoload[0];
+} elseif (file_exists($autoload[1])) {
+    include $autoload[1];
+} else {
+    echo 'ERROR, autoload not found' . PHP_EOL;
+    exit(1);
+}
+
+echo 'testphase v' . \Phramework\Testphase\Testphase::VERSION . PHP_EOL;
+
+$cwd = getcwd();
+echo "cdw: $cwd" . PHP_EOL;
+echo PHP_EOL;
+
+use \GetOptionKit\OptionCollection;
+use \GetOptionKit\OptionParser;
+use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
+
+$specs = new OptionCollection;
+$specs->add('d|dir:', 'Tests directory path')
+    ->isa('String')
+    ->defaultValue(null);
+$specs->add('b|bootstrap:', 'Optional, bootstrap file path')
+    ->isa('File')
+    ->defaultValue(null);
+
+$specs->add('debug', 'debug message.')->defaultValue(false);
+$specs->add('h|help', 'Show help')->defaultValue(false);
+
+$parser = new OptionParser($specs);
+$result = $parser->parse($argv);
+//var_dump($result);
+
+if ($result['help']->value) {
+    echo 'Help:' . PHP_EOL;
+    $printer = new ConsoleOptionPrinter;
+    echo $printer->render($specs);
+    return 0;
+} elseif ($result['debug']->value) {
+    echo 'Enabled options: ' . PHP_EOL;
+
+    foreach($result as $key => $spec) {
+        echo $spec . PHP_EOL;
+    }
+}
+
+echo 'dir :'       . $result['dir']->value . PHP_EOL;
+echo 'bootstrap: ' . $result['bootstrap']->value . PHP_EOL;

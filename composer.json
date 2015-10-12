@@ -1,5 +1,6 @@
 {
   "name": "phramework/testphase",
+  "description": "API response testing tool for Phramework",
   "homepage": "https://nohponex.gr",
   "authors": [{
     "name": "Xenophon Spafaridis",
@@ -20,7 +21,8 @@
     "php": ">=5.6",
     "phramework/phramework": "1.0.0-alpha.11",
     "ext-curl": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "corneltek/getoptionkit": "~2"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "*",
@@ -53,6 +55,10 @@
     "lint": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./Examples ./tests",
     "doc": [
       "./vendor/bin/apigen generate -s ./src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"phramework/testphase\""
-    ]
-  }
+    ],
+    "run": "php ./bin/testphase"
+  },
+  "bin": [
+    "bin/testphase"
+  ]
 }

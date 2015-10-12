@@ -8,21 +8,23 @@ use \Phramework\Models\Request;
 use \Phramework\Validate\Object;
 use \Phramework\Validate\String;
 use \Phramework\Validate\Integer;
+use \Phramework\Validate\UnsignedInteger;
+use \Phramework\Validate\URL;
 
 $jsonapiBaseResource = new Object(
     [
         'data' => new Object(
             [
                 'type' => new String(),
-                'id'  => new Integer(),
+                'id'  => new UnsignedInteger(),
                 'attributes'  => new Object()
             ],
             ['type', 'id']
         ),
         'links' => new Object(
             [
-                'self' => new String(),
-                'related' => new String()
+                'self' => new URL(),
+                'related' => new URL()
             ],
             ['self']
         )

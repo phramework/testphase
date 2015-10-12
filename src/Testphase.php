@@ -25,6 +25,8 @@ use \Phramework\Validate\Object;
  */
 class Testphase
 {
+    const VERSION = '0.0.0';
+
     /**
      * Base API url
      * @var string
