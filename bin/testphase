@@ -89,25 +89,41 @@ $files = Util::directoryToArray(
 Testphase::setBase('http://localhost/ostomate/api/');
 
 print_r($files);
+//aggregate
+$stats = (object)['tests' => 0, 'success' => 0, 'error' => 0];
 
 foreach ($files as $filename) {
     $p = new TestParser(str_replace('//', '/', $filename));
+    //todo sort files by order
+    $stats->tests += 1;
+    try {
+        $ok = $p->getTest()->run(function (
+            $responseStatusCode,
+            $responseHeaders,
+            $responseBody,
+            $responseBodyObject
+        ) {
+            echo 'Response Status Code:' . PHP_EOL;
+            echo $responseStatusCode . PHP_EOL;
+            echo 'Response Headers:' . PHP_EOL;
+            print_r($responseHeaders);
+            echo PHP_EOL;
+            echo 'Response Body:' . PHP_EOL;
+            echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
 
-    $p->getTest()->run(function (
-        $responseStatusCode,
-        $responseHeaders,
-        $responseBody,
-        $responseBodyObject
-    ) {
-        echo 'Response Status Code:' . PHP_EOL;
-        echo $responseStatusCode . PHP_EOL;
-        echo 'Response Headers:' . PHP_EOL;
-        print_r($responseHeaders);
-        echo PHP_EOL;
-        echo 'Response Body:' . PHP_EOL;
-        echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
 
-
-        echo 'Success!' . PHP_EOL;
-    });
+            echo 'Success!' . PHP_EOL;
+        });
+        $stats->success += 1;
+    }catch(\Exception $e) {
+        echo sprintf(
+            'test %s failed with message ' . PHP_EOL,
+            $filename,
+            $e->getMessage()
+        );
+        
+        $stats->error += 1;
+    }
 }
+echo 'Complete!' . PHP_EOL;
+print_r($stats);

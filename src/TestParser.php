@@ -102,15 +102,15 @@ class TestParser
             ['request', 'response']
         );
 
-        echo 'validator:' . PHP_EOL;
-        echo $validator->toJSON(true);
-        echo PHP_EOL;
+        //echo 'validator:' . PHP_EOL;
+        //echo $validator->toJSON(true);
+        //echo PHP_EOL;
 
         $parsed = $validator->parse($object);
-        echo 'parsed:' . PHP_EOL;
-        var_dump($parsed);
+        //echo 'parsed:' . PHP_EOL;
+        //var_dump($parsed);
 
-        $jsonapiBaseResource = new Object(
+        /*$jsonapiBaseResource = new Object(
             [
                 'data' => new Object(
                     [
@@ -129,7 +129,7 @@ class TestParser
                 )
             ],
             ['data']
-        );
+        );*/
 
         //create a testphase object with parsed
         $test = (new Testphase(
@@ -140,14 +140,11 @@ class TestParser
             true //json
         ))
         ->expectStatusCode($parsed->response->statusCode)
-        ->expectJSON()
-        ->expectObject($jsonapiBaseResource);
+        ->expectJSON();
+        //->expectObject($jsonapiBaseResource);
+
         //add rules
-        //
         foreach ($parsed->response->ruleObjects as $key => $ruleObject) {
-            var_dump($key);
-            var_dump($ruleObject);
-            var_dump(Object::createFromObject($ruleObject));
             $test->expectObject(Object::createFromObject($ruleObject));
         }
 

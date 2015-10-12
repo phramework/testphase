@@ -1,6 +1,6 @@
 {
   "request": {
-    "url": "account",
+    "url": "xyz",
     "method": "GET",
     "headers": [
       "Accept: application/vnd.api+json",
@@ -10,23 +10,9 @@
     ]
   },
   "response": {
-    "statusCode": 200,
+    "statusCode": 404,
     "headers": [
       "Content-Type: application/vnd.api+json;charset=utf-8"
-    ],
-    "ruleObjects": [{
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "enum",
-              "values": ["user"]
-            }
-          }
-        }
-      }
-    }]
+    ]
   }
 }
