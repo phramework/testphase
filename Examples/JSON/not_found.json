@@ -1,5 +1,6 @@
 {
   "request": {
+    "order": "a9999",
     "url": "xyz",
     "method": "GET",
     "headers": [
@@ -11,8 +12,8 @@
   },
   "response": {
     "statusCode": 404,
-    "headers": [
-      "Content-Type: application/vnd.api+json;charset=utf-8"
-    ]
+    "headers": {
+      "Content-Type": "application/vnd.api+json;charset=utf-8"
+    }
   }
 }

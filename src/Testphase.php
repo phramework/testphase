@@ -281,12 +281,16 @@ class Testphase
 
     /**
      * Add expected response header
-     * @param  array[] $ruleHeaders
+     * @param  array[]|object $ruleHeaders
      * @return Testphase Return's $this object
      * @throws Exception When $ruleHeaders is not an array
      */
     public function expectResponseHeader($ruleHeaders)
     {
+        if (is_object($ruleHeaders)) {
+            $ruleHeaders = (array)$ruleHeaders;
+        }
+
         if (!is_array($ruleHeaders)) {
             throw new \Exception(
                 'Expecting array for method expectResponseHeader'
