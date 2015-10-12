@@ -81,6 +81,8 @@ class TestParser
                 'method' => (new Enum(Phramework::$methodWhitelist, true))
                     ->setDefault(Phramework::METHOD_GET),
                 'headers' => (new ArrayValidator())
+                    ->setDefault([]),
+                'body' => (new Object())
                     ->setDefault([])
             ],
             ['url']
@@ -101,6 +103,7 @@ class TestParser
             [
                 'order' => (new Integer(-99999999, 99999999))
                     ->setDefault(0),
+                'description' => new String(),
                 'request' => $validatorRequest,
                 'response' => $validatorResponse
             ],
@@ -115,7 +118,11 @@ class TestParser
             $contentsParsed->request->url,
             $contentsParsed->request->method,
             $contentsParsed->request->headers,
-            null,
+            (
+                isset($contentsParsed->request->body)
+                ? json_encode($contentsParsed->request->body)
+                : null
+            ),
             true //json
         ))
         ->expectStatusCode($contentsParsed->response->statusCode)

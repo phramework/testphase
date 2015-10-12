@@ -55,24 +55,24 @@ $specs->add('h|help', 'Show help')->defaultValue(false);
 $specs->add('no-colors', 'No colors')->defaultValue(false);
 
 $parser = new OptionParser($specs);
-$result = $parser->parse($argv);
-//var_dump($result);
+$arguments = $parser->parse($argv);
+//var_dump($arguments);
 
-if ($result['help']->value) {
+if ($arguments['help']->value) {
     echo 'Help:' . PHP_EOL;
     $printer = new ConsoleOptionPrinter;
     echo $printer->render($specs);
     return 0;
-} elseif ($result['debug']->value) {
+} elseif ($arguments['debug']->value) {
     echo 'Enabled options: ' . PHP_EOL;
 
-    foreach ($result as $key => $spec) {
+    foreach ($arguments as $key => $spec) {
         echo $spec . PHP_EOL;
     }
 }
 
-$dir = $result['dir']->value;
-$bootstrap = $result['bootstrap']->value;
+$dir = $arguments['dir']->value;
+$bootstrap = $arguments['bootstrap']->value;
 //echo 'dir :'       . $dir . PHP_EOL;
 //echo 'bootstrap: ' . $bootstrap . PHP_EOL;
 
@@ -115,8 +115,8 @@ foreach ($files as $filename) {
             $responseBody,
             $responseBodyObject
         ) {
-            global $result;
-            if ($result['debug']->value) {
+            global $arguments;
+            if ($arguments['debug']->value) {
                 echo 'Response Status Code:' . PHP_EOL;
                 echo $responseStatusCode . PHP_EOL;
                 echo 'Response Headers:' . PHP_EOL;
@@ -131,10 +131,16 @@ foreach ($files as $filename) {
         echo '.';
     } catch (\Exception $e) {
         //@todo if verbose show more details (trace)
+        $message = $e->getMessage();
+
+        if ($arguments['debug']) {
+            $message .= PHP_EOL . $p->getTest()->getResponseBody();
+        }
+
         $stats->errors[] = sprintf(
             'Test "%s" failed with message %s' . PHP_EOL,
             $filename,
-            $e->getMessage()
+            $message
         );
 
         //Echo unsuccessful char
@@ -165,8 +171,8 @@ function output($text, $color)
     ];
 
     $c = array_key_exists($color, $colors) ? $colors[$color] : $colors['black'];
-    global $result;
-    if ($result['debug']->value) {
+    global $arguments;
+    if ($arguments['no-colors']->value) {
         echo $text;
     } else {
         echo "\033[". $c . "m" . $text . "\033[0m";

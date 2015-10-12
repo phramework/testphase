@@ -1,13 +1,24 @@
 {
+  "order": 5,
+  "description": "Create new account (throws already exists)",
   "request": {
     "url": "account",
-    "method": "GET",
+    "method": "POST",
     "headers": [
       "Accept: application/vnd.api+json",
-      "Content-Type: application/vnd.api+json",
-      "Authorization: Basic bm9ocG9uZXhAZ21haWwuY29tOjEyMzQ1Njc4eFg=",
-      "$requestHeaderAuthorization"
-    ]
+      "Content-Type: application/vnd.api+json"
+    ],
+    "body": {
+      "data": {
+        "type": "user",
+        "attributes": {
+          "username": "nohponex_cli",
+          "email": "nohponex_cli@gmail.com",
+          "name": "Xenophon Sp",
+          "password": "nohponex"
+        }
+      }
+    }
   },
   "response": {
     "statusCode": 200,
@@ -23,6 +34,9 @@
             "type": {
               "type": "enum",
               "values": ["user"]
+            },
+            "id": {
+              "type": "unsignedinteger"
             }
           }
         }

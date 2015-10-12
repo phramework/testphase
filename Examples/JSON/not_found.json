@@ -5,7 +5,7 @@
     "method": "GET",
     "headers": [
       "Accept: application/vnd.api+json",
-      "Content-Type: application/vnd.api+json;charset=utf-8",
+      "Content-Type: application/vnd.api+json",
       "Authorization: Basic bm9ocG9uZXhAZ21haWwuY29tOjEyMzQ1Njc4eFg=",
       "$requestHeaderAuthorization"
     ]

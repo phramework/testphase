@@ -181,7 +181,7 @@ class Testphase
         $binary = ($flags & self::REQUEST_BINARY) != 0;
 
         //If the request paramters form encoded
-        $form_encoded = !(($flags & self::REQUEST_NOT_URL_ENCODED) != 0);
+        $form_encoded = FALSE; //!(($flags & self::REQUEST_NOT_URL_ENCODED) != 0);
 
         //Initialize curl
         $curl = curl_init();
@@ -206,28 +206,28 @@ class Testphase
 
         //Switch on HTTP Request method
         switch ($this->method) {
-            case Phramework::METHOD_GET: //On METHOD_GET
-            case Phramework::METHOD_HEAD: //On METHOD_HEAD
+            case Phramework::METHOD_GET: //On GET
+            case Phramework::METHOD_HEAD: //On HEAD
                 break;
-            case Phramework::METHOD_POST: //On METHOD_POST
+            case Phramework::METHOD_POST: //On POST
                 curl_setopt($curl, CURLOPT_POST, true);
-
-                if ($this->$requestBody && $form_encoded) { //Encode fields if required ( URL ENCODED )
+                
+                if (FALSE && $this->requestBody && $form_encoded) { //Encode fields if required ( URL ENCODED )
                     curl_setopt(
                         $curl,
                         CURLOPT_POSTFIELDS,
-                        http_build_query($this->$requestBody)
+                        http_build_query($this->requestBody)
                     );
-                } elseif ($this->$requestBody) {
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $this->$requestBody);
+                } elseif ($this->requestBody) {
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestBody);
                 }
                 break;
-            case Phramework::METHOD_PUT: //On METHOD_PUT
-            case Phramework::METHOD_PATCH: //On METHOD_PATCH
+            case Phramework::METHOD_PUT: //On PUT
+            case Phramework::METHOD_PATCH: //On PATCH
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->method);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->$requestBody);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestBody);
                 break;
-            case Phramework::METHOD_DELETE: //On METHOD_DELETE
+            case Phramework::METHOD_DELETE: //On DELETE
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, Phramework::METHOD_DELETE);
                 break;
             default:
@@ -397,4 +397,35 @@ class Testphase
     {
         return static::$base;
     }
+
+    /**
+     * Get the value of Response Status Code
+     *
+     * @return mixed
+     */
+    public function getResponseStatusCode()
+    {
+        return $this->responseStatusCode;
+    }
+
+    /**
+     * Get the value of Response Headers
+     *
+     * @return mixed
+     */
+    public function getResponseHeaders()
+    {
+        return $this->responseHeaders;
+    }
+
+    /**
+     * Get the value of Response Body
+     *
+     * @return mixed
+     */
+    public function getResponseBody()
+    {
+        return $this->responseBody;
+    }
+
 }
