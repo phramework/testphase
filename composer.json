@@ -9,9 +9,6 @@
   }],
   "repositories": [{
     "type": "vcs",
-    "url": "nohponex@localhost:/var/www/Phramework"
-  }, {
-    "type": "vcs",
     "url": "git@gitlab.mathlogic.eu:Phramework/Phramework.git"
   }, {
     "type": "vcs",
