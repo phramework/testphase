@@ -97,8 +97,6 @@ $files = array_map(
     $files
 );
 
-Testphase::setBase('http://localhost/ostomate/api/');
-
 //aggregate statistics
 $stats = (object)[
     'tests' => 0,
