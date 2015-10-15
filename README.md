@@ -8,6 +8,13 @@ composer update
 npm update
 ```
 
+## Usage
+```
+./vendon/bin/testphase help -b ./bootstrap.php -d ./tests-directory/
+```
+Inside your `bootstrap.php` file you should use the `Testphase::setBase` method
+to set the base url of your api. For example `Testphase::setBase('http://localhost/myapp/api');`
+
 ## Test and lint code
 ```bash
 composer lint

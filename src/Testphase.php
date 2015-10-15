@@ -31,7 +31,7 @@ class Testphase
      * Base API url
      * @var string
      */
-    private static $base = 'http://localhost/ostomate/api/';
+    private static $base = '';
 
     /**
      * Request url, not including the base part
@@ -211,7 +211,7 @@ class Testphase
                 break;
             case Phramework::METHOD_POST: //On POST
                 curl_setopt($curl, CURLOPT_POST, true);
-                
+
                 if (FALSE && $this->requestBody && $form_encoded) { //Encode fields if required ( URL ENCODED )
                     curl_setopt(
                         $curl,
