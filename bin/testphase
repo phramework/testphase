@@ -73,6 +73,9 @@ if ($arguments['help']->value) {
 
 $dir = $arguments['dir']->value;
 $bootstrap = $arguments['bootstrap']->value;
+
+require $bootstrap;
+
 //echo 'dir :'       . $dir . PHP_EOL;
 //echo 'bootstrap: ' . $bootstrap . PHP_EOL;
 
