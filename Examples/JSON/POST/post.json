@@ -1,6 +1,8 @@
 {
-  "order": 5,
-  "description": "Create new account (throws already exists)",
+  "meta": {
+    "order": 5,
+    "description": "Create new account (throws already exists)"
+  },
   "request": {
     "url": "account",
     "method": "POST",
@@ -21,7 +23,7 @@
     }
   },
   "response": {
-    "statusCode": 200,
+    "statusCode": 400,
     "headers": {
       "Content-Type": "application/vnd.api+json;charset=utf-8"
     },

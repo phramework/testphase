@@ -54,7 +54,7 @@
     "doc": [
       "./vendor/bin/apigen generate -s ./src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"phramework/testphase\""
     ],
-    "run": "php ./bin/testphase"
+    "run": "php ./bin/testphase -d ./Examples/JSON -b ./Examples/JSON/bootstrap.php"
   },
   "bin": [
     "bin/testphase"

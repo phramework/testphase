@@ -1,4 +1,7 @@
 {
+  "meta": {
+    "ignore": true
+  },
   "request": {
     "url": "xyz",
     "method": "GET",

@@ -22,6 +22,7 @@ use \Phramework\Validate\Integer;
 use \Phramework\Validate\UnsignedInteger;
 use \Phramework\Validate\ArrayValidator;
 use \Phramework\Validate\Enum;
+use \Phramework\Validate\Boolean;
 use \Phramework\Validate\String;
 use \Phramework\Validate\URL;
 
@@ -46,6 +47,22 @@ class TestParser
     {
         return $this->test;
     }
+
+    /**
+     * Parsed test's meta object
+     * @var object
+     */
+    protected $meta;
+
+    /**
+     * Get parsed test's meta object
+     * @return object
+     */
+    public function getMeta()
+    {
+        return $this->meta;
+    }
+
 
     /**
      * @param String $filename
@@ -101,9 +118,13 @@ class TestParser
         //Setup validator for parsed test
         $validator = new Object(
             [
-                'order' => (new Integer(-99999999, 99999999))
-                    ->setDefault(0),
-                'description' => new String(),
+                'meta' => (new Object([
+                    'order' => (new Integer(-99999999, 99999999))
+                        ->setDefault(0),
+                    'ignore' => (new Boolean())
+                        ->setDefault(false),
+                    'description' => new String()
+                ])),
                 'request' => $validatorRequest,
                 'response' => $validatorResponse
             ],
@@ -133,6 +154,12 @@ class TestParser
         foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
             $test->expectObject(Object::createFromObject($ruleObject));
         }
+
+        $this->meta = (
+            isset($contentsParsed->meta)
+            ? $contentsParsed->meta
+            : new \stdClass()
+        );
 
         $this->test = $test;
     }
