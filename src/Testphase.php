@@ -134,7 +134,7 @@ class Testphase
 
         //Add extra rules ??
         if ($this->ruleJSON) {
-            $responseBodyObject = json_decode($responseBody, true);
+            $responseBodyObject = json_decode($responseBody);
 
             foreach ($this->ruleObjects as $ruleObject) {
                 $ruleObject->parse($responseBodyObject);
@@ -242,6 +242,7 @@ class Testphase
         $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $responseHeadersTemp = str_replace("\r", '', substr($response, 0, $headerSize));
         $responseHeaders = [];
+
         foreach (explode("\n", $responseHeadersTemp) as $i => $line) {
             if ($i !== 0 && !empty($line)) {
                 list($key, $value) = explode(': ', $line);
