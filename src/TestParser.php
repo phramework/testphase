@@ -63,6 +63,15 @@ class TestParser
         return $this->meta;
     }
 
+    protected $filename;
+
+    /**
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->$filename;
+    }
 
     /**
      * @param String $filename
@@ -70,6 +79,8 @@ class TestParser
      */
     public function __construct($filename)
     {
+        $this->filename = $filename;
+
         if (!file_exists($filename)) {
             throw new \Exception(sprintf(
                 'File %s doesn\'t exist',
@@ -158,7 +169,7 @@ class TestParser
         $this->meta = (
             isset($contentsParsed->meta)
             ? $contentsParsed->meta
-            : new \stdClass()
+            : (object)['order' => 0]
         );
 
         $this->test = $test;

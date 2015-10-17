@@ -99,28 +99,43 @@ $files = array_map(
     },
     $files
 );
+/**
+ * @var TestParser
+ */
+$tests = [];
 
-//aggregate statistics
+foreach ($files as $filename) {
+    $testParser = new TestParser($filename);
+    $tests[] = $testParser;
+}
+
+function cmp($a, $b)
+{
+    return ($a->getMeta()->order < $b->getMeta()->order ? -1 : 1);
+}
+
+//Sort tests by order
+uasort($tests, 'cmp');
+
+//Statistics object
 $stats = (object)[
-    'tests' => 0,
+    'tests' => count($tests),
     'success' => 0,
     'error' => 0,
     'ignore' => 0,
     'errors' => []
 ];
 
-foreach ($files as $filename) {
-    $stats->tests += 1;
-
+//Execute tests
+foreach ($tests as $test) {
     //Check if subdir argument is set
     if (isset($arguments['subdir']) && $arguments['subdir']->value !== null) {
         //If so check if file name passes the given pattern
-        
+
         $pattern = '/' . $arguments['subdir']->value . '/';
-        $t = $filename;
 
         $t = trim(
-            str_replace($arguments['dir']->value, '', $t),
+            str_replace($arguments['dir']->value, '', $test->getFilename()),
             '/'
         );
 
@@ -131,10 +146,10 @@ foreach ($files as $filename) {
         }
     }
 
-    $p = new TestParser($filename);
+
     //todo sort files by order
 
-    $meta = $p->getMeta();
+    $meta = $test->getMeta();
 
     if (isset($meta->ignore) && $meta->ignore) {
         $stats->ignore +=1;
@@ -143,7 +158,7 @@ foreach ($files as $filename) {
     }
 
     try {
-        $ok = $p->getTest()->run(function (
+        $ok = $test->getTest()->run(function (
             $responseStatusCode,
             $responseHeaders,
             $responseBody,

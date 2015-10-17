@@ -181,7 +181,7 @@ class Testphase
         $binary = ($flags & self::REQUEST_BINARY) != 0;
 
         //If the request paramters form encoded
-        $form_encoded = FALSE; //!(($flags & self::REQUEST_NOT_URL_ENCODED) != 0);
+        $form_encoded = false; //!(($flags & self::REQUEST_NOT_URL_ENCODED) != 0);
 
         //Initialize curl
         $curl = curl_init();
@@ -212,7 +212,7 @@ class Testphase
             case Phramework::METHOD_POST: //On POST
                 curl_setopt($curl, CURLOPT_POST, true);
 
-                if (FALSE && $this->requestBody && $form_encoded) { //Encode fields if required ( URL ENCODED )
+                if (false && $this->requestBody && $form_encoded) { //Encode fields if required ( URL ENCODED )
                     curl_setopt(
                         $curl,
                         CURLOPT_POSTFIELDS,
@@ -428,5 +428,4 @@ class Testphase
     {
         return $this->responseBody;
     }
-
 }
