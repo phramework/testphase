@@ -44,11 +44,14 @@ $cwd = getcwd();
 
 $specs = new OptionCollection;
 $specs->add('d|dir:', 'Tests directory path')
+    ->isa('String');
+
+$specs->add('s|subdir?', 'Optional, subdirectory pattern')
     ->isa('String')
     ->defaultValue(null);
-$specs->add('b|bootstrap:', 'Optional, bootstrap file path')
-    ->isa('File')
-    ->defaultValue(null);
+
+$specs->add('b|bootstrap:', 'Bootstrap file path')
+    ->isa('File');
 
 $specs->add('debug', 'debug message.')->defaultValue(false);
 $specs->add('h|help', 'Show help')->defaultValue(false);
@@ -107,9 +110,30 @@ $stats = (object)[
 ];
 
 foreach ($files as $filename) {
+    $stats->tests += 1;
+
+    //Check if subdir argument is set
+    if (isset($arguments['subdir']) && $arguments['subdir']->value !== null) {
+        //If so check if file name passes the given pattern
+        
+        $pattern = '/' . $arguments['subdir']->value . '/';
+        $t = $filename;
+
+        $t = trim(
+            str_replace($arguments['dir']->value, '', $t),
+            '/'
+        );
+
+        if (!preg_match($pattern, $t)) {
+            $stats->ignore +=1;
+            echo 'I';
+            continue;
+        }
+    }
+
     $p = new TestParser($filename);
     //todo sort files by order
-    $stats->tests += 1;
+
     $meta = $p->getMeta();
 
     if (isset($meta->ignore) && $meta->ignore) {
