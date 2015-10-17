@@ -147,19 +147,16 @@ foreach ($tests as $test) {
         }
 
         if (!$match) {
-            $stats->ignore +=1;
+            $stats->ignore += 1;
             echo 'I';
             continue;
         }
     }
 
-
-    //todo sort files by order
-
     $meta = $test->getMeta();
 
     if (isset($meta->ignore) && $meta->ignore) {
-        $stats->ignore +=1;
+        $stats->ignore += 1;
         echo 'I';
         continue;
     }
