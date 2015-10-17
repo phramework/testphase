@@ -33,6 +33,39 @@ use \Phramework\Validate\URL;
 class TestParser
 {
 
+    protected static $global;
+
+    public static function addGlobal($key, $value)
+    {
+        if (!self::$global) {
+            self::$global = new \stdClass();
+        }
+
+        self::$global->{$key} = $value;
+        return static::class;
+    }
+
+    public static function checkGlobalSet($key)
+    {
+        if (!property_exists(static::$global, $key)) {
+            throw new \Exception(sprintf(
+                'Key "%s" not found in TestParser globals',
+                $key
+            ));
+        }
+        return static::class;
+    }
+
+    public static function getGlobal($key = null)
+    {
+        if ($key) {
+            static::checkGlobalSet($key);
+            return static::$global->{$key};
+        }
+
+        return static::$global;
+    }
+
     /**
      * Parsed test
      * @var Testphase
@@ -145,6 +178,9 @@ class TestParser
         //Parse test file, using validator's rules
         $contentsParsed = $validator->parse($contentsObject);
 
+        //Recursive search whole object
+        $contentsParsed = $this->searchAndReplace($contentsParsed);
+
         //Create a Testphase object using parsed rule
         $test = (new Testphase(
             $contentsParsed->request->url,
@@ -174,4 +210,40 @@ class TestParser
 
         $this->test = $test;
     }
+
+    private function searchAndReplace($object)
+    {
+        foreach ($object as $key => &$value) {
+            if (is_array($value) || is_object($value)) {
+                $value = $this->searchAndReplace($value);
+            }
+
+            if (is_string($value)) {
+                $matches = [];
+                //Complete replace (key: "$globalKey$")
+                if (!!preg_match('/^\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\$$/', $value, $matches)) {
+                    $globalKey = $matches[1];
+
+                    //replace
+                    $value = static::getGlobal($globalKey);
+                } elseif (!!preg_match_all('/\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})/', $value, $matches)) {
+
+                    //Foreach variable replace
+                    foreach($matches[1] as $globalKey) {
+                        $value = str_replace(
+                            '$' . $globalKey,
+                            static::getGlobal($globalKey),
+                            $value
+                        );
+                    }
+                }
+            }
+        }
+        return $object;
+    }
 }
+
+TestParser::addGlobal('randInteger', rand(1, 100000));
+TestParser::addGlobal('randString', \Phramework\Models\Util::readableRandomString());
+TestParser::addGlobal('randHash', sha1(\Phramework\Models\Util::readableRandomString() . rand()));
+TestParser::addGlobal('randBoolean', rand(1, 100000) % 2 ? true : false);

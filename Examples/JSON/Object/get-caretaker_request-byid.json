@@ -3,12 +3,12 @@
     "order": 1
   },
   "request": {
-    "url": "caretaker_request/8",
+    "url": "caretaker_request/$caretaker_request_id",
     "method": "GET",
     "headers": [
-      "Accept: application/vnd.api+json",
-      "Content-Type: application/vnd.api+json",
-      "Authorization: Basic bm9ocG9uZXhAZ21haWwuY29tOjEyMzQ1Njc4eFg="
+      "$headerRequestAccept$",
+      "$headerRequestContentType$",
+      "$headerRequestAuthorization"
     ]
   },
   "response": {
