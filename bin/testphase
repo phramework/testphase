@@ -192,7 +192,7 @@ foreach ($tests as $test) {
 
         $stats->errors[] = sprintf(
             'Test "%s" failed with message %s' . PHP_EOL,
-            $filename,
+            $test->getFilename(),
             $message
         );
 
