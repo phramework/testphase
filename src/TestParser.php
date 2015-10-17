@@ -199,7 +199,7 @@ class TestParser
 
         //Add rule objects to validate body
         foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
-            $test->expectObject(Object::createFromObject($ruleObject));
+            $test->expectObject(Object::createFromObject(json_decode($ruleObject)));
         }
 
         $this->meta = (
@@ -221,17 +221,17 @@ class TestParser
             if (is_string($value)) {
                 $matches = [];
                 //Complete replace (key: "$globalKey$")
-                if (!!preg_match('/^\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\$$/', $value, $matches)) {
+                if (!!preg_match('/^\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\$$/', $value, $matches)) {
                     $globalKey = $matches[1];
 
                     //replace
                     $value = static::getGlobal($globalKey);
-                } elseif (!!preg_match_all('/\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})/', $value, $matches)) {
+                } elseif (!!preg_match_all('/\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})/', $value, $matches)) {
 
                     //Foreach variable replace
                     foreach($matches[1] as $globalKey) {
                         $value = str_replace(
-                            '$' . $globalKey,
+                            '$$' . $globalKey,
                             static::getGlobal($globalKey),
                             $value
                         );
@@ -240,6 +240,65 @@ class TestParser
             }
         }
         return $object;
+    }
+
+    public static function getResponseBodyJsonapiResource($ofType = null)
+    {
+        return '{
+            "type": "object",
+            "properties": {
+                "data" : {
+                    "type": "object",
+                    "properties" : {
+                        "type" : {
+                            "type" : "string"
+                        },
+                        "id" : {
+                            "type" : "string"
+                        }
+                    },
+                    "required" : ["type", "id"]
+                },
+                "links" : {
+                    "type": "object",
+                    "properties":{
+                        "self": {
+                            "type": "url"
+                        },
+                        "related": {
+                            "type": "url"
+                        }
+                    },
+                    "required": ["self"]
+                }
+            },
+            "required": ["data", "links"]
+        }';
+    }
+
+    public static function getResponseBodyJsonapiCollection()
+    {
+        return '{
+            "type": "object",
+            "properties": {
+                "data" : {
+                    "type": "array"
+                },
+                "links" : {
+                    "type": "object",
+                    "properties":{
+                        "self": {
+                            "type": "url"
+                        },
+                        "related": {
+                            "type": "url"
+                        }
+                    },
+                    "required": ["self"]
+                }
+            },
+            "required": ["data", "links"]
+        }';
     }
 }
 

@@ -3,12 +3,12 @@
     "order": 1
   },
   "request": {
-    "url": "caretaker_request/$caretaker_request_id",
+    "url": "caretaker_request/$$caretaker_request_id",
     "method": "GET",
     "headers": [
-      "$headerRequestAccept$",
-      "$headerRequestContentType$",
-      "$headerRequestAuthorization"
+      "$$headerRequestAccept$",
+      "$$headerRequestContentType$",
+      "$$headerRequestAuthorization$"
     ]
   },
   "response": {

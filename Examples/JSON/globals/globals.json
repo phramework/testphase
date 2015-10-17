@@ -1,21 +1,22 @@
 {
   "meta": {
     "order": -10,
-    "description": "string $randString and integer $randInteger"
+    "description": "string $$randString and integer $$randInteger"
   },
   "request": {
-    "url": "account/?filter=$randString",
+    "url": "account/?filter=$$randString",
     "method": "GET",
     "headers": [
-      "$headerRequestAccept$",
-      "$headerRequestContentType$",
-      "$headerRequestAuthorization$"
+      "$$headerRequestAccept$",
+      "$$headerRequestContentType$",
+      "$$headerRequestAuthorization$"
     ]
   },
   "response": {
     "statusCode": 200,
     "headers": {
-      "Content-Type": "$headerResponseContentType$"
-    }
+      "Content-Type": "$$headerResponseContentType$"
+    },
+    "ruleObjects": ["$$responseBodyJsonapiResource$"]
   }
 }

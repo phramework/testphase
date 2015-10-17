@@ -1,6 +1,11 @@
 <?php
 use \Phramework\Testphase\Testphase;
 use \Phramework\Testphase\TestParser;
+use \Phramework\Validate\Object;
+use \Phramework\Validate\String;
+use \Phramework\Validate\UnsignedInteger;
+use \Phramework\Validate\ArrayValidator;
+use \Phramework\Validate\URL;
 
 Testphase::setBase('http://localhost/ostomate/api/');
 
@@ -26,25 +31,12 @@ TestParser::addGlobal(
     8
 );
 
+TestParser::addGlobal(
+    'responseBodyJsonapiResource',
+    TestParser::getResponseBodyJsonapiResource()
+);
 
-
-/*$jsonapiBaseResource = new Object(
-    [
-        'data' => new Object(
-            [
-                'type' => new String(),
-                'id'  => new UnsignedInteger(),
-                'attributes'  => new Object()
-            ],
-            ['type', 'id']
-        ),
-        'links' => new Object(
-            [
-                'self' => new URL(),
-                'related' => new URL()
-            ],
-            ['self']
-        )
-    ],
-    ['data']
-);*/
+TestParser::addGlobal(
+    'responseBodyJsonapiCollection',
+    TestParser::getResponseBodyJsonapiCollection()
+);
