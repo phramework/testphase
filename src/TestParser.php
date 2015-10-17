@@ -70,7 +70,7 @@ class TestParser
      */
     public function getFilename()
     {
-        return $this->$filename;
+        return $this->filename;
     }
 
     /**

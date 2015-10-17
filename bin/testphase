@@ -46,7 +46,7 @@ $specs = new OptionCollection;
 $specs->add('d|dir:', 'Tests directory path')
     ->isa('String');
 
-$specs->add('s|subdir?', 'Optional, subdirectory pattern')
+$specs->add('s|subdir+', 'Optional, subdirectory pattern')
     ->isa('String')
     ->defaultValue(null);
 
@@ -59,7 +59,6 @@ $specs->add('no-colors', 'No colors')->defaultValue(false);
 
 $parser = new OptionParser($specs);
 $arguments = $parser->parse($argv);
-//var_dump($arguments);
 
 if ($arguments['help']->value) {
     echo 'Help:' . PHP_EOL;
@@ -78,9 +77,6 @@ $dir = $arguments['dir']->value;
 $bootstrap = $arguments['bootstrap']->value;
 
 require $bootstrap;
-
-//echo 'dir :'       . $dir . PHP_EOL;
-//echo 'bootstrap: ' . $bootstrap . PHP_EOL;
 
 //Get all .json files in directory
 $files = Util::directoryToArray(
@@ -131,15 +127,26 @@ foreach ($tests as $test) {
     //Check if subdir argument is set
     if (isset($arguments['subdir']) && $arguments['subdir']->value !== null) {
         //If so check if file name passes the given pattern
-
-        $pattern = '/' . $arguments['subdir']->value . '/';
-
         $t = trim(
-            str_replace($arguments['dir']->value, '', $test->getFilename()),
+            str_replace(
+                $arguments['dir']->value,
+                '',
+                $test->getFilename()
+            ),
             '/'
         );
 
-        if (!preg_match($pattern, $t)) {
+        $match = false;
+
+        foreach ($arguments['subdir']->value as $pattern) {
+            $pattern = '/' . $pattern . '/';
+            if (!!preg_match($pattern, $t)) {
+                $match = $match || true;
+                break;
+            }
+        }
+
+        if (!$match) {
             $stats->ignore +=1;
             echo 'I';
             continue;
