@@ -139,7 +139,7 @@ foreach ($tests as $test) {
         $match = false;
 
         foreach ($arguments['subdir']->value as $pattern) {
-            $pattern = '/' . $pattern . '/';
+            $pattern = '@' . $pattern . '@';
             if (!!preg_match($pattern, $t)) {
                 $match = $match || true;
                 break;
@@ -190,7 +190,7 @@ foreach ($tests as $test) {
         $message = $e->getMessage();
 
         if ($arguments['debug']) {
-            $message .= PHP_EOL . $p->getTest()->getResponseBody();
+            $message .= PHP_EOL . $test->getTest()->getResponseBody();
         }
 
         $stats->errors[] = sprintf(
