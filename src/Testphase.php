@@ -102,7 +102,7 @@ class Testphase
     {
         if ($responseStatusCode != $this->ruleStatusCode) {
             throw new \Exception(sprintf(
-                'Expected status code %s got %s',
+                'Expected status code "%s" got "%s"',
                 $this->ruleStatusCode,
                 $responseStatusCode
             ));
@@ -111,14 +111,14 @@ class Testphase
         foreach ($this->ruleHeaders as $headerKey => $headerValue) {
             if (!isset($responseHeaders[$headerKey])) {
                 throw new \Exception(sprintf(
-                    'Expected header %s is not set',
+                    'Expected header "%s" is not set',
                     $headerKey
                 ));
             }
 
             if ($headerValue != $responseHeaders[$headerKey]) {
                 throw new \Exception(sprintf(
-                    'Expected header value %s for header %s got %s',
+                    'Expected header value "%s" for header "%s" got "%s"',
                     $headerValue,
                     $headerKey,
                     $responseHeaders[$headerKey]
