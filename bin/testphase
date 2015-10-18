@@ -93,7 +93,7 @@ $files = array_map(
         false
     )
 );
-    
+
 /**
  * @var TestParser
  */
@@ -126,7 +126,7 @@ foreach ($tests as $test) {
     //Check if subdir argument is set
     if (isset($arguments['subdir']) && $arguments['subdir']->value !== null) {
         //If so check if file name passes the given pattern
-        
+
         //Remove base dir from filename
         $cleanFilename = trim(
             str_replace(
@@ -138,7 +138,7 @@ foreach ($tests as $test) {
         );
 
         $match = false;
-        
+
         //Check if any of the patterns ar matching
         foreach ($arguments['subdir']->value as $pattern) {
             $pattern = '@' . $pattern . '@';
@@ -162,9 +162,9 @@ foreach ($tests as $test) {
         echo 'I';
         continue;
     }
-    
+
     $test->createTest();
-    
+
     try {
         $ok = $test->getTest()->run(function (
             $responseStatusCode,
@@ -174,22 +174,22 @@ foreach ($tests as $test) {
         ) {
             global $arguments;
             global $test;
-            
+
             $export = $test->getExport();
-            
+
             //Fetch all teest exports and add them as globals
             foreach ($export as $key => $value) {
                 $path = explode('.', $value);
-                
+
                 $pathValue = $responseBodyObject;
-                
+
                 foreach ($path as $p) {
                     $pathValue = $pathValue->{$p};
                 }
-                
+
                 TestParser::addGlobal($key, $pathValue);
             }
-            
+
             if ($arguments['debug']->value) {
                 echo 'Response Status Code:' . PHP_EOL;
                 echo $responseStatusCode . PHP_EOL;
@@ -199,8 +199,8 @@ foreach ($tests as $test) {
                 echo 'Response Body:' . PHP_EOL;
                 echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
             }
-        });        
-        
+        });
+
         //Echo successful char
         echo '.';
         $stats->success += 1;
@@ -214,7 +214,7 @@ foreach ($tests as $test) {
 
         $stats->errors[] = sprintf(
             colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
-            $filename,
+            $test->getFilename(),
             $message
         );
 
@@ -248,7 +248,7 @@ function colored($text, $color)
     ];
 
     $c = array_key_exists($color, $colors) ? $colors[$color] : $colors['black'];
-    
+
     global $arguments;
     if ($arguments['no-colors']->value) {
         return $text;
