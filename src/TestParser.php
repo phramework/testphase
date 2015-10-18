@@ -32,9 +32,19 @@ use \Phramework\Validate\URL;
  */
 class TestParser
 {
-
+    /**
+     *
+     * @var object
+     */
+    protected $export;
+    
+    public function getExport()
+    {
+        return $this->export;
+    }
+    
     protected static $global;
-
+    
     public static function addGlobal($key, $value)
     {
         if (!self::$global) {
@@ -70,7 +80,7 @@ class TestParser
      * Parsed test
      * @var Testphase
      */
-    protected $test;
+    protected $test = null;
 
     /**
      * Get parsed test
@@ -78,9 +88,14 @@ class TestParser
      */
     public function getTest()
     {
+        if ($this->test === null) {
+            throw new \Exception('Test is not created');
+        }
         return $this->test;
     }
-
+    
+    protected $contentsParsed;
+    
     /**
      * Parsed test's meta object
      * @var object
@@ -107,8 +122,12 @@ class TestParser
     }
 
     /**
+     * Parse test informations from a json file
+     * this method will parse the file and prepare the meta object
+     * use createTest to complete creation of test
      * @param String $filename
      * @todo Set $validatorRequest header's subtype
+     * 
      */
     public function __construct($filename)
     {
@@ -155,7 +174,8 @@ class TestParser
                 'headers' => (new Object()),
                 'ruleObjects' => (new ArrayValidator())
                     ->setDefault([]),
-                'export' => new Object()
+                'export' => (new Object())
+                    ->setDefault((object)[])
             ],
             ['statusCode']
         );
@@ -177,11 +197,20 @@ class TestParser
         );
 
         //Parse test file, using validator's rules
-        $contentsParsed = $validator->parse($contentsObject);
-
+        $this->contentsParsed = $contentsParsed = $validator->parse($contentsObject);
+        
+        $this->meta = (
+            isset($contentsParsed->meta)
+            ? $contentsParsed->meta
+            : (object)['order' => 0]
+        );
+    }
+    
+    public function createTest()
+    {
         //Recursive search whole object
-        $contentsParsed = $this->searchAndReplace($contentsParsed);
-
+        $contentsParsed = $this->searchAndReplace($this->contentsParsed);
+        
         //Create a Testphase object using parsed rule
         $test = (new Testphase(
             $contentsParsed->request->url,
@@ -200,16 +229,15 @@ class TestParser
 
         //Add rule objects to validate body
         foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
-            $test->expectObject(Object::createFromObject(json_decode($ruleObject)));
+            if (is_string($ruleObject)) {
+                $ruleObject = json_decode($ruleObject);
+            }
+            
+            $test->expectObject(Object::createFromObject($ruleObject));
         }
-
-        $this->meta = (
-            isset($contentsParsed->meta)
-            ? $contentsParsed->meta
-            : (object)['order' => 0]
-        );
-
+        
         $this->test = $test;
+        $this->export = $contentsParsed->response->export;
     }
 
     private function searchAndReplace($object)
@@ -307,6 +335,27 @@ class TestParser
                 }
             },
             "required": ["data", "links"]
+        }';
+    }
+    
+    public static function getResponseBodyJsonapiException()
+    {
+        return '{
+            "type": "object"
+        }';
+    }
+    
+    public static function getResponseBodyJsonapiRelasionshipsSelf()
+    {
+        return '{
+            "type": "object"
+        }';
+    }
+    
+    public static function getResponseBodyJsonapiRelasionshipsRelated()
+    {
+        return '{
+            "type": "object"
         }';
     }
 }

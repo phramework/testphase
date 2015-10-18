@@ -162,7 +162,9 @@ foreach ($tests as $test) {
         echo 'I';
         continue;
     }
-
+    
+    $test->createTest();
+    
     try {
         $ok = $test->getTest()->run(function (
             $responseStatusCode,
@@ -171,6 +173,23 @@ foreach ($tests as $test) {
             $responseBodyObject
         ) {
             global $arguments;
+            global $test;
+            
+            $export = $test->getExport();
+            
+            //Fetch all teest exports and add them as globals
+            foreach ($export as $key => $value) {
+                $path = explode('.', $value);
+                
+                $pathValue = $responseBodyObject;
+                
+                foreach ($path as $p) {
+                    $pathValue = $pathValue->{$p};
+                }
+                
+                TestParser::addGlobal($key, $pathValue);
+            }
+            
             if ($arguments['debug']->value) {
                 echo 'Response Status Code:' . PHP_EOL;
                 echo $responseStatusCode . PHP_EOL;
@@ -180,11 +199,11 @@ foreach ($tests as $test) {
                 echo 'Response Body:' . PHP_EOL;
                 echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
             }
-        });
+        });        
         
-        $stats->success += 1;
         //Echo successful char
         echo '.';
+        $stats->success += 1;
     } catch (\Exception $e) {
         //@todo if verbose show more details (trace)
         $message = $e->getMessage();

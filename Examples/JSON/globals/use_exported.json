@@ -1,7 +1,7 @@
 {
   "meta": {
-    "order": -10,
-    "description": "string $$randString and integer $$randInteger"
+    "order": -9,
+    "description": "Use exported $$testId $$testEmail"
   },
   "request": {
     "url": "account/?filter=$$randString",
@@ -17,10 +17,6 @@
     "headers": {
       "Content-Type": "$$headerResponseContentType$"
     },
-    "ruleObjects": ["$$responseBodyJsonapiResource$"],
-    "export": {
-        "testId" : "data.attributes.id",
-        "testEmail" : "data.attributes.email"
-    }
+    "ruleObjects": ["$$responseBodyJsonapiResource$"]
   }
 }

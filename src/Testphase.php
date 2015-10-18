@@ -25,7 +25,7 @@ use \Phramework\Validate\Object;
  */
 class Testphase
 {
-    const VERSION = '0.0.0';
+    const VERSION = '0.0.0-dev';
 
     /**
      * Base API url
@@ -91,15 +91,20 @@ class Testphase
     private $responseBody;
 
     /**
-     * Handle renspose
-     * @param  [type] $responseStatusCode [description]
-     * @param  [type] $responseHeaders    [description]
-     * @param  [type] $responseBody       [description]
+     * Handle renspose, test response against provided rules
+     * @param  integer $responseStatusCode [description]
+     * @param  array $responseHeaders    [description]
+     * @param  string $responseBody       [description]
      * @param  callable|null
-     * @return [type]                     [description]
+     * @throws \Exception
+     * @return boolean True on success
      */
-    private function handle($responseStatusCode, $responseHeaders, $responseBody, $callback)
-    {
+    private function handle(
+        $responseStatusCode,
+        $responseHeaders,
+        $responseBody,
+        $callback
+    ) {
         if ($responseStatusCode != $this->ruleStatusCode) {
             throw new \Exception(sprintf(
                 'Expected status code "%s" got "%s"',
@@ -182,7 +187,7 @@ class Testphase
 
         //If the request paramters form encoded
         $form_encoded = false; //!(($flags & self::REQUEST_NOT_URL_ENCODED) != 0);
-
+        
         //Initialize curl
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);

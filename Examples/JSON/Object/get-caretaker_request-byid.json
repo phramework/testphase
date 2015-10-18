@@ -8,7 +8,7 @@
     "headers": [
       "$$headerRequestAccept$",
       "$$headerRequestContentType$",
-      "$$headerRequestAuthorization$"
+      "Authorization: Basic bm9ocG9uZXhAZ21haWwuY29tOjEyMzQ1Njc4eFg="
     ]
   },
   "response": {
