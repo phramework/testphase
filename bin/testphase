@@ -53,7 +53,8 @@ $specs->add('s|subdir+', 'Optional, subdirectory pattern')
 $specs->add('b|bootstrap:', 'Bootstrap file path')
     ->isa('File');
 
-$specs->add('debug', 'debug message.')->defaultValue(false);
+$specs->add('show-globals', 'Show values of global variables')->defaultValue(false);
+$specs->add('debug', 'Show debug messages')->defaultValue(false);
 $specs->add('h|help', 'Show help')->defaultValue(false);
 $specs->add('no-colors', 'No colors')->defaultValue(false);
 
@@ -182,11 +183,18 @@ foreach ($tests as $test) {
                 $path = explode('.', $value);
 
                 $pathValue = $responseBodyObject;
-
+                
                 foreach ($path as $p) {
-                    $pathValue = $pathValue->{$p};
+                    $arrayIndex = 0;
+                    
+                    if (is_array($pathValue)) {
+                        $pathValue = $pathValue[$arrayIndex]->{$p};
+                    } else {
+                        $pathValue = $pathValue->{$p};
+                    }
+                    
                 }
-
+                
                 TestParser::addGlobal($key, $pathValue);
             }
 
@@ -259,6 +267,11 @@ function colored($text, $color)
 function output($text, $color)
 {
    echo colored($text, $color);
+}
+
+if ($arguments['show-globals']->value) {
+    echo 'Globals:' . PHP_EOL;
+    print_r(TestParser::getGlobal());
 }
 
 if ($stats->error > 0) {

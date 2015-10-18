@@ -1,10 +1,10 @@
 {
   "meta": {
-    "order": -11,
-    "description": "string $$randString and integer $$randInteger"
+    "order": -10,
+    "description": "Use exported $$testId $$testEmail"
   },
   "request": {
-    "url": "account/?filter=$$randString",
+    "url": "condition",
     "method": "GET",
     "headers": [
       "$$headerRequestAccept$",
@@ -17,10 +17,9 @@
     "headers": {
       "Content-Type": "$$headerResponseContentType$"
     },
-    "ruleObjects": ["$$responseBodyJsonapiResource$"],
+    "ruleObjects": ["$$responseBodyJsonapiCollection$"],
     "export": {
-        "testId" : "data.attributes.id",
-        "testEmail" : "data.attributes.email"
+        "aConditionId" : "data.attributes.id"
     }
   }
 }
