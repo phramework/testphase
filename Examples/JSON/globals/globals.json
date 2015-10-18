@@ -17,6 +17,9 @@
     "headers": {
       "Content-Type": "$$headerResponseContentType$"
     },
-    "ruleObjects": ["$$responseBodyJsonapiResource$"]
+    "ruleObjects": ["$$responseBodyJsonapiResource$"],
+    "export": {
+        "testId" : "data.attributes.id"
+    }
   }
 }

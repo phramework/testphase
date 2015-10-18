@@ -79,22 +79,21 @@ $bootstrap = $arguments['bootstrap']->value;
 require $bootstrap;
 
 //Get all .json files in directory
-$files = Util::directoryToArray(
-    $dir,
-    true,
-    false,
-    true,
-    '/^\.|\.\.$/',
-    ['json'],
-    false
-);
-
 $files = array_map(
     function ($f) {
         return str_replace('//', '/', $f);
     },
-    $files
+    Util::directoryToArray(
+        $dir,
+        true,
+        false,
+        true,
+        '/^\.|\.\.$/',
+        ['json'],
+        false
+    )
 );
+    
 /**
  * @var TestParser
  */
@@ -127,7 +126,9 @@ foreach ($tests as $test) {
     //Check if subdir argument is set
     if (isset($arguments['subdir']) && $arguments['subdir']->value !== null) {
         //If so check if file name passes the given pattern
-        $t = trim(
+        
+        //Remove base dir from filename
+        $cleanFilename = trim(
             str_replace(
                 $arguments['dir']->value,
                 '',
@@ -137,10 +138,11 @@ foreach ($tests as $test) {
         );
 
         $match = false;
-
+        
+        //Check if any of the patterns ar matching
         foreach ($arguments['subdir']->value as $pattern) {
             $pattern = '@' . $pattern . '@';
-            if (!!preg_match($pattern, $t)) {
+            if (!!preg_match($pattern, $cleanFilename)) {
                 $match = $match || true;
                 break;
             }
@@ -179,6 +181,7 @@ foreach ($tests as $test) {
                 echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
             }
         });
+        
         $stats->success += 1;
         //Echo successful char
         echo '.';
@@ -191,7 +194,7 @@ foreach ($tests as $test) {
         }
 
         $stats->errors[] = sprintf(
-            'Test "%s" failed with message %s' . PHP_EOL,
+            colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
             $filename,
             $message
         );
@@ -204,7 +207,7 @@ foreach ($tests as $test) {
 echo PHP_EOL;
 
 foreach ($stats->errors as $e) {
-    output($e . PHP_EOL, 'red');
+    echo $e . PHP_EOL;
 }
 
 echo 'Complete!' . PHP_EOL;
@@ -215,8 +218,7 @@ output('Ignored: ' . $stats->ignore, 'yellow');
 echo ', ';
 output('Unsuccessful: ' . $stats->error . PHP_EOL, 'red');
 
-
-function output($text, $color)
+function colored($text, $color)
 {
     $colors = [
         'black' => '0;30',
@@ -227,12 +229,17 @@ function output($text, $color)
     ];
 
     $c = array_key_exists($color, $colors) ? $colors[$color] : $colors['black'];
+    
     global $arguments;
     if ($arguments['no-colors']->value) {
-        echo $text;
+        return $text;
     } else {
-        echo "\033[". $c . "m" . $text . "\033[0m";
+        return "\033[". $c . "m" . $text . "\033[0m";
     }
+}
+function output($text, $color)
+{
+   echo colored($text, $color);
 }
 
 if ($stats->error > 0) {
