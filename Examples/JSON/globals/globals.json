@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "order": -10,
+    "description": "string $$randString and integer $$randInteger"
+  },
+  "request": {
+    "url": "account/?filter=$$randString",
+    "method": "GET",
+    "headers": [
+      "$$headerRequestAccept$",
+      "$$headerRequestContentType$",
+      "$$headerRequestAuthorization$"
+    ]
+  },
+  "response": {
+    "statusCode": 200,
+    "headers": {
+      "Content-Type": "$$headerResponseContentType$"
+    },
+    "ruleObjects": ["$$responseBodyJsonapiResource$"],
+    "export": {
+        "testId" : "data.attributes.id",
+        "testEmail" : "data.attributes.email"
+    }
+  }
+}

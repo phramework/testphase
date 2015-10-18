@@ -32,12 +32,55 @@ use \Phramework\Validate\URL;
  */
 class TestParser
 {
+    /**
+     *
+     * @var object
+     */
+    protected $export;
+    
+    public function getExport()
+    {
+        return $this->export;
+    }
+    
+    protected static $global;
+    
+    public static function addGlobal($key, $value)
+    {
+        if (!self::$global) {
+            self::$global = new \stdClass();
+        }
+
+        self::$global->{$key} = $value;
+        return static::class;
+    }
+
+    public static function checkGlobalSet($key)
+    {
+        if (!property_exists(static::$global, $key)) {
+            throw new \Exception(sprintf(
+                'Key "%s" not found in TestParser globals',
+                $key
+            ));
+        }
+        return static::class;
+    }
+
+    public static function getGlobal($key = null)
+    {
+        if ($key) {
+            static::checkGlobalSet($key);
+            return static::$global->{$key};
+        }
+
+        return static::$global;
+    }
 
     /**
      * Parsed test
      * @var Testphase
      */
-    protected $test;
+    protected $test = null;
 
     /**
      * Get parsed test
@@ -45,9 +88,14 @@ class TestParser
      */
     public function getTest()
     {
+        if ($this->test === null) {
+            throw new \Exception('Test is not created');
+        }
         return $this->test;
     }
-
+    
+    protected $contentsParsed;
+    
     /**
      * Parsed test's meta object
      * @var object
@@ -74,8 +122,12 @@ class TestParser
     }
 
     /**
+     * Parse test informations from a json file
+     * this method will parse the file and prepare the meta object
+     * use createTest to complete creation of test
      * @param String $filename
      * @todo Set $validatorRequest header's subtype
+     * 
      */
     public function __construct($filename)
     {
@@ -121,7 +173,9 @@ class TestParser
                 'statusCode' => new UnsignedInteger(100, 999),
                 'headers' => (new Object()),
                 'ruleObjects' => (new ArrayValidator())
-                    ->setDefault([])
+                    ->setDefault([]),
+                'export' => (new Object())
+                    ->setDefault((object)[])
             ],
             ['statusCode']
         );
@@ -143,8 +197,20 @@ class TestParser
         );
 
         //Parse test file, using validator's rules
-        $contentsParsed = $validator->parse($contentsObject);
-
+        $this->contentsParsed = $contentsParsed = $validator->parse($contentsObject);
+        
+        $this->meta = (
+            isset($contentsParsed->meta)
+            ? $contentsParsed->meta
+            : (object)['order' => 0]
+        );
+    }
+    
+    public function createTest()
+    {
+        //Recursive search whole object
+        $contentsParsed = $this->searchAndReplace($this->contentsParsed);
+        
         //Create a Testphase object using parsed rule
         $test = (new Testphase(
             $contentsParsed->request->url,
@@ -163,15 +229,138 @@ class TestParser
 
         //Add rule objects to validate body
         foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
+            if (is_string($ruleObject)) {
+                $ruleObject = json_decode($ruleObject);
+            }
+            
             $test->expectObject(Object::createFromObject($ruleObject));
         }
-
-        $this->meta = (
-            isset($contentsParsed->meta)
-            ? $contentsParsed->meta
-            : (object)['order' => 0]
-        );
-
+        
         $this->test = $test;
+        $this->export = $contentsParsed->response->export;
+    }
+
+    private function searchAndReplace($object)
+    {
+        foreach ($object as $key => &$value) {
+            if (is_array($value) || is_object($value)) {
+                $value = $this->searchAndReplace($value);
+            }
+
+            if (is_string($value)) {
+                $matches = [];
+                //Complete replace (key: "$globalKey$")
+                if (!!preg_match(
+                        '/^\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\$$/',
+                        $value,
+                        $matches
+                )) {
+                    $globalKey = $matches[1];
+
+                    //replace
+                    $value = static::getGlobal($globalKey);
+                } elseif (!!preg_match_all(
+                        '/\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})/',
+                        $value,
+                        $matches
+                )) {
+
+                    //Foreach variable replace
+                    foreach($matches[1] as $globalKey) {
+                        $value = str_replace(
+                            '$$' . $globalKey,
+                            static::getGlobal($globalKey),
+                            $value
+                        );
+                    }
+                }
+            }
+        }
+        return $object;
+    }
+
+    public static function getResponseBodyJsonapiResource($ofType = null)
+    {
+        return '{
+            "type": "object",
+            "properties": {
+                "data" : {
+                    "type": "object",
+                    "properties" : {
+                        "type" : {
+                            "type" : "string"
+                        },
+                        "id" : {
+                            "type" : "string"
+                        }
+                    },
+                    "required" : ["type", "id"]
+                },
+                "links" : {
+                    "type": "object",
+                    "properties":{
+                        "self": {
+                            "type": "url"
+                        },
+                        "related": {
+                            "type": "url"
+                        }
+                    },
+                    "required": ["self"]
+                }
+            },
+            "required": ["data", "links"]
+        }';
+    }
+
+    public static function getResponseBodyJsonapiCollection()
+    {
+        return '{
+            "type": "object",
+            "properties": {
+                "data" : {
+                    "type": "array"
+                },
+                "links" : {
+                    "type": "object",
+                    "properties":{
+                        "self": {
+                            "type": "url"
+                        },
+                        "related": {
+                            "type": "url"
+                        }
+                    },
+                    "required": ["self"]
+                }
+            },
+            "required": ["data", "links"]
+        }';
+    }
+    
+    public static function getResponseBodyJsonapiException()
+    {
+        return '{
+            "type": "object"
+        }';
+    }
+    
+    public static function getResponseBodyJsonapiRelasionshipsSelf()
+    {
+        return '{
+            "type": "object"
+        }';
+    }
+    
+    public static function getResponseBodyJsonapiRelasionshipsRelated()
+    {
+        return '{
+            "type": "object"
+        }';
     }
 }
+
+TestParser::addGlobal('randInteger', rand(1, 100000));
+TestParser::addGlobal('randString', \Phramework\Models\Util::readableRandomString());
+TestParser::addGlobal('randHash', sha1(\Phramework\Models\Util::readableRandomString() . rand()));
+TestParser::addGlobal('randBoolean', rand(1, 100000) % 2 ? true : false);
