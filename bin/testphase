@@ -233,6 +233,11 @@ foreach ($tests as $test) {
 }
 echo PHP_EOL;
 
+if ($arguments['show-globals']->value) {
+    echo 'Globals:' . PHP_EOL;
+    print_r(TestParser::getGlobal());
+}
+
 foreach ($stats->errors as $e) {
     echo $e . PHP_EOL;
 }
@@ -269,10 +274,7 @@ function output($text, $color)
    echo colored($text, $color);
 }
 
-if ($arguments['show-globals']->value) {
-    echo 'Globals:' . PHP_EOL;
-    print_r(TestParser::getGlobal());
-}
+
 
 if ($stats->error > 0) {
     return (1);
