@@ -37,14 +37,14 @@ class TestParser
      * @var object
      */
     protected $export;
-    
+
     public function getExport()
     {
         return $this->export;
     }
-    
+
     protected static $global;
-    
+
     public static function addGlobal($key, $value)
     {
         if (!self::$global) {
@@ -93,9 +93,9 @@ class TestParser
         }
         return $this->test;
     }
-    
+
     protected $contentsParsed;
-    
+
     /**
      * Parsed test's meta object
      * @var object
@@ -127,7 +127,7 @@ class TestParser
      * use createTest to complete creation of test
      * @param String $filename
      * @todo Set $validatorRequest header's subtype
-     * 
+     *
      */
     public function __construct($filename)
     {
@@ -198,19 +198,19 @@ class TestParser
 
         //Parse test file, using validator's rules
         $this->contentsParsed = $contentsParsed = $validator->parse($contentsObject);
-        
+
         $this->meta = (
             isset($contentsParsed->meta)
             ? $contentsParsed->meta
             : (object)['order' => 0]
         );
     }
-    
+
     public function createTest()
     {
         //Recursive search whole object
         $contentsParsed = $this->searchAndReplace($this->contentsParsed);
-        
+
         //Create a Testphase object using parsed rule
         $test = (new Testphase(
             $contentsParsed->request->url,
@@ -232,10 +232,10 @@ class TestParser
             if (is_string($ruleObject)) {
                 $ruleObject = json_decode($ruleObject);
             }
-            
+
             $test->expectObject(Object::createFromObject($ruleObject));
         }
-        
+
         $this->test = $test;
         $this->export = $contentsParsed->response->export;
     }
@@ -337,21 +337,21 @@ class TestParser
             "required": ["data", "links"]
         }';
     }
-    
+
     public static function getResponseBodyJsonapiException()
     {
         return '{
             "type": "object"
         }';
     }
-    
+
     public static function getResponseBodyJsonapiRelasionshipsSelf()
     {
         return '{
             "type": "object"
         }';
     }
-    
+
     public static function getResponseBodyJsonapiRelasionshipsRelated()
     {
         return '{
@@ -360,7 +360,7 @@ class TestParser
     }
 }
 
-TestParser::addGlobal('randInteger', rand(1, 100000));
+TestParser::addGlobal('randInteger', rand(1, 100));
 TestParser::addGlobal('randString', \Phramework\Models\Util::readableRandomString());
 TestParser::addGlobal('randHash', sha1(\Phramework\Models\Util::readableRandomString() . rand()));
-TestParser::addGlobal('randBoolean', rand(1, 100000) % 2 ? true : false);
+TestParser::addGlobal('randBoolean', rand(1, 999) % 2 ? true : false);
