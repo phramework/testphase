@@ -37,7 +37,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             $this->requestHeaders
         );
 
-        Testphase::setBase('http://localhost/ostomate/api/');
+        Testphase::setBase('http://localhost/ostomate/api/patient/');
     }
 
     /**
