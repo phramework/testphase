@@ -121,7 +121,7 @@ $stats = (object)[
     'ignore' => 0,
     'errors' => []
 ];
-
+$i=0;
 //Execute tests
 foreach ($tests as $test) {
     //Check if subdir argument is set
@@ -229,6 +229,11 @@ foreach ($tests as $test) {
         //Echo unsuccessful char
         echo 'E';
         $stats->error += 1;
+    }
+    ++$i;
+    //Allow only 80 characters per line
+    if (!($i % 80)) {
+        echo PHP_EOL;
     }
 }
 echo PHP_EOL;
