@@ -76,7 +76,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             Phramework::METHOD_GET,
             $this->requestHeaders
         ))
-        ->expectStatusCode(200)
+        ->expectStatusCode(403)
         ->expectResponseHeader([
             Request::HEADER_CONTENT_TYPE => 'application/vnd.api+json;charset=utf-8'
         ])
