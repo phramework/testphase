@@ -16,7 +16,7 @@
   }],
   "require": {
     "php": ">=5.6",
-    "phramework/phramework": "1.0.0-alpha.32",
+    "phramework/phramework": "1.0.0-alpha.34",
     "ext-curl": "*",
     "ext-json": "*",
     "corneltek/getoptionkit": "~2"
