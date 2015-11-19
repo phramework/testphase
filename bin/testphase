@@ -227,15 +227,17 @@ foreach ($tests as $test) {
             $test->getFilename(),
             $message
         );
+        //push message to error message
         $stats->errors[] = $message;
-
-        if ($arguments['immediate']) {
-            echo $message . PHP_EOL;
-        }
-
 
         //Echo unsuccessful char
         echo 'E';
+
+        //print if immediate
+        if ($arguments['immediate']) {
+            echo PHP_EOL . $message . PHP_EOL;
+        }
+        
         $stats->error += 1;
     }
     ++$i;
@@ -251,6 +253,7 @@ if ($arguments['show-globals']->value) {
     print_r(TestParser::getGlobal());
 }
 
+//dont print if immediate is true
 if (!$arguments['immediate']) {
     foreach ($stats->errors as $e) {
         echo $e . PHP_EOL;
