@@ -249,24 +249,23 @@ class TestParser
 
             if (is_string($value)) {
                 $matches = [];
-                //Complete replace (key: "$globalKey$")
+                //Complete replace (key: "$$globalKey$")
                 if (!!preg_match(
-                        '/^\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\$$/',
-                        $value,
-                        $matches
+                    '/^\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\$$/',
+                    $value,
+                    $matches
                 )) {
                     $globalKey = $matches[1];
 
                     //replace
                     $value = static::getGlobal($globalKey);
                 } elseif (!!preg_match_all(
-                        '/\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})/',
-                        $value,
-                        $matches
+                    '/\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})/',
+                    $value,
+                    $matches
                 )) {
-
                     //Foreach variable replace
-                    foreach($matches[1] as $globalKey) {
+                    foreach ($matches[1] as $globalKey) {
                         $value = str_replace(
                             '$$' . $globalKey,
                             static::getGlobal($globalKey),

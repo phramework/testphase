@@ -132,9 +132,12 @@ class Testphase
         }
 
         if ($this->ruleJSON && !Testphase::isJSON($responseBody)) {
-            throw new \Exception(sprintf(
-                'Expected valid JSON response Body'
-            ));
+            //Ignore isJSON body on "204 No Content" when it's empty
+            if ($this->ruleStatusCode != 204 || !empty($responseBody)) {
+                throw new \Exception(sprintf(
+                    'Expected valid JSON response Body'
+                ));
+            }
         }
 
         //Add extra rules ??
@@ -187,7 +190,7 @@ class Testphase
 
         //If the request paramters form encoded
         $form_encoded = false; //!(($flags & self::REQUEST_NOT_URL_ENCODED) != 0);
-        
+
         //Initialize curl
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
