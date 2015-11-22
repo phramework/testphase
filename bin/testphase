@@ -40,7 +40,6 @@ use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
 echo 'testphase v' . Testphase::VERSION . PHP_EOL;
 
 $cwd = getcwd();
-//echo "cdw: $cwd" . PHP_EOL;
 
 $specs = new OptionCollection;
 $specs->add('d|dir:', 'Tests directory path')
@@ -237,7 +236,7 @@ foreach ($tests as $test) {
         if ($arguments['immediate']) {
             echo PHP_EOL . $message . PHP_EOL;
         }
-        
+
         $stats->error += 1;
     }
     ++$i;

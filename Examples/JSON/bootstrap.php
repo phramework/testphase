@@ -7,7 +7,7 @@ use \Phramework\Validate\UnsignedInteger;
 use \Phramework\Validate\ArrayValidator;
 use \Phramework\Validate\URL;
 
-Testphase::setBase('http://localhost/ostomate/api/');
+Testphase::setBase('http://localhost/api/');
 
 TestParser::addGlobal(
     'headerRequestAuthorization',

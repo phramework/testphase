@@ -278,6 +278,9 @@ class TestParser
         return $object;
     }
 
+    /**
+     * @todo use type
+     */
     public static function getResponseBodyJsonapiResource($ofType = null)
     {
         return '{
@@ -312,6 +315,9 @@ class TestParser
         }';
     }
 
+    /**
+     * @todo use type
+     */
     public static function getResponseBodyJsonapiCollection()
     {
         return '{
