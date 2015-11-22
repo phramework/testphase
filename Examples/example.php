@@ -32,7 +32,7 @@ $jsonapiBaseResource = new Object(
     ['data']
 );
 
-Testphase::setBase('http://localhost/ostomate/api/');
+Testphase::setBase();
 
 $requestHeaders = [
     'Authorization: Basic bm9ocG9uZXhAZ21haWwuY29tOjEyMzQ1Njc4eFg=',

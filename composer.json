@@ -1,6 +1,7 @@
 {
   "name": "phramework/testphase",
   "description": "API response testing tool for Phramework",
+  "license": "Apache-2.0",
   "homepage": "https://nohponex.gr",
   "authors": [{
     "name": "Xenophon Spafaridis",
