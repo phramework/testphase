@@ -155,41 +155,41 @@ class TestParser
 
         //Setup validator, to validate and parse the test file
 
-        $validatorRequest = new Object(
+        $validatorRequest = new ObjectValidator(
             [
-                'url' => new String(1, 1024),
-                'method' => (new Enum(Phramework::$methodWhitelist, true))
+                'url' => new StringValidator(1, 1024),
+                'method' => (new EnumValidator(Phramework::$methodWhitelist, true))
                     ->setDefault(Phramework::METHOD_GET),
                 'headers' => (new ArrayValidator())
                     ->setDefault([]),
-                'body' => (new Object())
+                'body' => (new ObjectValidator())
                     ->setDefault([])
             ],
             ['url']
         );
 
-        $validatorResponse = new Object(
+        $validatorResponse = new ObjectValidator(
             [
-                'statusCode' => new UnsignedInteger(100, 999),
-                'headers' => (new Object()),
+                'statusCode' => new UnsignedIntegerValidator(100, 999),
+                'headers' => (new ObjectValidator()),
                 'ruleObjects' => (new ArrayValidator())
                     ->setDefault([]),
-                'export' => (new Object())
+                'export' => (new ObjectValidator())
                     ->setDefault((object)[])
             ],
             ['statusCode']
         );
 
         //Setup validator for parsed test
-        $validator = new Object(
+        $validator = new ObjectValidator(
             [
-                'meta' => (new Object([
-                    'order' => (new Integer(-99999999, 99999999))
+                'meta' => (new ObjectValidator([
+                    'order' => (new IntegerValidator(-99999999, 99999999))
                         ->setDefault(0),
-                    'ignore' => (new Boolean())
+                    'ignore' => (new BooleanValidator())
                         ->setDefault(false),
-                    'description' => new String(),
-                    'JSONbody' => (new Boolean())
+                    'description' => new StringValidator(),
+                    'JSONbody' => (new BooleanValidator())
                         ->setDefault(true)
                 ])),
                 'request' => $validatorRequest,
@@ -239,7 +239,7 @@ class TestParser
                 $ruleObject = json_decode($ruleObject);
             }
 
-            $test->expectObject(Object::createFromObject($ruleObject));
+            $test->expectObjectValidator(Object::createFromObjectValidator($ruleObject));
         }
 
         $this->test = $test;
@@ -372,6 +372,6 @@ class TestParser
 }
 
 TestParser::addGlobal('randInteger', rand(1, 100));
-TestParser::addGlobal('randString', \Phramework\Models\Util::readableRandomString());
-TestParser::addGlobal('randHash', sha1(\Phramework\Models\Util::readableRandomString() . rand()));
+TestParser::addGlobal('randString', \Phramework\Models\Util::readableRandomStringValidator());
+TestParser::addGlobal('randHash', sha1(\Phramework\Models\Util::readableRandomStringValidator() . rand()));
 TestParser::addGlobal('randBoolean', rand(1, 999) % 2 ? true : false);

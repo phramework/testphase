@@ -4,9 +4,9 @@ namespace Phramework\Testphase;
 
 use \Phramework\Phramework;
 use \Phramework\Models\Request;
-use \Phramework\Validate\Object;
-use \Phramework\Validate\String;
-use \Phramework\Validate\Integer;
+use \Phramework\Validate\ObjectValidator;
+use \Phramework\Validate\StringValidator;
+use \Phramework\Validate\IntegerValidator;
 
 /**
  * @todo Make $requestHeaders settings
@@ -31,13 +31,15 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+
+        Testphase::setBase('http://localhost:8000/');
+
         $this->object = new Testphase(
-            'account',
+            'book',
             Phramework::METHOD_GET,
             $this->requestHeaders
         );
 
-        Testphase::setBase();
     }
 
     /**
@@ -49,36 +51,20 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function validateSuccessProvider()
-    {
-        //input, expected
-        return [
-            [1, true]
-        ];
-    }
-
-    public function validateFailureProvider()
-    {
-        //input
-        return [
-            ['100'],
-        ];
-    }
 
     /**
-     * @dataProvider validateSuccessProvider
      * @covers Phramework\Testphase\Testphase::run
      */
-    public function testRunSuccess($input, $expected)
+    public function testRunSuccess()
     {
         $test = (new Testphase(
-            'account',
+            'bookz',
             Phramework::METHOD_GET,
             $this->requestHeaders
         ))
-        ->expectStatusCode(403)
+        ->expectStatusCode(404)
         ->expectResponseHeader([
-            Request::HEADER_CONTENT_TYPE => 'application/vnd.api+json;charset=utf-8'
+            Request::HEADER_CONTENT_TYPE => 'application/json;charset=utf-8'
         ])
         ->expectJSON()
         ->run();
@@ -121,7 +107,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpectObjectJSON()
     {
-        $o = $this->object->expectObject(new Object());
+        $o = $this->object->expectObject(new ObjectValidator());
 
         $this->assertInstanceOf(Testphase::class, $o);
     }
@@ -141,14 +127,13 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider validateFailureProvider
      * @covers Phramework\Testphase\Testphase::run
      * @expectedException Exception
      */
-    public function testRunFailure($input)
+    public function testRunFailure()
     {
         $test = (new Testphase(
-            'account',
+            'book',
             Phramework::METHOD_GET,
             $this->requestHeaders
         ))

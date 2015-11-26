@@ -17,7 +17,7 @@
 namespace Phramework\Testphase;
 
 use \Phramework\Phramework;
-use \Phramework\Validate\Object;
+use \Phramework\Validate\ObjectValidator;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
@@ -330,10 +330,10 @@ class Testphase
 
     /**
      * Object validator, used to validate the response
-     * @param  PhrameworkValidateObject $object Validator object
+     * @param  ObjectValidator $object Validator object
      * @return Testphase Return's $this object
      */
-    public function expectObject(\Phramework\Validate\Object $object)
+    public function expectObject(ObjectValidator $object)
     {
         $this->ruleObjects[] = $object;
 
