@@ -188,7 +188,9 @@ class TestParser
                         ->setDefault(0),
                     'ignore' => (new Boolean())
                         ->setDefault(false),
-                    'description' => new String()
+                    'description' => new String(),
+                    'JSONbody' => (new Boolean())
+                        ->setDefault(true)
                 ])),
                 'request' => $validatorRequest,
                 'response' => $validatorResponse
@@ -202,7 +204,10 @@ class TestParser
         $this->meta = (
             isset($contentsParsed->meta)
             ? $contentsParsed->meta
-            : (object)['order' => 0]
+            : (object)[
+                'order' => 0,
+                'JSONbody' => true
+            ]
         );
     }
 
@@ -224,8 +229,9 @@ class TestParser
             true //json
         ))
         ->expectStatusCode($contentsParsed->response->statusCode)
-        ->expectResponseHeader($contentsParsed->response->headers)
-        ->expectJSON();
+        ->expectResponseHeader($contentsParsed->response->headers);
+
+        $test->expectJSON($contentsParsed->meta->JSONbody);
 
         //Add rule objects to validate body
         foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {

@@ -173,10 +173,13 @@ foreach ($tests as $test) {
             $responseStatusCode,
             $responseHeaders,
             $responseBody,
-            $responseBodyObject
+            $responseBodyObject = null
+        ) use (
+            $test,
+            $arguments
         ) {
-            global $arguments;
-            global $test;
+            //global $arguments;
+            //global $test;
 
             $export = $test->getExport();
 
