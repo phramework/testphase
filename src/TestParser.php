@@ -17,14 +17,14 @@
 namespace Phramework\Testphase;
 
 use \Phramework\Phramework;
-use \Phramework\Validate\Object;
-use \Phramework\Validate\Integer;
-use \Phramework\Validate\UnsignedInteger;
+use \Phramework\Validate\ObjectValidator;
+use \Phramework\Validate\IntegerValidator;
+use \Phramework\Validate\UnsignedIntegerValidator;
 use \Phramework\Validate\ArrayValidator;
-use \Phramework\Validate\Enum;
-use \Phramework\Validate\Boolean;
-use \Phramework\Validate\String;
-use \Phramework\Validate\URL;
+use \Phramework\Validate\EnumValidator;
+use \Phramework\Validate\BooleanValidator;
+use \Phramework\Validate\StringValidator;
+use \Phramework\Validate\URLValidator;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
@@ -239,7 +239,7 @@ class TestParser
                 $ruleObject = json_decode($ruleObject);
             }
 
-            $test->expectObjectValidator(Object::createFromObjectValidator($ruleObject));
+            $test->expectObject(ObjectValidator::createFromObject($ruleObject));
         }
 
         $this->test = $test;
@@ -372,6 +372,6 @@ class TestParser
 }
 
 TestParser::addGlobal('randInteger', rand(1, 100));
-TestParser::addGlobal('randString', \Phramework\Models\Util::readableRandomStringValidator());
-TestParser::addGlobal('randHash', sha1(\Phramework\Models\Util::readableRandomStringValidator() . rand()));
+TestParser::addGlobal('randString', \Phramework\Models\Util::readableRandomString());
+TestParser::addGlobal('randHash', sha1(\Phramework\Models\Util::readableRandomString() . rand()));
 TestParser::addGlobal('randBoolean', rand(1, 999) % 2 ? true : false);
