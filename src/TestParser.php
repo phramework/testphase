@@ -231,7 +231,11 @@ class TestParser
         ->expectStatusCode($contentsParsed->response->statusCode)
         ->expectResponseHeader($contentsParsed->response->headers);
 
-        $test->expectJSON($contentsParsed->meta->JSONbody);
+        $test->expectJSON(
+            isset($contentsParsed->meta->JSONbody)
+            ? $contentsParsed->meta->JSONbody
+            : true
+        );
 
         //Add rule objects to validate body
         foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
