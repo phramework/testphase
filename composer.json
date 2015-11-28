@@ -4,13 +4,13 @@
   "license": "Apache-2.0",
   "homepage": "https://phramework.github.io/",
   "authors": [{
-    "name": "Xenophon Spafaridis",
+    "name": "Xenofon Spafaridis",
     "email": "nohponex@gmail.com",
     "homepage": "https://nohponex.gr"
   }],
   "require": {
     "php": ">=5.6",
-    "phramework/phramework": "dev-master",
+    "phramework/phramework": "1.0.0",
     "ext-curl": "*",
     "ext-json": "*",
     "corneltek/getoptionkit": "~2"
