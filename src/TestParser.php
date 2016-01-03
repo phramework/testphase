@@ -171,7 +171,8 @@ class TestParser
         $validatorResponse = new ObjectValidator(
             [
                 'statusCode' => new UnsignedIntegerValidator(100, 999),
-                'headers' => (new ObjectValidator()),
+                'headers' => (new ObjectValidator())
+                    ->setDefault((object)[]),
                 'ruleObjects' => (new ArrayValidator())
                     ->setDefault([]),
                 'export' => (new ObjectValidator())
