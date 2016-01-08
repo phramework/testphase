@@ -43,9 +43,10 @@
       "find tests/ -name '*.php' -print0 | xargs -0 -L 1 php -l",
       "phpunit"
     ],
-    "lint": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./Examples ./tests ./bin",
+    "lint": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests ./bin",
     "doc": [
-      "./vendor/bin/apigen generate -s ./src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"phramework/testphase\""
+      "apigen generate -s ./src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"testphase\"",
+      "start=\"file://\";end=\"doc/index.html\"; echo \"\nOpen $start$(pwd)/$end\" in browser..."
     ],
     "run": "php ./bin/testphase -d ./Examples -b ./Examples/bootstrap.php"
   },
