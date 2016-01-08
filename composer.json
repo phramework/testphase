@@ -10,7 +10,8 @@
   }],
   "require": {
     "php": ">=5.6",
-    "phramework/phramework": "^1.0.3",
+    "phramework/validate": "0.*",
+    "phramework/exceptions": "0.*",
     "ext-curl": "*",
     "ext-json": "*",
     "corneltek/getoptionkit": "~2"
@@ -28,7 +29,11 @@
       "Phramework\\Testphase\\": "src"
     }
   },
-  "autoload-dev": {},
+  "autoload-dev": {
+    "psr-4": {
+      "Phramework\\Testphase\\APP\\": "tests/APP"
+    }
+  },
   "archive": {
     "exclude": [
       "*",
@@ -45,7 +50,7 @@
     ],
     "lint": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests ./bin",
     "doc": [
-      "apigen generate -s ./src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"testphase\"",
+      "apigen generate -s ./src,./vendor/phramework/validate/src,./vendor/exceptions/validate/src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"testphase\"",
       "start=\"file://\";end=\"doc/index.html\"; echo \"\nOpen $start$(pwd)/$end\" in browser..."
     ],
     "run": "php ./bin/testphase -d ./Examples -b ./Examples/bootstrap.php"

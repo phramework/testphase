@@ -16,16 +16,16 @@
  */
 namespace Phramework\Testphase;
 
-use \Phramework\Phramework;
 use \Phramework\Validate\ObjectValidator;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
+ * @version 0.0.1
  */
 class Testphase
 {
-    const VERSION = '0.0.0';
+    const VERSION = '0.0.1';
 
     /**
      * Base API url
@@ -65,15 +65,15 @@ class Testphase
 
     public function __construct(
         $url,
-        $method = Phramework::METHOD_GET,
+        $method = 'GET',
         $headers = [],
         $requestBody = null,
         $ruleJSON = false
     ) {
         $this->url = $url;
 
-        if (!in_array($method, Phramework::$methodWhitelist, true)) {
-            throw new \Exception('Unsupported method');
+        if (!is_string($method)) {
+            throw new \Exception('Method must be string');
         }
 
         $this->method = $method;
@@ -214,10 +214,10 @@ class Testphase
 
         //Switch on HTTP Request method
         switch ($this->method) {
-            case Phramework::METHOD_GET: //On GET
-            case Phramework::METHOD_HEAD: //On HEAD
+            case 'GET': //On GET
+            case 'HEAD': //On HEAD
                 break;
-            case Phramework::METHOD_POST: //On POST
+            case 'POST': //On POST
                 curl_setopt($curl, CURLOPT_POST, true);
 
                 if (false && $this->requestBody && $form_encoded) { //Encode fields if required ( URL ENCODED )
@@ -230,13 +230,13 @@ class Testphase
                     curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestBody);
                 }
                 break;
-            case Phramework::METHOD_PUT: //On PUT
-            case Phramework::METHOD_PATCH: //On PATCH
+            case 'PUT': //On PUT
+            case 'PATCH': //On PATCH
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->method);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestBody);
                 break;
-            case Phramework::METHOD_DELETE: //On DELETE
-                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, Phramework::METHOD_DELETE);
+            case 'DELETE': //On DELETE
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
                 break;
             default:
                 throw new \Exception('Unsupporter method');

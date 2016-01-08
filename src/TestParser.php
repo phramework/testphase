@@ -16,7 +16,6 @@
  */
 namespace Phramework\Testphase;
 
-use \Phramework\Phramework;
 use \Phramework\Validate\ObjectValidator;
 use \Phramework\Validate\IntegerValidator;
 use \Phramework\Validate\UnsignedIntegerValidator;
@@ -157,9 +156,9 @@ class TestParser
 
         $validatorRequest = new ObjectValidator(
             [
-                'url' => new StringValidator(1, 1024),
-                'method' => (new EnumValidator(Phramework::$methodWhitelist, true))
-                    ->setDefault(Phramework::METHOD_GET),
+                'url' => new StringValidator(1, 2048),
+                'method' => (new StringValidator())
+                    ->setDefault('GET'),
                 'headers' => (new ArrayValidator())
                     ->setDefault([]),
                 'body' => (new ObjectValidator())
@@ -377,6 +376,7 @@ class TestParser
 }
 
 TestParser::addGlobal('randInteger', rand(1, 100));
-TestParser::addGlobal('randString', \Phramework\Models\Util::readableRandomString());
-TestParser::addGlobal('randHash', sha1(\Phramework\Models\Util::readableRandomString() . rand()));
+//@todo
+TestParser::addGlobal('randString', 'abc');
+TestParser::addGlobal('randHash', sha1(rand() . rand() . rand()));
 TestParser::addGlobal('randBoolean', rand(1, 999) % 2 ? true : false);

@@ -32,7 +32,6 @@ if (file_exists($autoload[0])) {
 
 use \Phramework\Testphase\Testphase;
 use \Phramework\Testphase\TestParser;
-use \Phramework\Models\Util;
 use \GetOptionKit\OptionCollection;
 use \GetOptionKit\OptionParser;
 use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;

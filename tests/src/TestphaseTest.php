@@ -3,7 +3,6 @@
 namespace Phramework\Testphase;
 
 use \Phramework\Phramework;
-use \Phramework\Models\Request;
 use \Phramework\Validate\ObjectValidator;
 use \Phramework\Validate\StringValidator;
 use \Phramework\Validate\IntegerValidator;
@@ -36,7 +35,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
         $this->object = new Testphase(
             'book',
-            Phramework::METHOD_GET,
+            'GET',
             $this->requestHeaders
         );
 
@@ -59,12 +58,12 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     {
         $test = (new Testphase(
             'bookz',
-            Phramework::METHOD_GET,
+            'GET',
             $this->requestHeaders
         ))
         ->expectStatusCode(404)
         ->expectResponseHeader([
-            Request::HEADER_CONTENT_TYPE => 'application/json;charset=utf-8'
+            'Content-Type' => 'application/json;charset=utf-8'
         ])
         ->expectJSON()
         ->run();
@@ -86,7 +85,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     public function testExpectResponseHeader()
     {
         $o = $this->object->expectResponseHeader([
-            Request::HEADER_CONTENT_TYPE => 'application/vnd.api+json;charset=utf-8'
+            'Content-Type' => 'application/vnd.api+json;charset=utf-8'
         ]);
 
         $this->assertInstanceOf(Testphase::class, $o);
@@ -139,7 +138,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         ))
         ->expectStatusCode(440) //wrong
         ->expectResponseHeader([
-            Request::HEADER_CONTENT_TYPE => 'application/vnd.api+json;charset=utf-8'
+            'Content-Type' => 'application/vnd.api+json;charset=utf-8'
         ])
         ->expectJSON()
         ->run();
