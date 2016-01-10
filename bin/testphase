@@ -218,6 +218,7 @@ foreach ($tests as $test) {
         echo '.';
         $stats->success += 1;
     } catch (\Exception $e) {
+
         //@todo if verbose show more details (trace)
         $message = $e->getMessage();
 
@@ -229,6 +230,13 @@ foreach ($tests as $test) {
             $test->getFilename(),
             $message
         );
+
+        if (get_class($e) == \Phramework\Exceptions\IncorrectParametersException::class) {
+            $message .= 'Incorrect:' . PHP_EOL . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+        } elseif (get_class($e) == \Phramework\Exceptions\MissingParametersException::class) {
+            $message .= 'Missing:' . PHP_EOL . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+        }
+
         //push message to error message
         $stats->errors[] = $message;
 
