@@ -51,7 +51,10 @@ class Testphase
 
     private $requestBody;
 
-    private $ruleStatusCode = 200;
+    /**
+     * @var integer[]
+     */
+    private $ruleStatusCode = [200];
 
     private $ruleHeaders = [];
 
@@ -103,10 +106,10 @@ class Testphase
         $responseBody,
         $callback
     ) {
-        if ($responseStatusCode != $this->ruleStatusCode) {
+        if (!in_array($responseStatusCode, $this->ruleStatusCode, true)) {
             throw new \Exception(sprintf(
                 'Expected status code "%s" got "%s"',
-                $this->ruleStatusCode,
+                implode(' or ', $this->ruleStatusCode),
                 $responseStatusCode
             ));
         }
@@ -131,7 +134,7 @@ class Testphase
 
         if ($this->ruleJSON && !Testphase::isJSON($responseBody)) {
             //Ignore isJSON body on "204 No Content" when it's empty
-            if ($this->ruleStatusCode != 204 || !empty($responseBody)) {
+            if ($responseStatusCode != 204 || !empty($responseBody)) {
                 throw new \Exception(sprintf(
                     'Expected valid JSON response Body'
                 ));
@@ -276,11 +279,16 @@ class Testphase
     /**
      * Set expected HTTP response Status Code
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-     * @param  Integer $statusCode
+     * @param  integer|integer[] $statusCode
      * @return Testphase Return's $this object
      */
     public function expectStatusCode($statusCode)
     {
+        //Work with arrays, if single integer is given
+        if (!is_array($statusCode)) {
+            $statusCode = [$statusCode]
+        }
+
         $this->ruleStatusCode = $statusCode;
 
         return $this;
