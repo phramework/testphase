@@ -50,6 +50,21 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * @covers Phramework\Testphase\Testphase::getVersion
+     */
+    public function testGetVersion()
+    {
+        $version = Testphase::getVersion();
+
+        $this->assertInternalType('string', $version);
+
+        $this->$this->assertRegExp(
+            '/^1\.[1-9]*[0-9]?\.[1-9]*[0-9]?$/',
+            $version,
+            'Validates againts 1.x.x versions'
+        );
+    }
 
     /**
      * @covers Phramework\Testphase\Testphase::run
@@ -133,7 +148,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     {
         $test = (new Testphase(
             'book',
-            Phramework::METHOD_GET,
+            'GET',
             $this->requestHeaders
         ))
         ->expectStatusCode(440) //wrong

@@ -28,6 +28,7 @@ use \Phramework\Validate\URLValidator;
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
+ * @since 0.0.0
  */
 class TestParser
 {
@@ -42,21 +43,40 @@ class TestParser
         return $this->export;
     }
 
-    protected static $global;
+    protected static $globals = null;
 
     public static function addGlobal($key, $value)
     {
-        if (!self::$global) {
-            self::$global = new \stdClass();
+        if (!static::$globals) {
+            static::initializeGlobals();
         }
 
-        self::$global->{$key} = $value;
+        static::$globals->{$key} = $value;
         return static::class;
     }
 
+    protected static function initializeGlobals()
+    {
+        //initialize globals
+        static::$globals = new \stdClass();
+
+        static::$globals->randInteger = rand(1, 100);
+        static::$globals->randString = Util::readableRandomString();
+        static::$globals->randHash =  sha1(rand() . rand() . rand());
+        static::$globals->randBoolean = rand(1, 999) % 2 ? true : false;
+    }
+
+    public static function getGlobals()
+    {
+        if (static::$globals === null) {
+            static::initializeGlobals();
+        }
+
+        return static::$globals;
+    }
     public static function checkGlobalSet($key)
     {
-        if (!property_exists(static::$global, $key)) {
+        if (!property_exists(static::$globals, $key)) {
             throw new \Exception(sprintf(
                 'Key "%s" not found in TestParser globals',
                 $key
@@ -69,10 +89,10 @@ class TestParser
     {
         if ($key) {
             static::checkGlobalSet($key);
-            return static::$global->{$key};
+            return static::$globals->{$key};
         }
 
-        return static::$global;
+        return static::$globals;
     }
 
     /**
@@ -250,6 +270,9 @@ class TestParser
         $this->export = $contentsParsed->response->export;
     }
 
+    /**
+     * @todo add special exception, when global is not found test should be ignored with special warning (EG unavailable)
+     */
     private function searchAndReplace($object)
     {
         foreach ($object as $key => &$value) {
@@ -259,26 +282,27 @@ class TestParser
 
             if (is_string($value)) {
                 $matches = [];
-                //Complete replace (key: "$$globalKey$")
+                //Complete replace (key: "{{{globalsKey}}}")
                 if (!!preg_match(
-                    '/^\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\$$/',
+                    '/^\{\{\{([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\}\}\}$/',
                     $value,
                     $matches
                 )) {
-                    $globalKey = $matches[1];
+                    $globalsKey = $matches[1];
 
                     //replace
-                    $value = static::getGlobal($globalKey);
+                    $value = static::getGlobal($globalsKey);
+                //replace "{{globalsKey}}" values
                 } elseif (!!preg_match_all(
-                    '/\$\$([a-zA-Z][a-zA-Z0-9\.\-_]{1,})/',
+                    '/\{\{([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\}\}/',
                     $value,
                     $matches
                 )) {
                     //Foreach variable replace
-                    foreach ($matches[1] as $globalKey) {
+                    foreach ($matches[1] as $globalsKey) {
                         $value = str_replace(
-                            '$$' . $globalKey,
-                            static::getGlobal($globalKey),
+                            '$$' . $globalsKey,
+                            static::getGlobal($globalsKey),
                             $value
                         );
                     }
@@ -374,9 +398,3 @@ class TestParser
         }';
     }
 }
-
-TestParser::addGlobal('randInteger', rand(1, 100));
-//@todo
-TestParser::addGlobal('randString', 'abc');
-TestParser::addGlobal('randHash', sha1(rand() . rand() . rand()));
-TestParser::addGlobal('randBoolean', rand(1, 999) % 2 ? true : false);
