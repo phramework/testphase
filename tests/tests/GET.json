@@ -6,10 +6,15 @@
   "request": {
     "url": "http://jsonplaceholder.typicode.com/posts",
     "method": "GET",
-    "headers": []
+    "headers": [
+      "Accept: application/json"
+    ]
   },
   "response": {
-    "statusCode": [200],
+    "statusCode": 200,
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    },
     "ruleObjects": [{
       "type": "array",
       "items": {

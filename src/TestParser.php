@@ -168,7 +168,7 @@ class TestParser
         //Check if contents are a valid jsonfile
         if (!Util::isJSON($contents)) {
             throw new \Exception(sprintf(
-                'File %s isn\'t a valid JSON file',
+                'File "%s" isn\'t a valid JSON file',
                 $filename
             ));
         }
@@ -185,8 +185,10 @@ class TestParser
                     ->setDefault('GET'),
                 'headers' => (new ArrayValidator())
                     ->setDefault([]),
-                'body' => (new ObjectValidator())
-                    ->setDefault((object)[])
+                'body' => new AnyOf([
+                    new ObjectValidator(),
+                    new StringValidator
+                ])
             ],
             ['url']
         );
@@ -259,7 +261,11 @@ class TestParser
             $contentsParsed->request->headers,
             (
                 isset($contentsParsed->request->body)
-                ? json_encode($contentsParsed->request->body)
+                ? (
+                    is_object($contentsParsed->request->body)
+                    ? json_encode($contentsParsed->request->body)
+                    : $contentsParsed->request->body
+                )
                 : null
             ),
             true //json

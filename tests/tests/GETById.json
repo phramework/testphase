@@ -14,11 +14,11 @@
       "type": "object",
       "properties": {
         "userId": {
-          "type": "unsignedinteger",
-          "enum": ["{{postId}}"]
+          "type": "unsignedinteger"
         },
         "id": {
-          "type": "unsignedinteger"
+          "type": "unsignedinteger",
+          "enum": ["{{postId}}"]
         },
         "title": {
           "type": "string"
