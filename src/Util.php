@@ -26,6 +26,21 @@ namespace Phramework\Testphase;
 class Util
 {
     /**
+     * Check if given string is valid JSON string
+     * @param  string  $string
+     * @return boolean
+     */
+    public static function isJSON($string)
+    {
+        $object = json_decode($string);
+        
+        return (is_string($string) && json_last_error() == JSON_ERROR_NONE
+            ? true
+            : false
+        );
+    }
+
+    /**
      * Create a random readable word
      * @param  integer $length *[Optional]* String's length
      * @return string

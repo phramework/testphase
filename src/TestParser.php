@@ -16,6 +16,9 @@
  */
 namespace Phramework\Testphase;
 
+use \Phramework\Validate\AnyOf;
+use \Phramework\Validate\OneOf;
+use \Phramework\Validate\AllOf;
 use \Phramework\Validate\ObjectValidator;
 use \Phramework\Validate\IntegerValidator;
 use \Phramework\Validate\UnsignedIntegerValidator;
@@ -29,6 +32,7 @@ use \Phramework\Validate\URLValidator;
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @since 0.0.0
+ * @version 1.0.0
  */
 class TestParser
 {
@@ -162,7 +166,7 @@ class TestParser
         $contents = file_get_contents($filename);
 
         //Check if contents are a valid jsonfile
-        if (!Testphase::isJSON($contents)) {
+        if (!Util::isJSON($contents)) {
             throw new \Exception(sprintf(
                 'File %s isn\'t a valid JSON file',
                 $filename
@@ -182,14 +186,21 @@ class TestParser
                 'headers' => (new ArrayValidator())
                     ->setDefault([]),
                 'body' => (new ObjectValidator())
-                    ->setDefault([])
+                    ->setDefault((object)[])
             ],
             ['url']
         );
 
         $validatorResponse = new ObjectValidator(
             [
-                'statusCode' => new UnsignedIntegerValidator(100, 999),
+                'statusCode' => new AnyOf([
+                    new UnsignedIntegerValidator(100, 999),
+                    new ArrayValidator(
+                        1,
+                        10,
+                        new UnsignedIntegerValidator(100, 999)
+                    )
+                ]),
                 'headers' => (new ObjectValidator())
                     ->setDefault((object)[]),
                 'ruleObjects' => (new ArrayValidator())
@@ -219,8 +230,11 @@ class TestParser
         );
 
         //Parse test file, using validator's rules
-        $this->contentsParsed = $contentsParsed = $validator->parse($contentsObject);
+        $this->contentsParsed = $contentsParsed = $validator->parse(
+            $contentsObject
+        );
 
+        //Fix meta if not defined
         $this->meta = (
             isset($contentsParsed->meta)
             ? $contentsParsed->meta
@@ -231,6 +245,8 @@ class TestParser
         );
     }
 
+    /**
+     */
     public function createTest()
     {
         //Recursive search whole object
@@ -272,6 +288,8 @@ class TestParser
 
     /**
      * @todo add special exception, when global is not found test should be ignored with special warning (EG unavailable)
+     * @todo add function
+     * @todo add array access
      */
     private function searchAndReplace($object)
     {
@@ -301,7 +319,7 @@ class TestParser
                     //Foreach variable replace
                     foreach ($matches[1] as $globalsKey) {
                         $value = str_replace(
-                            '$$' . $globalsKey,
+                            '{{' . $globalsKey . '}}',
                             static::getGlobal($globalsKey),
                             $value
                         );
@@ -312,9 +330,7 @@ class TestParser
         return $object;
     }
 
-    /**
-     * @todo use type
-     */
+/*
     public static function getResponseBodyJsonapiResource($ofType = null)
     {
         return '{
@@ -349,9 +365,6 @@ class TestParser
         }';
     }
 
-    /**
-     * @todo use type
-     */
     public static function getResponseBodyJsonapiCollection()
     {
         return '{
@@ -397,4 +410,5 @@ class TestParser
             "type": "object"
         }';
     }
+    **/
 }

@@ -36,34 +36,51 @@ class Testphase
      * @var string
      */
     private $url;
-
     /**
      * Request HTTP headers
      * @var array
      */
     private $headers;
-
     /**
      * Request HTTP method
      * @var string
      */
     private $method;
-
+    /**
+     * @var string|null
+     */
     private $requestBody;
-
     /**
      * @var integer[]
      */
     private $ruleStatusCode = [200];
-
+    /**
+     * @var array
+     */
     private $ruleHeaders = [];
-
+    /**
+     * @var array
+     */
     private $ruleObjects = [];
 
+    /**
+     * @var boolean
+     */
     private $ruleJSON = false;
 
+    /**
+     * @var boolean
+     */
     private $inspectOnFailure = false;
 
+    /**
+     * @param string      $url
+     *     Request url, without the base part, (see setBase method)
+     * @param string      $method      [Optional] HTTP request method
+     * @param array       $headers     [Optional] HTTP request headers
+     * @param string|null $requestBody [Optional] HTTP request body
+     * @param boolean     $ruleJSON    [Optional] Response rule, expect JSON encoded response body
+     */
     public function __construct(
         $url,
         $method = 'GET',
@@ -87,15 +104,26 @@ class Testphase
         $this->ruleJSON = $ruleJSON;
     }
 
+    /**
+     * @var integer
+     */
     private $responseStatusCode;
+
+    /**
+     * @var array
+     */
     private $responseHeaders;
+
+    /**
+     * @var string
+     */
     private $responseBody;
 
     /**
      * Handle renspose, test response against provided rules
-     * @param  integer $responseStatusCode [description]
-     * @param  array $responseHeaders    [description]
-     * @param  string $responseBody       [description]
+     * @param  integer $responseStatusCode
+     * @param  array $responseHeaders
+     * @param  string $responseBody
      * @param  callable|null
      * @throws \Exception
      * @return boolean True on success
@@ -132,7 +160,7 @@ class Testphase
             }
         }
 
-        if ($this->ruleJSON && !Testphase::isJSON($responseBody)) {
+        if ($this->ruleJSON && !Util::isJSON($responseBody)) {
             //Ignore isJSON body on "204 No Content" when it's empty
             if ($responseStatusCode != 204 || !empty($responseBody)) {
                 throw new \Exception(sprintf(
@@ -286,7 +314,7 @@ class Testphase
     {
         //Work with arrays, if single integer is given
         if (!is_array($statusCode)) {
-            $statusCode = [$statusCode]
+            $statusCode = [$statusCode];
         }
 
         $this->ruleStatusCode = $statusCode;
@@ -321,9 +349,9 @@ class Testphase
     }
 
     /**
-     * Set expect JSON flag rule value,
-     * when true it will throw an error if the response is not a valid JSON.
-     * Also ruleObjects only works with this flag set to true
+     * Set rule, expect JSON encoded response body.
+     * When true it will throw an error if the response is not a valid JSON.
+     * **NOTE** ruleObjects only works with this flag set to true
      * @param  boolean $flag [Optional] Value of the flag, default is true
      * @return Testphase Return's $this object
      */
@@ -336,31 +364,12 @@ class Testphase
 
     /**
      * Object validator, used to validate the response
-     * @param  ObjectValidator $object Validator object
+     * @param  BaseValidator $object Validator object
      * @return Testphase Return's $this object
      */
-    public function expectObject(ObjectValidator $object)
+    public function expectObject($object)
     {
         $this->ruleObjects[] = $object;
-
-        return $this;
-    }
-
-    /**
-     * Check if given string is valid JSON
-     * @param  string  $string
-     * @return boolean
-     */
-    public static function isJSON($string)
-    {
-        return (is_string($string)
-            && is_object(json_decode($string))
-            && (json_last_error() == JSON_ERROR_NONE)) ? true : false;
-    }
-
-    public static function setAuthorizationBasic($username, $password)
-    {
-        throw new \Phramework\Exceptions\NotImplementedExceptions();
 
         return $this;
     }
@@ -415,7 +424,6 @@ class Testphase
 
     /**
      * Get the value of Response Status Code
-     *
      * @return mixed
      */
     public function getResponseStatusCode()
@@ -425,8 +433,7 @@ class Testphase
 
     /**
      * Get the value of Response Headers
-     *
-     * @return mixed
+     * @return array
      */
     public function getResponseHeaders()
     {
@@ -435,8 +442,7 @@ class Testphase
 
     /**
      * Get the value of Response Body
-     *
-     * @return mixed
+     * @return string
      */
     public function getResponseBody()
     {
@@ -446,6 +452,7 @@ class Testphase
 
     /**
      * Get library's version
+     * @uses Doc comments of Testphase class to extract version tag
      * @return string
      */
     public static function getVersion()

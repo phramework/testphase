@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "description": "Get posts",
+    "order": -1
+  },
+  "request": {
+    "url": "http://jsonplaceholder.typicode.com/posts",
+    "method": "GET",
+    "headers": []
+  },
+  "response": {
+    "statusCode": [200],
+    "ruleObjects": [{
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "unsignedinteger"
+          },
+          "id": {
+            "type": "unsignedinteger"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        },
+        "required": ["userId", "id", "title", "body"]
+      }
+    }],
+    "export": {
+      "postId": "id"
+    }
+  }
+}

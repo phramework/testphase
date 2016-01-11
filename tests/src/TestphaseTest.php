@@ -127,20 +127,6 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::isJSON
-     */
-    public function testisJSON()
-    {
-        $this->assertTrue(
-            Testphase::isJSON('{"object" : "OK"}')
-        );
-
-        $this->assertFalse(
-            Testphase::isJSON('{"object" : "OK"}warning')
-        );
-    }
-
-    /**
      * @covers Phramework\Testphase\Testphase::run
      * @expectedException Exception
      */

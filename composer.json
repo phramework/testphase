@@ -10,7 +10,7 @@
   }],
   "require": {
     "php": ">=5.6",
-    "phramework/validate": "0.*",
+    "phramework/validate": "^0.4",
     "phramework/exceptions": "0.*",
     "ext-curl": "*",
     "ext-json": "*",
@@ -53,7 +53,7 @@
       "apigen generate -s ./src,./vendor/phramework/validate/src,./vendor/exceptions/validate/src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"testphase\"",
       "start=\"file://\";end=\"doc/index.html\"; echo \"\nOpen $start$(pwd)/$end\" in browser..."
     ],
-    "run": "php ./bin/testphase -d ./Examples -b ./Examples/bootstrap.php"
+    "run": "php ./bin/testphase -d ./tests/tests --show-globals"
   },
   "bin": [
     "bin/testphase"

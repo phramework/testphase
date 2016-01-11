@@ -186,7 +186,7 @@ class Binary
                 ) {
                     //global $arguments;
                     //global $test;
-
+                    //todo move to TestParser
                     $export = $test->getExport();
 
                     //Fetch all teest exports and add them as globals
@@ -209,7 +209,7 @@ class Binary
                         TestParser::addGlobal($key, $pathValue);
                     }
 
-                    if ($arguments->debug->value) {
+                    if ($arguments->debug) {
                         echo 'Response Status Code:' . PHP_EOL;
                         echo $responseStatusCode . PHP_EOL;
                         echo 'Response Headers:' . PHP_EOL;
@@ -232,7 +232,7 @@ class Binary
                     $message .= PHP_EOL . $test->getTest()->getResponseBody();
                 }
                 $message = sprintf(
-                    colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
+                    self::colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
                     $test->getFilename(),
                     $message
                 );
