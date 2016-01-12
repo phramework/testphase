@@ -4,18 +4,54 @@ namespace Phramework\Testphase;
 
 class GlobalsTest extends \PHPUnit_Framework_TestCase
 {
+    public function regexpProvider()
+    {
+        return [
+            [
+                '{{{key}}}',
+                (object) [
+                    'mode'  => Globals::KEY_VARIABLE,
+                    'key'   => 'key',
+                ]
+            ],
+            [
+                '{{{array[0]}}}',
+                (object) [
+                    'mode'  => Globals::KEY_ARRAY,
+                    'key'   => 'array',
+                    'index' => 0
+                ]
+            ],
+            [
+                '{{{func()}}}',
+                (object) [
+                    'mode'  => Globals::KEY_FUNCTION,
+                    'key'   => 'func'
+                ]
+            ]
+        ];
+    }
     /**
+     * @dataProvider regexpProvider
      * @covers Phramework\Testphase\Globals::regex
      */
-    public function testRegexp()
+    public function testRegexp($input, $expected)
     {
-        Globals::regex('{{{key}}}');
-        Globals::regex('{{{array[0]}}}');
-        Globals::regex('{{{array[10]}}}', true);
-        Globals::regex('{{{func()}}}');
-        Globals::regex('{{{func(param)}}}');
-        Globals::regex('{{{func(\'param\')}}}');
-        Globals::regex('{{{func("param")}}}');
+        $return = Globals::regex($input);
+
+        $this->assertInternalType('object', $return);
+
+
+        $this->assertEquals(
+            $expected,
+            $return
+        );
+
+        //Globals::regex('{{{array[10]}}}', true);
+        //Globals::regex('{{{func()}}}');
+        //Globals::regex('{{{func(param)}}}');
+        //Globals::regex('{{{func(\'param\')}}}');
+        //Globals::regex('{{{func("param")}}}');
     }
 
     /**

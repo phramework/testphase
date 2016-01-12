@@ -29,6 +29,9 @@ use \Phramework\Testphase\Util;
  */
 class Globals
 {
+    const KEY_VARIABLE = 'variable';
+    const KEY_FUNCTION = 'function';
+    const KEY_ARRAY    = 'array';
     /**
      * @var object
      */
@@ -37,7 +40,7 @@ class Globals
     public static function regex($value, $debug = false)
     {
         $key = '[a-zA-Z][a-zA-Z0-9\.\-_]{1,}';
-        $parameter = '([\'\"])?' . $key . '\4?';
+        $parameter = '([\'\"])?' . $key . '\4';
         //function parameter literal can be anything
         //param should be key
         $prefix = '{\{\{';
@@ -60,20 +63,18 @@ class Globals
             return null;
         }
 
-
-
         $object = new \stdClass();
 
         $object->key = $matches['key'];
-        $object->mode = 'variable';
+        $object->mode = self::KEY_VARIABLE;
 
         if (isset($matches['function']) && !empty($matches['function'])) {
-            $object->mode = 'function';
+            $object->mode = self::KEY_FUNCTION;
             if (key_exists('parameter', $matches)  && !empty($matches['parameter'])) {
                 $object->parameter = $matches['parameter'];
             }
         } elseif (isset($matches['array'])  && !empty($matches['array'])) {
-            $object->mode = 'array';
+            $object->mode = self::KEY_ARRAY;
             //should exists
             $object->index = $matches['index'];
         }
@@ -145,7 +146,7 @@ class Globals
             $global = static::$globals->{$regex->key};
 
             switch ($regex->mode) {
-                case 'function':
+                case self::KEY_FUNCTION:
                     $parameters = [];
 
                     if (property_exists($regex, 'parameters')) {
@@ -157,10 +158,10 @@ class Globals
                         $parameters
                     );
                     //break;
-                case 'array':
+                case self::KEY_ARRAY:
                     return $global[$regex->index];
                     //break;
-                case 'variable':
+                case self::KEY_VARIABLE:
                 default:
                     return $global;
             }
