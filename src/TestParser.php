@@ -47,58 +47,6 @@ class TestParser
         return $this->export;
     }
 
-    protected static $globals = null;
-
-    public static function addGlobal($key, $value)
-    {
-        if (!static::$globals) {
-            static::initializeGlobals();
-        }
-
-        static::$globals->{$key} = $value;
-        return static::class;
-    }
-
-    protected static function initializeGlobals()
-    {
-        //initialize globals
-        static::$globals = new \stdClass();
-
-        static::$globals->randInteger = rand(1, 100);
-        static::$globals->randString = Util::readableRandomString();
-        static::$globals->randHash =  sha1(rand() . rand() . rand());
-        static::$globals->randBoolean = rand(1, 999) % 2 ? true : false;
-    }
-
-    public static function getGlobals()
-    {
-        if (static::$globals === null) {
-            static::initializeGlobals();
-        }
-
-        return static::$globals;
-    }
-    public static function checkGlobalSet($key)
-    {
-        if (!property_exists(static::$globals, $key)) {
-            throw new \Exception(sprintf(
-                'Key "%s" not found in TestParser globals',
-                $key
-            ));
-        }
-        return static::class;
-    }
-
-    public static function getGlobal($key = null)
-    {
-        if ($key) {
-            static::checkGlobalSet($key);
-            return static::$globals->{$key};
-        }
-
-        return static::$globals;
-    }
-
     /**
      * Parsed test
      * @var Testphase
@@ -315,7 +263,7 @@ class TestParser
                     $globalsKey = $matches[1];
 
                     //replace
-                    $value = static::getGlobal($globalsKey);
+                    $value = Globals::get($globalsKey);
                 //replace "{{globalsKey}}" values
                 } elseif (!!preg_match_all(
                     '/\{\{([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\}\}/',
@@ -326,7 +274,7 @@ class TestParser
                     foreach ($matches[1] as $globalsKey) {
                         $value = str_replace(
                             '{{' . $globalsKey . '}}',
-                            static::getGlobal($globalsKey),
+                            Globals::get($globalsKey),
                             $value
                         );
                     }

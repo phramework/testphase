@@ -27,6 +27,7 @@ use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
  * Various utility methods
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
+ * @version 1.0.0
  * @since 1.0.0
  */
 class Binary
@@ -206,7 +207,7 @@ class Binary
 
                         }
 
-                        TestParser::addGlobal($key, $pathValue);
+                        Globals::set($key, $pathValue);
                     }
 
                     if ($arguments->debug) {
@@ -266,7 +267,7 @@ class Binary
 
         if ($arguments['show-globals']->value) {
             echo 'Globals:' . PHP_EOL;
-            print_r(TestParser::getGlobal());
+            print_r(Globals::get());
         }
 
         //dont print if immediate is true

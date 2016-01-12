@@ -22,9 +22,12 @@
       "properties": {
         "id": {
           "type": "unsignedinteger"
+        },
+        "title": {
+          "type": "string"
         }
       },
-      "required": ["id"]
+      "required": ["id", "title"]
     }],
     "export": {
       "newPostId": "id",
