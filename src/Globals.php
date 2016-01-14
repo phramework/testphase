@@ -37,19 +37,23 @@ class Globals
      */
     protected static $globals = null;
 
+    /**
+     * @todo remove debug functionality
+     */
     public static function regex($value, $debug = false)
     {
-        $key = '[a-zA-Z][a-zA-Z0-9\.\-_]{1,}';
-        $parameter = '([\'\"])?' . $key . '\4';
+        $key = '[a-zA-Z][a-zA-Z0-9\-_]{1,}';
+
+        $parameters = '([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\4';
         //function parameter literal can be anything
         //param should be key
-        $prefix = '{\{\{';
-        $suffix = '\}\}\}';
+        $prefix = '';//'{\{\{';
+        $suffix = '';//'\}\}\}';
         $exp = sprintf(
-            '/^\%s(?P<key>%s)(?:(?P<function>\((?P<parameter>%s)?\))|(?P<array>\[(?P<index>[1-9]*[0-9])\]))?%s$/',
+            '/^%s(?P<key>%s)(?:(?P<function>\((?P<parameters>%s)?\))|(?P<array>\[(?P<index>[1-9]*[0-9])\]))?%s$/',
             $prefix,
             $key,
-            $parameter,
+            $parameters,
             $suffix
         );
 
@@ -70,8 +74,9 @@ class Globals
 
         if (isset($matches['function']) && !empty($matches['function'])) {
             $object->mode = self::KEY_FUNCTION;
-            if (key_exists('parameter', $matches)  && !empty($matches['parameter'])) {
-                $object->parameter = $matches['parameter'];
+
+            if (key_exists('parameters', $matches)  && strlen((string)$matches['parameters'])) {
+                $object->parameters = $matches['parameters'];
             }
         } elseif (isset($matches['array'])  && !empty($matches['array'])) {
             $object->mode = self::KEY_ARRAY;
@@ -94,17 +99,26 @@ class Globals
     }
 
     /**
-     * @todo improve
+     * @todo keep a record of globals
      */
     protected static function initializeGlobals()
     {
         //initialize globals
         static::$globals = new \stdClass();
 
-        static::$globals->{'rand.integer'} = rand(1, 100);
-        static::$globals->{'rand.string'}  = [Util::class, 'readableRandomString'];
-        static::$globals->{'rand.hash'}    = sha1(rand() . rand() . rand());
-        static::$globals->{'rand.boolean'} = rand(1, 999) % 2 ? true : false;
+        static::$globals->{'rand-integer'} = function ($max = null) {
+            if ($max === null) {
+                $max = getrandmax();
+            }
+            return rand(0, $max);
+        };
+
+        static::$globals->{'rand-string'}  = function ($length = 8) {
+            return Util::readableRandomString($length);
+        };
+
+        static::$globals->{'rand-hash'}    = sha1(rand() . mt_rand() . rand());
+        static::$globals->{'rand-boolean'} = rand(1, 999) % 2 ? true : false;
         static::$globals->{'array'}        = [1, 3, 5, 7, 10];
     }
 
@@ -118,12 +132,7 @@ class Globals
             static::initializeGlobals();
         }
 
-        if (!property_exists(static::$globals, $key)) {
-            throw new \Exception(sprintf(
-                'Key "%s" not found in TestParser globals',
-                $key
-            ));
-        }
+        return property_exists(static::$globals, $key);
     }
 
     /**
@@ -134,28 +143,32 @@ class Globals
     public static function get($key = null, $operators = null)
     {
         if ($key !== null) {
-
             $regex = self::regex($key);
 
             if ($regex === null) {
                 throw new \Exception('Invalid key ' . $key);
             }
 
-            static::exists($regex->key);
+            if (!static::exists($regex->key)) {
+                throw new \Exception(sprintf(
+                    'Key "%s" not found in TestParser globals',
+                    $regex->key
+                ));
+            }
 
             $global = static::$globals->{$regex->key};
 
             switch ($regex->mode) {
                 case self::KEY_FUNCTION:
-                    $parameters = [];
+                    $functionParameters = [];
 
                     if (property_exists($regex, 'parameters')) {
-                        $parameters[$regex->parameters];
+                        $functionParameters[] = $regex->parameters;
                     }
 
                     return call_user_func_array(
                         $global,
-                        $parameters
+                        $functionParameters
                     );
                     //break;
                 case self::KEY_ARRAY:
