@@ -32,74 +32,14 @@ class Globals
     const KEY_VARIABLE = 'variable';
     const KEY_FUNCTION = 'function';
     const KEY_ARRAY    = 'array';
+
     /**
      * @var object
      */
     protected static $globals = null;
 
     /**
-     * @todo remove debug functionality
-     */
-    public static function regex($value, $debug = false)
-    {
-        $key = '[a-zA-Z][a-zA-Z0-9\-_]{1,}';
-
-        $parameters = '([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\4';
-        //function parameter literal can be anything
-        //param should be key
-        $prefix = '';//'{\{\{';
-        $suffix = '';//'\}\}\}';
-        $exp = sprintf(
-            '/^%s(?P<key>%s)(?:(?P<function>\((?P<parameters>%s)?\))|(?P<array>\[(?P<index>[1-9]*[0-9])\]))?%s$/',
-            $prefix,
-            $key,
-            $parameters,
-            $suffix
-        );
-
-        $return = preg_match(
-            $exp,
-            $value,
-            $matches
-        );
-
-        if (!$return) {
-            return null;
-        }
-
-        $object = new \stdClass();
-
-        $object->key = $matches['key'];
-        $object->mode = self::KEY_VARIABLE;
-
-        if (isset($matches['function']) && !empty($matches['function'])) {
-            $object->mode = self::KEY_FUNCTION;
-
-            if (key_exists('parameters', $matches)  && strlen((string)$matches['parameters'])) {
-                $object->parameters = $matches['parameters'];
-            }
-        } elseif (isset($matches['array'])  && !empty($matches['array'])) {
-            $object->mode = self::KEY_ARRAY;
-            //should exists
-            $object->index = $matches['index'];
-        }
-
-        if ($debug) {
-            echo $exp . PHP_EOL;
-
-            print_r([
-                $value,
-                $matches
-            ]);
-
-            var_dump($object);
-        }
-
-        return $object;
-    }
-
-    /**
-     * @todo keep a record of globals
+     * @todo keep a documentation record of globals
      */
     protected static function initializeGlobals()
     {
@@ -143,27 +83,27 @@ class Globals
     public static function get($key = null, $operators = null)
     {
         if ($key !== null) {
-            $regex = self::regex($key);
+            $parsed = Expression::parse($key);
 
-            if ($regex === null) {
+            if ($parsed === null) {
                 throw new \Exception('Invalid key ' . $key);
             }
 
-            if (!static::exists($regex->key)) {
+            if (!static::exists($parsed->key)) {
                 throw new \Exception(sprintf(
                     'Key "%s" not found in TestParser globals',
-                    $regex->key
+                    $parsed->key
                 ));
             }
 
-            $global = static::$globals->{$regex->key};
+            $global = static::$globals->{$parsed->key};
 
-            switch ($regex->mode) {
-                case self::KEY_FUNCTION:
+            switch ($parsed->mode) {
+                case Globals::KEY_FUNCTION:
                     $functionParameters = [];
 
-                    if (property_exists($regex, 'parameters')) {
-                        $functionParameters[] = $regex->parameters;
+                    if (property_exists($parsed, 'parameters')) {
+                        $functionParameters = $parsed->parameters;
                     }
 
                     return call_user_func_array(
@@ -171,10 +111,10 @@ class Globals
                         $functionParameters
                     );
                     //break;
-                case self::KEY_ARRAY:
-                    return $global[$regex->index];
+                case Globals::KEY_ARRAY:
+                    return $global[$parsed->index];
                     //break;
-                case self::KEY_VARIABLE:
+                case Globals::KEY_VARIABLE:
                 default:
                     return $global;
             }
