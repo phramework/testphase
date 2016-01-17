@@ -52,7 +52,7 @@ class Binary
             ->defaultValue(null);
 
         $specs->add('v|verbose', 'Verbose output')
-            ->defaultValue(true);
+            ->defaultValue(false);
 
         $specs->add('show-globals', 'Show values of global variables')->defaultValue(false);
         $specs->add('debug', 'Show debug messages')->defaultValue(false);
@@ -214,7 +214,7 @@ class Binary
             }
 
             $testphaseCollection = $test->getTest();
-            
+
             //Include number of additional testphase collections
             $stats->tests += count($testphaseCollection) - 1 ;
 
@@ -291,9 +291,11 @@ class Binary
                     );
 
                     if (get_class($e) == \Phramework\Exceptions\IncorrectParametersException::class) {
-                        $message .= 'Incorrect:' . PHP_EOL . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                        $message .= 'Incorrect:' . PHP_EOL
+                            . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
                     } elseif (get_class($e) == \Phramework\Exceptions\MissingParametersException::class) {
-                        $message .= 'Missing:' . PHP_EOL . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                        $message .= 'Missing:' . PHP_EOL
+                            . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
                     }
 
                     //push message to error message

@@ -10,7 +10,7 @@
       "Accept: application/json",
       "Content-Type: application/x-www-form-urlencoded"
     ],
-    "body": "title=foo"
+    "body": "title={{rand-string()}}"
   },
   "response": {
     "statusCode": 201,

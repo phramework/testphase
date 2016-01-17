@@ -33,10 +33,6 @@
         }
       },
       "required": ["id", "title"]
-    }],
-    "export": {
-      "newPostId": "id",
-      "newPostTitle": "title"
-    }
+    }]
   }
 }

@@ -44,9 +44,40 @@ class Expression
     const PATTERN_KEY = '[a-zA-Z][a-zA-Z0-9\-_]{1,}';
     const PATTERN_FUNCTION_PARAMETER = self::PATTERN_KEY . '|([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\5';
     const PATTERN_ARRAY_INDEX = '[1-9]*[0-9]';
+
     /**
-     * [getExpression description]
-     * @param   $expression [description]
+     * @param  string $expression
+     * @return string[4]
+     */
+    public static function getPrefixSuffix($expression = Expression::EXPRESSION_TYPE_PLAIN)
+    {
+        $prefix = '';
+        $suffix = '';
+        $patternPrefix = '';
+        $patternSuffix = '';
+
+        switch ($expression) {
+            case Expression::EXPRESSION_TYPE_PLAIN:
+                $patternPrefix = '^';
+                $patternSuffix = '$';
+                break;
+            case Expression::EXPRESSION_TYPE_REPLACE:
+                $prefix = '{{{';
+                $suffix = '}}}';
+                $patternPrefix = '^';
+                $patternSuffix = '$';
+                break;
+            case Expression::EXPRESSION_TYPE_INLINE_REPLACE:
+                $prefix = '{{';
+                $suffix = '}}';
+                break;
+        }
+
+        return [$prefix, $suffix, $patternPrefix, $patternSuffix];
+    }
+
+    /**
+     * @param string $expression
      * @return string Returns a regular expession string
      */
     public static function getExpression($expression = Expression::EXPRESSION_TYPE_PLAIN)
@@ -56,27 +87,23 @@ class Expression
         //$functionParametersExpression = '([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\5';
         //$functionParametersExpression = self::KEY_EXPRESSION . '|([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\5';
         //$arrayIndexExpression = '[1-9]*[0-9]';
-        $prefix = '';
-        $suffix = '';
 
-        switch ($expression) {
-            case Expression::EXPRESSION_TYPE_REPLACE:
-                $prefix = '\{\{\{';
-                $suffix = '\}\}\}';
-                break;
-            case Expression::EXPRESSION_TYPE_INLINE_REPLACE:
-                $prefix = '{\{';
-                $suffix = '\}\}';
-                break;
-        }
+        list(
+            $prefix,
+            $suffix,
+            $patternPrefix,
+            $patternSuffix
+        ) = self::getPrefixSuffix($expression);
 
         $expression = sprintf(
-            '/^%s(?P<value>(?P<key>%s)(?:(?P<function>\((?P<parameters>%s)?\))|(?P<array>\[(?P<index>%s)\]))?)%s$/',
-            $prefix,
+            '/%s%s(?P<value>(?P<key>%s)(?:(?P<function>\((?P<parameters>%s)?\))|(?P<array>\[(?P<index>%s)\]))?)%s%s/',
+            $patternPrefix,
+            preg_quote($prefix),
             self::PATTERN_KEY,
             self::PATTERN_FUNCTION_PARAMETER,
             self::PATTERN_ARRAY_INDEX,
-            $suffix
+            preg_quote($suffix),
+            $patternSuffix
         );
 
         return $expression;

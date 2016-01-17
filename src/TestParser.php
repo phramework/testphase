@@ -29,7 +29,8 @@ use \Phramework\Validate\StringValidator;
 use \Phramework\Validate\URLValidator;
 
 /**
- * Parse a test from a file
+ * Parse tests from file.
+ * Α TestParser instance may contain one or more Testphase instances.
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @since 0.0.0
@@ -98,17 +99,20 @@ class TestParser
      * Parse test informations from a json file
      * this method will parse the file and prepare the meta object
      * use createTest to complete creation of test
-     * @param String $filename
+     * @param String $filename JSON file containing the test
      * @todo Set $validatorRequest header's subtype
-     *
+     * @throws Phramework\Exceptions\NotFoundException When file is not found.
+     * @throws Exception When file contains not valid JSON.
+     * @throws Phramework\Exceptions\MissingParametersException When required test properties are not set.
+     * @throws Phramework\Exceptions\IncorrectParametersException When test properties are not correct.
      */
     public function __construct($filename)
     {
         $this->filename = $filename;
 
         if (!file_exists($filename)) {
-            throw new \Exception(sprintf(
-                'File %s doesn\'t exist',
+            throw new \Phramework\Exceptions\NotFoundException(sprintf(
+                'File "%s" doesn\'t exist',
                 $filename
             ));
         }
@@ -133,8 +137,11 @@ class TestParser
                 'url' => new StringValidator(1, 2048),
                 'method' => (new StringValidator())
                     ->setDefault('GET'),
-                'headers' => (new ArrayValidator())
-                    ->setDefault([]),
+                'headers' => (new ArrayValidator(
+                    0,
+                    null,
+                    new StringValidator()
+                ))->setDefault([]),
                 'body' => new OneOf([ // Allow objects, strings or array of them
                     new ObjectValidator(),
                     new StringValidator,
@@ -216,7 +223,7 @@ class TestParser
         $requestBody = null;
 
         $requestBodies = [];
-        
+
         if (isset($contentsParsed->request->body)
             && !empty($contentsParsed->request->body)
         ) {
@@ -243,6 +250,7 @@ class TestParser
         if (empty($requestBodies)) {
             $requestBodies[] = null;
         }
+
         foreach ($requestBodies as $requestBody) {
             //Create a Testphase object using parsed rule
             $testphase = (new Testphase(
@@ -277,12 +285,25 @@ class TestParser
     }
 
     /**
-     * @todo add special exception, when global is not found test should be ignored with special warning (EG unavailable)
+     * @todo add special exception, when global is not found test should
+     * be ignored with special warning (EG unavailable)
      * @todo add function
      * @todo add array access
      */
     private function searchAndReplace($object)
     {
+        $pattern_replace        = Expression::getExpression(
+            Expression::EXPRESSION_TYPE_REPLACE
+        );
+
+        $pattern_inline_replace = Expression::getExpression(
+            Expression::EXPRESSION_TYPE_INLINE_REPLACE
+        );
+
+        list($prefix, $suffix) = Expression::getPrefixSuffix(
+            Expression::EXPRESSION_TYPE_INLINE_REPLACE
+        );
+
         foreach ($object as $key => &$value) {
             if (is_array($value) || is_object($value)) {
                 $value = $this->searchAndReplace($value);
@@ -290,26 +311,27 @@ class TestParser
 
             if (is_string($value)) {
                 $matches = [];
-                //Complete replace (key: "{{{globalsKey}}}")
+                //Complete replace
                 if (!!preg_match(
-                    '/^\{\{\{([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\}\}\}$/',
+                    $pattern_replace,
                     $value,
                     $matches
                 )) {
-                    $globalsKey = $matches[1];
+                    $globalsKey = $matches['value'];
 
                     //replace
                     $value = Globals::get($globalsKey);
-                //replace "{{globalsKey}}" values
+
                 } elseif (!!preg_match_all(
-                    '/\{\{([a-zA-Z][a-zA-Z0-9\.\-_]{1,})\}\}/',
+                    $pattern_inline_replace,
                     $value,
                     $matches
                 )) {
-                    //Foreach variable replace
-                    foreach ($matches[1] as $globalsKey) {
+                    //Foreach variable replace in string
+                    foreach ($matches['value'] as $globalsKey) {
+                        
                         $value = str_replace(
-                            '{{' . $globalsKey . '}}',
+                            $prefix . $globalsKey . $suffix,
                             Globals::get($globalsKey),
                             $value
                         );
