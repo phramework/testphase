@@ -53,7 +53,7 @@
       "apigen generate -s ./src,./vendor/phramework/validate/src,./vendor/phramework/exceptions/src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"testphase\"",
       "start=\"file://\";end=\"doc/index.html\"; echo \"\nOpen $start$(pwd)/$end\" in browser..."
     ],
-    "run": "php ./bin/testphase -d ./tests/tests --show-globals --verbose"
+    "run": "php ./bin/testphase -d ./tests/tests -b ./tests/tests/Bootstrap.php --show-globals --verbose"
   },
   "bin": [
     "bin/testphase"

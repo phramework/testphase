@@ -137,6 +137,11 @@ class TestParser
                 'url' => new StringValidator(1, 2048),
                 'method' => (new StringValidator())
                     ->setDefault('GET'),
+                'iterators' => (new ObjectValidator(
+                    [],
+                    [],
+                    true //Todo use Expression::PATTERN_KEY
+                ))->setDefault((object)[]),
                 'headers' => (new ArrayValidator(
                     0,
                     null,
@@ -172,8 +177,11 @@ class TestParser
                     ->setDefault((object)[]),
                 'ruleObjects' => (new ArrayValidator())
                     ->setDefault([]),
-                'export' => (new ObjectValidator())
-                    ->setDefault((object)[])
+                'export' => (new ObjectValidator(
+                    [],
+                    [],
+                    true //todo Validate key's pattern (using additionalProperties)
+                ))->setDefault((object)[])
             ],
             ['statusCode']
         );
@@ -211,84 +219,116 @@ class TestParser
             ]
         );
     }
+    public static function combinations($object)
+    {
+        $combinations = [];
+        foreach ($object as $iteratorKey => $iteratorValue) {
+            $combinations[] = (object) [
+                $iteratorKey => $iteratorValue[0]
+            ];
+        }
+
+        return $combinations;
+    }
 
     /**
      * @todo clean up
+     * @todo implement combinations
      */
     public function createTest()
     {
-        //Recursive search whole object
-        $contentsParsed = $this->searchAndReplace($this->contentsParsed);
-
-        $requestBody = null;
-
-        $requestBodies = [];
-
-        if (isset($contentsParsed->request->body)
-            && !empty($contentsParsed->request->body)
-        ) {
-            if (!is_array($contentsParsed->request->body)) {
-                //Work with array
-                $contentsParsed->request->body = [
-                    $contentsParsed->request->body
-                ];
-            }
-
-            foreach ($contentsParsed->request->body as $body) {
-                //Push to bodies
-                $requestBodies[] = (
-                    is_object($body)
-                    ? json_encode($body)
-                    : $body
-                );
-            }
-        }
-
         $testphaseCollection = [];
 
-        //Incase there is no request body, then at least one test must be created
-        if (empty($requestBodies)) {
-            $requestBodies[] = null;
-        }
+        //searchAndReplace in request->iterators first
+        $iterators = $this->searchAndReplace(
+            $this->contentsParsed->request->iterators
+        );
 
-        foreach ($requestBodies as $requestBody) {
-            //Create a Testphase object using parsed rule
-            $testphase = (new Testphase(
-                $contentsParsed->request->url,
-                $contentsParsed->request->method,
-                $contentsParsed->request->headers,
-                $requestBody
-            ))
-            ->expectStatusCode($contentsParsed->response->statusCode)
-            ->expectResponseHeader($contentsParsed->response->headers);
+        $combinations = self::combinations($iterators);
 
-            $testphase->expectJSON(
-                isset($contentsParsed->meta->JSONbody)
-                ? $contentsParsed->meta->JSONbody
-                : true
-            );
+        //replace back to contentsParsed
+        $this->contentsParsed->request->iterators = $iterators;
 
-            //Add rule objects to validate body
-            foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
-                if (is_string($ruleObject)) {
-                    $ruleObject = json_decode($ruleObject);
+        foreach ($combinations as $combination) {
+            foreach ($combination as $combinationKey => $combinationValue) {
+                Globals::set($combinationKey, $combinationValue);
+            }
+
+            //echo Globals::toString() . PHP_EOL;
+
+            //Recursive search whole object
+            $contentsParsed = $this->searchAndReplace($this->contentsParsed);
+
+            $requestBody = null;
+
+            $requestBodies = [];
+
+            if (isset($contentsParsed->request->body)
+                && !empty($contentsParsed->request->body)
+            ) {
+                if (!is_array($contentsParsed->request->body)) {
+                    //Work with array
+                    $contentsParsed->request->body = [
+                        $contentsParsed->request->body
+                    ];
                 }
 
-                $testphase->expectObject(ObjectValidator::createFromObject($ruleObject));
+                foreach ($contentsParsed->request->body as $body) {
+                    //Push to bodies
+                    $requestBodies[] = (
+                        is_object($body)
+                        ? json_encode($body)
+                        : $body
+                    );
+                }
             }
-            $testphaseCollection[] = $testphase;
+
+
+
+            //Incase there is no request body, then at least one test must be created
+            if (empty($requestBodies)) {
+                $requestBodies[] = null;
+            }
+
+            foreach ($requestBodies as $requestBody) {
+                //Create a Testphase object using parsed rule
+                $testphase = (new Testphase(
+                    $contentsParsed->request->url,
+                    $contentsParsed->request->method,
+                    $contentsParsed->request->headers,
+                    $requestBody
+                ))
+                ->expectStatusCode($contentsParsed->response->statusCode)
+                ->expectResponseHeader($contentsParsed->response->headers);
+
+                $testphase->expectJSON(
+                    isset($contentsParsed->meta->JSONbody)
+                    ? $contentsParsed->meta->JSONbody
+                    : true
+                );
+
+                //Add rule objects to validate body
+                foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
+                    if (is_string($ruleObject)) {
+                        $ruleObject = json_decode($ruleObject);
+                    }
+
+                    $testphase->expectObject(ObjectValidator::createFromObject($ruleObject));
+                }
+                //push test
+                $testphaseCollection[] = $testphase;
+
+                //todo
+                $this->export = $contentsParsed->response->export;
+            }
         }
 
         $this->testphaseCollection = $testphaseCollection;
-        //todo
-        $this->export = $contentsParsed->response->export;
     }
 
     /**
      * @todo add special exception, when global is not found test should
      * be ignored with special warning (EG unavailable)
-     * @todo add function
-     * @todo add array access
      */
     private function searchAndReplace($object)
     {
