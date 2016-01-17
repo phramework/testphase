@@ -36,28 +36,34 @@ class Testphase
      * @var string
      */
     private $url;
+
     /**
      * Request HTTP headers
      * @var array
      */
     private $headers;
+
     /**
      * Request HTTP method
      * @var string
      */
     private $method;
+
     /**
      * @var string|null
      */
     private $requestBody;
+
     /**
      * @var int[]
      */
     private $ruleStatusCode = [200];
+
     /**
      * @var array
      */
     private $ruleHeaders = [];
+
     /**
      * @var array
      */
@@ -286,9 +292,12 @@ class Testphase
 
         foreach (explode("\n", $responseHeadersTemp) as $i => $line) {
             if ($i !== 0 && !empty($line)) {
-                list($key, $value) = explode(': ', $line);
 
-                $responseHeaders[$key] = $value;
+                if (count($parts = explode(': ', $line)) === 2) {
+                    list($key, $value) = explode(': ', $line);
+
+                    $responseHeaders[$key] = $value;
+                }
             }
         }
 
@@ -367,7 +376,7 @@ class Testphase
     }
 
     /**
-     * Object validator, used to validate the response
+     * Object validator, as an additional set of rules to validate the response.
      * @param  BaseValidator $object Validator object
      * @return $this
      */

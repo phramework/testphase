@@ -30,8 +30,9 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        return;
-        Testphase::setBase('http://localhost:8000/');
+        $base = 'http://jsonplaceholder.typicode.com/';
+
+        Testphase::setBase($base);
 
         $this->object = new Testphase(
             'book',
@@ -77,7 +78,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('string', $version);
 
         $this->assertRegExp(
-            '/^1\.[1-9]*[0-9]?\.[1-9]*[0-9]?$/',
+            '/^1\.[1-9]*[0-9]?\.[1-9]*[0-9]?(:?\-[a-zA-Z0-9]+)?$/',
             $version,
             'Validates againts 1.x.x versions'
         );
@@ -88,29 +89,48 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testRunSuccess()
     {
-        return;
         $test = (new Testphase(
-            'bookz',
+            'posts/notFound',
             'GET',
             $this->requestHeaders
         ))
         ->expectStatusCode(404)
-        ->expectResponseHeader([
-            'Content-Type' => 'application/json;charset=utf-8'
-        ])
         ->expectJSON()
         ->run();
-    }
 
-    /**
-     * @covers Phramework\Testphase\Testphase::expectStatusCode
-     */
-    public function testExpectStatusCode()
-    {
-        return;
-        $o = $this->object->expectStatusCode(200);
+        $test = (new Testphase(
+            'posts/notFound',
+            'POST',
+            $this->requestHeaders,
+            '{}'
+        ))
+        ->expectStatusCode(404)
+        ->run();
 
-        $this->assertInstanceOf(Testphase::class, $o);
+        $test = (new Testphase(
+            'posts/notFound',
+            'PATCH',
+            $this->requestHeaders
+        ))
+        ->expectStatusCode(404)
+        ->run();
+
+
+        $test = (new Testphase(
+            'posts/notFound',
+            'PUT',
+            $this->requestHeaders
+        ))
+        ->expectStatusCode(404)
+        ->run();
+
+        $test = (new Testphase(
+            'posts/notFound',
+            'DELETE',
+            $this->requestHeaders
+        ))
+        ->expectStatusCode(404)
+        ->run();
     }
 
     /**
@@ -118,12 +138,26 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testExpectResponseHeader()
     {
-        return;
-        $o = $this->object->expectResponseHeader([
+        $this->object->expectResponseHeader([
+            'Content-Type' => 'application/vnd.api+json;charset=utf-8'
+        ]);
+
+        $o = $this->object->expectResponseHeader((object)[
             'Content-Type' => 'application/vnd.api+json;charset=utf-8'
         ]);
 
         $this->assertInstanceOf(Testphase::class, $o);
+    }
+
+    /**
+     * @covers Phramework\Testphase\Testphase::expectResponseHeader
+     * @expectedException Exception
+     */
+    public function testExpectResponseHeaderFailure1()
+    {
+        $this->object->expectResponseHeader(
+            'application/vnd.api+json;charset=utf-8'
+        );
     }
 
     /**
@@ -166,5 +200,122 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         ])
         ->expectJSON()
         ->run();
+    }
+
+    /**
+     * @covers Phramework\Testphase\Testphase::setBase
+     */
+    public function testSetBase()
+    {
+        $base = 'http://jsonplaceholder.typicode.com/';
+
+        Testphase::setBase($base);
+
+        return $base;
+    }
+
+    /**
+     * @covers Phramework\Testphase\Testphase::getBase
+     * @depends testSetBase
+     */
+    public function testGetBase($base)
+    {
+        $this->assertSame(
+            $base,
+            Testphase::getBase()
+        );
+    }
+
+    /**
+     * @covers Phramework\Testphase\Testphase::expectStatusCode
+     */
+    public function testExpectStatusCode()
+    {
+        $testphase = (new Testphase(
+            'posts/notFound',
+            'GET'
+        ))->expectStatusCode(404);
+
+        $testphase->run();
+
+        $statusCode = $testphase->getResponseStatusCode();
+
+        $this->assertInternalType('integer', $statusCode);
+        $this->assertSame(404, $statusCode);
+
+        //multiple status codes
+
+        $testphase = (new Testphase(
+            'posts/notFound',
+            'GET'
+        ))->expectStatusCode([400, 404]);
+
+        $testphase->run();
+
+        $statusCode = $testphase->getResponseStatusCode();
+
+        $this->assertInternalType('integer', $statusCode);
+        $this->assertSame(404, $statusCode);
+    }
+
+    /**
+     * @covers Phramework\Testphase\Testphase::getResponseStatusCode
+     */
+    public function testGetResponseStatusCode()
+    {
+        $testphase = (new Testphase(
+            'posts/notFound',
+            'GET'
+        ))->expectStatusCode(404);
+
+        $testphase->run();
+
+        $statusCode = $testphase->getResponseStatusCode();
+
+        $this->assertInternalType('integer', $statusCode);
+        $this->assertSame(404, $statusCode);
+    }
+
+    /**
+     * @covers Phramework\Testphase\Testphase::getResponseBody
+     */
+    public function testGetResponseBody()
+    {
+        $testphase = (new Testphase(
+            'posts/notFound',
+            'GET'
+        ))->expectStatusCode(404);
+
+        $testphase->run();
+
+        $responseBody = $testphase->getResponseBody();
+
+        $this->assertInternalType('string', $responseBody);
+
+        $this->assertTrue(Util::isJSON($responseBody));
+    }
+
+    /**
+     * @covers Phramework\Testphase\Testphase::getResponseHeaders
+     */
+    public function testGetResponseHeaders()
+    {
+        $testphase = (new Testphase(
+            'posts/notFound',
+            'GET'
+        ))->expectStatusCode(404);
+
+        $testphase->run();
+
+        $responseHeaders = $testphase->getResponseHeaders();
+
+        $this->assertInternalType('array', $responseHeaders);
+
+        $this->assertArrayHasKey('Content-Type', $responseHeaders);
+
+        $this->assertStringStartsWith(
+            'application/json',
+            $responseHeaders['Content-Type']
+        );
     }
 }
