@@ -1,13 +1,37 @@
 # testphase
 API testing environment build for phramework and RESTful APIs
 
+[![Coverage Status](https://coveralls.io/repos/phramework/testphase/badge.svg?branch=master&service=github)](https://coveralls.io/github/phramework/testphase?branch=master) [![Build Status](https://travis-ci.org/phramework/testphase.svg?branch=master)](https://travis-ci.org/phramework/testphase)
+
 ## Usage
+Require package using composer
+
+```bash
+composer require phramework/testphase
+```
+
+### Execute tests written in JSON files using command line
 
 ```
 ./vendon/bin/testphase help -b ./bootstrap.php -d ./tests-directory/
 ```
 
-Inside your `bootstrap.php` file you should use the `Testphase::setBase` method to set the base url of your api. For example `Testphase::setBase('http://localhost/myapp/api');`
+Inside your `bootstrap.php` file you MAY use the `Testphase::setBase` method to set the base url of your API. For example: `Testphase::setBase('http://localhost/myapp/api/');`
+
+### Execute tests in PHP scripts
+
+```php
+$test = (new Testphase(
+    'posts/notFound',
+    'GET',
+    [
+        'Accept: application/json'
+    ]
+))
+->expectStatusCode(404)
+->expectJSON()
+->run();
+```
 
 ## Development
 ### Install
@@ -16,12 +40,14 @@ Inside your `bootstrap.php` file you should use the `Testphase::setBase` method 
 composer update
 ```
 
-### Test and lint code
+### Lint and test code
 
 ```bash
 composer lint
 composer test
 ```
+
+Testing relies on [JSONPlaceholder](http://jsonplaceholder.typicode.com/) service.
 
 ### Generate documentation
 

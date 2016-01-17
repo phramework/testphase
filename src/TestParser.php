@@ -51,9 +51,9 @@ class TestParser
 
     /**
      * Parsed test
-     * @var Testphase
+     * @var Testphase[]
      */
-    protected $testphase = null;
+    protected $testphaseCollection = null;
 
     /**
      * Get parsed test
@@ -62,10 +62,10 @@ class TestParser
      */
     public function getTest()
     {
-        if ($this->testphase === null) {
+        if ($this->testphaseCollection === null) {
             throw new \Exception('Test is not created');
         }
-        return $this->testphase;
+        return $this->testphaseCollection;
     }
 
     protected $contentsParsed;
@@ -279,7 +279,7 @@ class TestParser
             $testphaseCollection[] = $testphase;
         }
 
-        $this->testphase = $testphaseCollection;
+        $this->testphaseCollection = $testphaseCollection;
         //todo
         $this->export = $contentsParsed->response->export;
     }
@@ -329,7 +329,7 @@ class TestParser
                 )) {
                     //Foreach variable replace in string
                     foreach ($matches['value'] as $globalsKey) {
-                        
+
                         $value = str_replace(
                             $prefix . $globalsKey . $suffix,
                             Globals::get($globalsKey),

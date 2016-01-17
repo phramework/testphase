@@ -26,7 +26,8 @@ use \GetOptionKit\OptionParser;
 use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
 
 /**
- * Various utility methods
+ * This class is used by the script executed as binary.
+ * Construct method is responsible to parse the arguments passed to script.
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @version 1.0.0
@@ -39,6 +40,9 @@ class Binary
      */
     protected $arguments;
 
+    /**
+     * @param array $argv Array of arguments passed to script
+     */
     public function __construct($argv)
     {
         $specs = new OptionCollection;
@@ -69,6 +73,11 @@ class Binary
         unset($parser);
     }
 
+    /**
+     * Invoke scripts
+     * @return integer Returns indicate how the script exited.
+     * Normal exit is generally represented by a 0 return.
+     */
     public function invoke()
     {
         echo 'testphase v' . Testphase::getVersion() . PHP_EOL;
@@ -144,7 +153,7 @@ class Binary
         }
 
         //Sort tests by order
-        uasort($tests, [self::class, 'sortTest']);
+        uasort($tests, [self::class, 'sortTests']);
 
         //Statistics object
         $stats = (object)[
@@ -155,7 +164,7 @@ class Binary
             'errors' => []
         ];
 
-        $i = 0;
+        $testIndex = 0;
 
         //Execute tests
         foreach ($tests as $test) {
@@ -229,7 +238,7 @@ class Binary
             $testphaseCollection = $test->getTest();
 
             //Include number of additional testphase collections
-            $stats->tests += count($testphaseCollection) - 1 ;
+            $stats->tests += count($testphaseCollection) - 1;
 
             foreach ($testphaseCollection as $testphase) {
                 try {
@@ -331,9 +340,9 @@ class Binary
 
                     $stats->error += 1;
                 }
-                ++$i;
+                ++$testIndex;
                 //Allow only 80 characters per line
-                if (!($i % 79)) {
+                if (!($testIndex % 79)) {
                     echo PHP_EOL;
                 }
             }
@@ -341,7 +350,7 @@ class Binary
 
         echo PHP_EOL;
 
-        if ($arguments['show-globals']->value) {
+        if ($arguments->{'show-globals'}) {
             echo 'Globals:' . PHP_EOL;
             echo Globals::toString() . PHP_EOL;
         }
@@ -369,7 +378,7 @@ class Binary
         return 0;
     }
 
-    protected static function sortTest($a, $b)
+    protected static function sortTests($a, $b)
     {
         return (
             $a->getMeta()->order < $b->getMeta()->order
