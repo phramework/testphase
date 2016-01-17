@@ -51,7 +51,7 @@ class Testphase
      */
     private $requestBody;
     /**
-     * @var integer[]
+     * @var int[]
      */
     private $ruleStatusCode = [200];
     /**
@@ -76,10 +76,10 @@ class Testphase
     /**
      * @param string      $url
      *     Request url, without the base part, (see setBase method)
-     * @param string      $method      [Optional] HTTP request method
-     * @param array       $headers     [Optional] HTTP request headers
-     * @param string|null $requestBody [Optional] HTTP request body
-     * @param boolean     $ruleJSON    [Optional] Response rule, expect JSON encoded response body
+     * @param string      $method      *[Optional]* HTTP request method
+     * @param array       $headers     *[Optional]* HTTP request headers
+     * @param string|null $requestBody *[Optional]* HTTP request body
+     * @param boolean     $ruleJSON    *[Optional]* Response rule, expect JSON encoded response body
      */
     public function __construct(
         $url,
@@ -105,7 +105,7 @@ class Testphase
     }
 
     /**
-     * @var integer
+     * @var int
      */
     private $responseStatusCode;
 
@@ -121,7 +121,7 @@ class Testphase
 
     /**
      * Handle renspose, test response against provided rules
-     * @param  integer $responseStatusCode
+     * @param  int $responseStatusCode
      * @param  array $responseHeaders
      * @param  string $responseBody
      * @param  callable|null
@@ -203,7 +203,7 @@ class Testphase
     /**
      * Run testphase
      * Will execute the request and apply all defined rules to validate the response
-     * @param  callable|null $callback [Optional] Callback to execute after
+     * @param  callable|null $callback *[Optional]* Callback to execute after
      * completing the test rules
      * @return true On success
      */
@@ -307,12 +307,12 @@ class Testphase
     /**
      * Set expected HTTP response Status Code
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-     * @param  integer|integer[] $statusCode
-     * @return Testphase Return's $this object
+     * @param  int|int[] $statusCode
+     * @return $this
      */
     public function expectStatusCode($statusCode)
     {
-        //Work with arrays, if single integer is given
+        //Work with arrays, if single int is given
         if (!is_array($statusCode)) {
             $statusCode = [$statusCode];
         }
@@ -325,7 +325,7 @@ class Testphase
     /**
      * Add expected response header
      * @param  array[]|object $ruleHeaders
-     * @return Testphase Return's $this object
+     * @return $this
      * @throws Exception When $ruleHeaders is not an array
      */
     public function expectResponseHeader($ruleHeaders)
@@ -336,7 +336,7 @@ class Testphase
 
         if (!is_array($ruleHeaders)) {
             throw new \Exception(
-                'Expecting array for method expectResponseHeader'
+                'Expecting array at expectResponseHeader method'
             );
         }
 
@@ -352,8 +352,8 @@ class Testphase
      * Set rule, expect JSON encoded response body.
      * When true it will throw an error if the response is not a valid JSON.
      * **NOTE** ruleObjects only works with this flag set to true
-     * @param  boolean $flag [Optional] Value of the flag, default is true
-     * @return Testphase Return's $this object
+     * @param  boolean $flag *[Optional]* Value of the flag, default is true
+     * @return $this
      */
     public function expectJSON($flag = true)
     {
@@ -365,7 +365,7 @@ class Testphase
     /**
      * Object validator, used to validate the response
      * @param  BaseValidator $object Validator object
-     * @return Testphase Return's $this object
+     * @return $this
      */
     public function expectObject($object)
     {
@@ -386,7 +386,7 @@ class Testphase
      * Set to zero to switch to the default built-in connection timeout - 300 seconds.
      * Default timeout is 300.
      * @see CURLOPT_CONNECTTIMEOUT
-     * @var integer
+     * @var int
      */
     public static $SETTING_CURLOPT_CONNECTTIMEOUT = 300;
 
@@ -400,7 +400,7 @@ class Testphase
      * This option may cause libcurl to use the SIGALRM signal to timeout system calls.
      * Default timeout is 0 (zero) which means it never times out during transfer.
      * @see CURLOPT_TIMEOUT
-     * @var integer
+     * @var int
      */
     public static $SETTING_CURLOPT_TIMEOUT = 0;
 

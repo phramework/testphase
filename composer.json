@@ -46,11 +46,11 @@
       "find src/ -name '*.php' -print0 | xargs -0 -L 1 php -l",
       "find bin/ -name '*.php' -print0 | xargs -0 -L 1 php -l",
       "find tests/ -name '*.php' -print0 | xargs -0 -L 1 php -l",
-      "phpunit"
+      "phpunit; start=\"file://\";end=\"build/coverage/index.html\"; echo \"\nOpen $start$(pwd)/$end\" in browser..."
     ],
     "lint": "./vendor/bin/phpcs -p -s --standard=PSR2 ./src ./tests ./bin",
     "doc": [
-      "apigen generate -s ./src,./vendor/phramework/validate/src,./vendor/exceptions/validate/src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"testphase\"",
+      "apigen generate -s ./src,./vendor/phramework/validate/src,./vendor/phramework/exceptions/src -d ./doc --template-theme bootstrap --todo --tree --deprecated --no-source-code --title \"testphase\"",
       "start=\"file://\";end=\"doc/index.html\"; echo \"\nOpen $start$(pwd)/$end\" in browser..."
     ],
     "run": "php ./bin/testphase -d ./tests/tests --show-globals"

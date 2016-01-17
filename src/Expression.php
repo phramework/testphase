@@ -28,31 +28,43 @@ use \Phramework\Testphase\Util;
  */
 class Expression
 {
-    const EXPRESSION_PLAIN          = 'plain';
-    const EXPRESSION_REPLACE        = 'replace';
-    const EXPRESSION_INLINE_REPLACE = 'inline_replace';
+    /**
+     * Expression of plain type
+     */
+    const EXPRESSION_TYPE_PLAIN          = 'plain';
+    /**
+     * Expression of type "replace", used to replace the whole key with expression value.
+     */
+    const EXPRESSION_TYPE_REPLACE        = 'replace';
+    /**
+     * Expression of type "inline_replace", used to inline replace the key with the expression value.
+     */
+    const EXPRESSION_TYPE_INLINE_REPLACE = 'inline_replace';
 
+    const PATTERN_KEY = '[a-zA-Z][a-zA-Z0-9\-_]{1,}';
+    const PATTERN_FUNCTION_PARAMETER = self::PATTERN_KEY . '|([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\5';
+    const PATTERN_ARRAY_INDEX = '[1-9]*[0-9]';
     /**
      * [getExpression description]
      * @param   $expression [description]
      * @return string Returns a regular expession string
      */
-    public static function getExpression($expression = Expression::EXPRESSION_PLAIN)
+    public static function getExpression($expression = Expression::EXPRESSION_TYPE_PLAIN)
     {
-        $keyExpression = '[a-zA-Z][a-zA-Z0-9\-_]{1,}';
+        //$keyExpression = '[a-zA-Z][a-zA-Z0-9\-_]{1,}';
 
         //$functionParametersExpression = '([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\5';
-        $functionParametersExpression = $keyExpression . '|([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\5';
-        $arrayIndexExpression = '[1-9]*[0-9]';
+        //$functionParametersExpression = self::KEY_EXPRESSION . '|([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\5';
+        //$arrayIndexExpression = '[1-9]*[0-9]';
         $prefix = '';
         $suffix = '';
 
         switch ($expression) {
-            case Expression::EXPRESSION_REPLACE:
+            case Expression::EXPRESSION_TYPE_REPLACE:
                 $prefix = '\{\{\{';
                 $suffix = '\}\}\}';
                 break;
-            case Expression::EXPRESSION_INLINE_REPLACE:
+            case Expression::EXPRESSION_TYPE_INLINE_REPLACE:
                 $prefix = '{\{';
                 $suffix = '\}\}';
                 break;
@@ -61,9 +73,9 @@ class Expression
         $expression = sprintf(
             '/^%s(?P<value>(?P<key>%s)(?:(?P<function>\((?P<parameters>%s)?\))|(?P<array>\[(?P<index>%s)\]))?)%s$/',
             $prefix,
-            $keyExpression,
-            $functionParametersExpression,
-            $arrayIndexExpression,
+            self::PATTERN_KEY,
+            self::PATTERN_FUNCTION_PARAMETER,
+            self::PATTERN_ARRAY_INDEX,
             $suffix
         );
 
@@ -75,14 +87,14 @@ class Expression
      * @return null|object
      * @example
      * ```php
-     * $parsed = Expression::parse('Myfunction(10)');
+     * $parsed = Expression::parse('myFunction(10)');
      *
      * print_r($parsed);
      *
      * //Will output
      * //stdClass Object
      * //(
-     * //    [key] => rand-string
+     * //    [key] => myFunction
      * //    [mode] => function
      * //    [parameters] => [6]
      * //)

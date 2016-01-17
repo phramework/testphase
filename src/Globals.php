@@ -29,8 +29,17 @@ use \Phramework\Testphase\Util;
  */
 class Globals
 {
+    /**
+     * Key of type variable
+     */
     const KEY_VARIABLE = 'variable';
+    /**
+     * Key of type function
+     */
     const KEY_FUNCTION = 'function';
+    /**
+     * Key of type array
+     */
     const KEY_ARRAY    = 'array';
 
     /**
@@ -53,22 +62,23 @@ class Globals
             return rand(0, $max);
         };
 
-        static::$globals->{'rand-string'}  = function ($length = 8) {
-            return Util::readableRandomString($length);
-        };
+        static::$globals->{'rand-string'}  = [Util::class, 'readableRandomString'];
 
         static::$globals->{'rand-hash'}    = sha1(rand() . mt_rand() . rand());
-        static::$globals->{'rand-boolean'} = rand(1, 999) % 2 ? true : false;
-        static::$globals->{'array'}        = [1, 3, 5, 7, 10];
+
+        static::$globals->{'rand-boolean'} = function () {
+            return (boolean)rand(0, 1);
+        };
     }
 
     /**
+     * Check if global variable exists
      * @param string $key
      * @throws Exception
      */
     public static function exists($key)
     {
-        if (!static::$globals) {
+        if (static::$globals === null) {
             static::initializeGlobals();
         }
 
@@ -76,9 +86,24 @@ class Globals
     }
 
     /**
-     * @param string $key
-     * @return mixed
-     * @throws Exception
+     * Get global key's value.
+     * An expression to access array elements or a function can be given.
+     * @param string $key Expression key, can have parenthesis or square brackets operator.
+     * @return mixed|callable|array If you access a function without the
+     * parenthesis operator or an array without square brackets operator
+     * then this method will return the callable or the whole array respectively.
+     * @example
+     * ```php
+     * Globals::get('myVarible');
+     *
+     * Globals::get('rand-boolean()');
+     *
+     * Globals::get('rand-integer(10)'); //A random integer from 0 to 10
+     *
+     * Globals::get('myArray[1]'); //Get second array element
+     * ```
+     * @throws Exception When expression key is invalid.
+     * @throws Phramework\Exceptions\NotFoundException When key is not found.
      */
     public static function get($key = null, $operators = null)
     {
@@ -86,12 +111,15 @@ class Globals
             $parsed = Expression::parse($key);
 
             if ($parsed === null) {
-                throw new \Exception('Invalid key ' . $key);
+                throw new \Exception(sprintf(
+                    'Invalid key "%s"',
+                    $key
+                ));
             }
 
             if (!static::exists($parsed->key)) {
-                throw new \Exception(sprintf(
-                    'Key "%s" not found in TestParser globals',
+                throw new \Phramework\Exceptions\NotFoundException(sprintf(
+                    'Key "%s" not found in globals',
                     $parsed->key
                 ));
             }
@@ -125,13 +153,31 @@ class Globals
 
     /**
      * Will overwrite value with same key
-     * @param string $key
+     * @param string $key Key
      * @param mixed $value
+     * @example
+     * ```php
+     * Globals::set('myVariable', 5);
+     * Globals::set(
+     *     'dots',
+     *     function ($length = 4) {
+     *         return str_repeat('.', $length);
+     *     }
+     * );
+     *
+     * Globals::get('dots()'); //Will return a string of 4 dots
+     * Globals::get('dots(10)'); //Will return a string of 10 dots
+     * ```
+     * @throws Exception When key is invalid, *see Expression::PATTERN_KEY*
      */
     public static function set($key, $value)
     {
-        if (!static::$globals) {
+        if (static::$globals === null) {
             static::initializeGlobals();
+        }
+
+        if (!preg_match('/^' . Expression::PATTERN_KEY . '$/', $key)) {
+            throw new \Exception('Invalid key');
         }
 
         static::$globals->{$key} = $value;

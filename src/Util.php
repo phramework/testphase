@@ -16,7 +16,6 @@
  */
 namespace Phramework\Testphase;
 
-
 /**
  * Various utility methods
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
@@ -42,7 +41,7 @@ class Util
 
     /**
      * Create a random readable word
-     * @param  integer $length *[Optional]* String's length
+     * @param  int $length *[Optional]* String's length
      * @return string
      * @link https://github.com/phramework/phramework/blob/master/src/Models/Util.php Source
      */

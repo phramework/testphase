@@ -5,11 +5,57 @@ namespace Phramework\Testphase;
 class GlobalsTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Phramework\Testphase\Globals::get
+     * @covers Phramework\Testphase\Globals::set
      *
      */
-    public function testGet()
+    public function testSet()
     {
+        Globals::set('myVariable', 5);
+
+        $this->assertSame(5, Globals::get('myVariable'));
+
+        Globals::set(
+            'dots',
+            function ($length = 4) {
+                return str_repeat('.', $length);
+            }
+        );
+        $this->assertSame(
+            '....',
+            Globals::get('dots()')
+        );
+
+        $this->assertSame(
+            '.....',
+            Globals::get('dots(5)')
+        );
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::set
+     * @expectedException Exception
+     */
+    public function testSetFailure1()
+    {
+        Globals::set('myVariable()', 5);
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::set
+     * @expectedException Exception
+     */
+    public function testSetFailure2()
+    {
+        Globals::set('myVariable[]', 5);
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::set
+     * @expectedException Exception
+     */
+    public function testSetFailure3()
+    {
+        Globals::set('0123', 5);
     }
 
     /**
@@ -25,6 +71,43 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(Globals::exists('array'));
 
         return $array;
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::get
+     */
+    public function testGet()
+    {
+        $globals = Globals::get();
+
+        $this->assertInternalType('object', $globals);
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::get
+     * @expectedException Exception
+     */
+    public function testGetFailure1()
+    {
+        Globals::get('0123');
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::get
+     * @expectedException Exception
+     */
+    public function testGetFailure2()
+    {
+        Globals::get('myFunc{1}');
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::get
+     * @expectedException Phramework\Exceptions\NotFoundException
+     */
+    public function testGetFailure3()
+    {
+        Globals::get('NotFoundXXXSADASDASDAS');
     }
 
     /**
@@ -115,5 +198,24 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
             Globals::get('rand-integer()'),
             'Expect different value for each call to random'
         );
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::exists
+     */
+    public function testExists()
+    {
+        $this->assertFalse(Globals::exists('NotFoundXXXSADASDASDAS'));
+        $this->assertFalse(Globals::exists('NotFoundXXXSADASDASDAS[]'));
+
+        $this->assertTrue(Globals::exists('rand-integer'));
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::initializeGlobals
+     */
+    public function testInitializeGlobals()
+    {
+
     }
 }
