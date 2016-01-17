@@ -29,4 +29,22 @@ class UtilTest extends \PHPUnit_Framework_TestCase
             Util::isJSON('{"object" : "OK"}warning')
         );
     }
+
+    /**
+     * @covers Phramework\Testphase\Util::readableRandomString
+     */
+    public function testReadableRandomString()
+    {
+        $this->assertSame(
+            5,
+            strlen(Util::readableRandomString(5)),
+            'Expect same length as given length parameter'
+        );
+
+        $this->assertSame(
+            6,
+            strlen(Util::readableRandomString(6)),
+            'Expect same length as given length parameter'
+        );
+    }
 }

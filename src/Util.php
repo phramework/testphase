@@ -33,7 +33,7 @@ class Util
     public static function isJSON($string)
     {
         $object = json_decode($string);
-        
+
         return (is_string($string) && json_last_error() == JSON_ERROR_NONE
             ? true
             : false
@@ -48,20 +48,25 @@ class Util
      */
     public static function readableRandomString($length = 8)
     {
-        $conso = [
+        $consonants = [
             'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'
         ];
-        $vocal = ['a', 'e', 'i', 'o', 'u'];
+        $vowels = ['a', 'e', 'i', 'o', 'u'];
 
-        $word = '';
+        $string = '';
         srand((double) microtime() * 1000000);
-        $max = $length / 2;
+        $max = floor($length / 2);
 
-        for ($i = 1; $i <= $max; ++$i) {
-            $word .= $conso[rand(0, 19)];
-            $word .= $vocal[rand(0, 4)];
+        for ($i = 0; $i < $max; ++$i) {
+            $string .= $consonants[rand(0, count($consonants)-1)];
+            $string .= $vowels[rand(0, count($vowels)-1)];
         }
-        return $word;
+
+        if (strlen($string) < $length) {
+            $string .= $vowels[rand(0, count($vowels)-1)];
+        }
+
+        return $string;
     }
 
     /**

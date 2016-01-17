@@ -10,26 +10,6 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
      */
     public function testGet()
     {
-        return;
-        $value = Globals::get('rand-string()');
-        var_dump($value);
-        $value = Globals::get('rand-string()');
-        var_dump($value);
-
-        $value = Globals::get('array');
-        var_dump($value);
-
-        $value = Globals::get('array[1]');
-        var_dump($value);
-
-        $value = Globals::get('rand-integer()');
-        var_dump($value);
-
-        $value = Globals::get('rand-integer(2)');
-        var_dump($value);
-
-        $value = Globals::get('rand-integer(1)');
-        var_dump($value);
     }
 
     /**
@@ -77,10 +57,28 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRandString()
     {
+        $return = Globals::get('rand-string');
+
+        $this->assertInternalType(
+            'callable',
+            $return,
+            'Expect rand-string() to return a function'
+        );
+
         $return = Globals::get('rand-string(6)');
 
         $this->assertInternalType('string', $return);
-        $this->assertSame(6, strlen($return));
+        $this->assertSame(
+            6,
+            strlen($return),
+            'Expect same length as given length parameter'
+        );
+
+        $this->assertSame(
+            5,
+            strlen(Globals::get('rand-string(5)')),
+            'Expect same length as given length parameter'
+        );
 
         $this->assertNotEquals(
             Globals::get('rand-string()'),
@@ -95,6 +93,21 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRandInteger()
     {
+        $return = Globals::get('rand-integer');
+
+        $this->assertInternalType(
+            'callable',
+            $return,
+            'Expect rand-integer to return a function'
+        );
+
+        $return = Globals::get('rand-integer()');
+        $this->assertInternalType(
+            'integer',
+            $return,
+            'Expect rand-integer() to return an integer'
+        );
+
         $this->assertSame(0, Globals::get('rand-integer(0)'));
 
         $this->assertNotEquals(
