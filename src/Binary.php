@@ -343,11 +343,12 @@ class Binary
 
         if ($arguments['show-globals']->value) {
             echo 'Globals:' . PHP_EOL;
-            print_r(Globals::get());
+            echo Globals::toString() . PHP_EOL;
         }
 
         //dont print if immediate is true
         if (!$arguments->immediate) {
+            echo 'Errors:' . PHP_EOL;
             foreach ($stats->errors as $e) {
                 echo $e . PHP_EOL;
             }

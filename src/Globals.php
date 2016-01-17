@@ -64,7 +64,9 @@ class Globals
 
         static::$globals->{'rand-string'}  = [Util::class, 'readableRandomString'];
 
-        static::$globals->{'rand-hash'}    = sha1(rand() . mt_rand() . rand());
+        static::$globals->{'rand-hash'}    =  function () {
+            return sha1(rand() . mt_rand() . rand());
+        };
 
         static::$globals->{'rand-boolean'} = function () {
             return (boolean)rand(0, 1);
@@ -110,7 +112,7 @@ class Globals
         if (static::$globals === null) {
             static::initializeGlobals();
         }
-        
+
         if ($key !== null) {
             $parsed = Expression::parse($key);
 
@@ -185,5 +187,37 @@ class Globals
         }
 
         static::$globals->{$key} = $value;
+    }
+
+    /**
+     * Return keys and values of global variables as string
+     * @return string
+     */
+    public static function toString()
+    {
+        $return = [];
+
+        foreach (static::$globals as $key => $value) {
+            $valueString = '';
+            $type = gettype($value);
+
+            if (is_callable($value)) {
+                $valueString = 'callable';
+                $type = 'callable';
+            } elseif (is_array($value)) {
+                $valueString = implode(', ', $value);
+            } else {
+                $valueString = (string)$value;
+            }
+
+            $return[] = sprintf(
+                '"%s": (%s) %s',
+                $key,
+                $type,
+                $valueString
+            );
+        }
+
+        return implode(PHP_EOL, $return);
     }
 }
