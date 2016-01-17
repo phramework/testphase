@@ -51,6 +51,23 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Phramework\Testphase\Testphase::__construct
+     */
+    public function testConstruct()
+    {
+        new Testphase('url', 'GET');
+    }
+
+    /**
+     * @covers Phramework\Testphase\Testphase::__construct
+     * @expectedException Phramework\Exceptions\IncorrectParametersException
+     */
+    public function testConstructFailure1()
+    {
+        new Testphase('url', ['WhatsUp']);
+    }
+
+    /**
      * @covers Phramework\Testphase\Testphase::getVersion
      */
     public function testGetVersion()
@@ -65,7 +82,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             'Validates againts 1.x.x versions'
         );
     }
-    
+
     /**
      * @covers Phramework\Testphase\Testphase::run
      */

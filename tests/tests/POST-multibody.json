@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "description": "POST post",
+    "order": 0
+  },
+  "request": {
+    "url": "http://jsonplaceholder.typicode.com/posts",
+    "method": "POST",
+    "headers": [
+      "Accept: application/json",
+      "Content-Type: application/x-www-form-urlencoded"
+    ],
+    "body": [
+      "title=foo1",
+      "title=foo2",
+      "title=foo5"
+    ]
+  },
+  "response": {
+    "statusCode": 201,
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    },
+    "ruleObjects": [{
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "unsignedinteger"
+        },
+        "title": {
+          "type": "string",
+          "pattern": "/^foo[1-9]$/"
+        }
+      },
+      "required": ["id", "title"]
+    }],
+    "export": {
+      "newPostId": "id",
+      "newPostTitle": "title"
+    }
+  }
+}

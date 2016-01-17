@@ -47,4 +47,47 @@ class UtilTest extends \PHPUnit_Framework_TestCase
             'Expect same length as given length parameter'
         );
     }
+
+    /**
+     * @covers Phramework\Testphase\Util::directoryToArray
+     */
+    public function testDirectoryToArray()
+    {
+        $files = Util::directoryToArray(
+            __DIR__,
+            false,
+            false,
+            true,
+            '',
+            ['php'],
+            true //Relative paths
+        );
+
+        $this->assertInternalType('array', $files);
+
+        $this->assertContains(
+            basename(__FILE__),
+            $files,
+            'Current file must be in array'
+        );
+
+
+        $files = Util::directoryToArray(
+            __DIR__,
+            false,
+            false,
+            true,
+            '',
+            ['php', 'html'],
+            false //Absolut paths
+        );
+
+        $this->assertInternalType('array', $files);
+
+        $this->assertContains(
+            __FILE__,
+            $files,
+            'Current file must be in array'
+        );
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015 Xenofon Spafaridis
+ * Copyright 2015 - 2016 Xenofon Spafaridis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ class Util
      * @param string  $exclude       *[Optional]* Exclude paths that matches this
      * regular expression
      * @param array   $allowed_filetypes *[Optional]* Allowed file extensions,
-     * default `[]`` (allow all)
+     * default `[]` (allow all)
      * @param boolean $relative_path *[Optional]* Return paths in relative form,
      * default `false`
      * @link https://github.com/phramework/phramework/blob/master/src/Models/Util.php Source

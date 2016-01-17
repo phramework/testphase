@@ -107,6 +107,10 @@ class Globals
      */
     public static function get($key = null, $operators = null)
     {
+        if (static::$globals === null) {
+            static::initializeGlobals();
+        }
+        
         if ($key !== null) {
             $parsed = Expression::parse($key);
 

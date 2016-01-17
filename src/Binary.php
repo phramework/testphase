@@ -51,6 +51,9 @@ class Binary
             ->isa('File')
             ->defaultValue(null);
 
+        $specs->add('v|verbose', 'Verbose output')
+            ->defaultValue(true);
+
         $specs->add('show-globals', 'Show values of global variables')->defaultValue(false);
         $specs->add('debug', 'Show debug messages')->defaultValue(false);
         $specs->add('h|help', 'Show help')->defaultValue(false);
@@ -92,7 +95,7 @@ class Binary
         }
 
         //Get all .json files in directory
-        $files = array_map(
+        $testFiles = array_map(
             function ($f) {
                 return str_replace('//', '/', $f);
             },
@@ -102,7 +105,7 @@ class Binary
                 false,
                 true,
                 '/^\.|\.\.$/',
-                ['json'],
+                ['json'], //Only .json files
                 false
             )
         );
@@ -112,13 +115,23 @@ class Binary
          */
         $tests = [];
 
-        foreach ($files as $filename) {
-            $testParser = new TestParser($filename);
+        foreach ($testFiles as $filename) {
+            try {
+                $testParser = new TestParser($filename);
+            } catch (\Exception $e) {
+                echo sprintf(
+                    'Failed to parse file "%s" %s With message: "%s"',
+                    $filename,
+                    PHP_EOL,
+                    $e->getMessage()
+                ) . PHP_EOL;
+                return 1;
+            }
             $tests[] = $testParser;
         }
 
         //Sort tests by order
-        uasort($tests, [self::class, 'cmp']);
+        uasort($tests, [self::class, 'sortTest']);
 
         //Statistics object
         $stats = (object)[
@@ -129,7 +142,7 @@ class Binary
             'errors' => []
         ];
 
-        $i=0;
+        $i = 0;
 
         //Execute tests
         foreach ($tests as $test) {
@@ -160,7 +173,14 @@ class Binary
 
                 if (!$match) {
                     $stats->ignore += 1;
-                    echo 'I';
+                    if ($arguments->verbose) {
+                        echo sprintf(
+                            'I %s',
+                            $test->getFilename()
+                        ) . PHP_EOL;
+                    } else {
+                        echo 'I';
+                    }
                     continue;
                 }
             }
@@ -168,101 +188,142 @@ class Binary
             $meta = $test->getMeta();
 
             if (isset($meta->ignore) && $meta->ignore) {
+                if ($arguments->verbose) {
+                    echo sprintf(
+                        'I %s',
+                        $test->getFilename()
+                    ) . PHP_EOL;
+                } else {
+                    echo 'I';
+                }
                 $stats->ignore += 1;
-                echo 'I';
                 continue;
             }
 
-            $test->createTest();
-
             try {
-                $ok = $test->getTest()->run(function (
-                    $responseStatusCode,
-                    $responseHeaders,
-                    $responseBody,
-                    $responseBodyObject = null
-                ) use (
-                    $test,
-                    $arguments
-                ) {
-                    //global $arguments;
-                    //global $test;
-                    //todo move to TestParser
-                    $export = $test->getExport();
+                //Complete test's testphase collection
+                $test->createTest();
+            } catch (\Exception $e) {
+                echo sprintf(
+                    'Unable to create test from file "%s" %s With message: "%s"',
+                    $test->getFilename(),
+                    PHP_EOL,
+                    $e->getMessage()
+                ) . PHP_EOL;
+                return 1;
+            }
 
-                    //Fetch all teest exports and add them as globals
-                    foreach ($export as $key => $value) {
-                        $path = explode('.', $value);
+            $testphaseCollection = $test->getTest();
+            
+            //Include number of additional testphase collections
+            $stats->tests += count($testphaseCollection) - 1 ;
 
-                        $pathValue = $responseBodyObject;
+            foreach ($testphaseCollection as $testphase) {
+                try {
+                    $ok = $testphase->run(function (
+                        $responseStatusCode,
+                        $responseHeaders,
+                        $responseBody,
+                        $responseBodyObject = null
+                    ) use (
+                        $test,
+                        $arguments
+                    ) {
+                        //global $arguments;
+                        //global $test;
+                        //todo move to TestParser
+                        $export = $test->getExport();
 
-                        foreach ($path as $p) {
-                            $arrayIndex = 0;
+                        //Fetch all teest exports and add them as globals
+                        foreach ($export as $key => $value) {
+                            $path = explode('.', $value);
 
-                            if (is_array($pathValue)) {
-                                $pathValue = $pathValue[$arrayIndex]->{$p};
-                            } else {
-                                $pathValue = $pathValue->{$p};
+                            $pathValue = $responseBodyObject;
+
+                            foreach ($path as $p) {
+                                //@todo array index
+                                $arrayIndex = 0;
+
+                                if (is_array($pathValue)) {
+                                    $pathValue = $pathValue[$arrayIndex]->{$p};
+                                } else {
+                                    $pathValue = $pathValue->{$p};
+                                }
+
                             }
 
+                            Globals::set($key, $pathValue);
                         }
 
-                        Globals::set($key, $pathValue);
+                        if ($arguments->debug) {
+                            echo 'Response Status Code:' . PHP_EOL;
+                            echo $responseStatusCode . PHP_EOL;
+                            echo 'Response Headers:' . PHP_EOL;
+                            print_r($responseHeaders);
+                            echo PHP_EOL;
+                            echo 'Response Body:' . PHP_EOL;
+                            echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
+                        }
+                    });
+
+                    //Echo successful char
+                    if ($arguments->verbose) {
+                        echo sprintf(
+                            '. %s',
+                            $test->getFilename()
+                        ) . PHP_EOL;
+                    } else {
+                        echo '.';
                     }
+                    $stats->success += 1;
+                } catch (\Exception $e) {
+
+                    //@todo if verbose show more details (trace)
+                    $message = $e->getMessage();
 
                     if ($arguments->debug) {
-                        echo 'Response Status Code:' . PHP_EOL;
-                        echo $responseStatusCode . PHP_EOL;
-                        echo 'Response Headers:' . PHP_EOL;
-                        print_r($responseHeaders);
-                        echo PHP_EOL;
-                        echo 'Response Body:' . PHP_EOL;
-                        echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
+                        $message .= PHP_EOL . $test->getTest()->getResponseBody();
                     }
-                });
+                    $message = sprintf(
+                        self::colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
+                        $test->getFilename(),
+                        $message
+                    );
 
-                //Echo successful char
-                echo '.';
-                $stats->success += 1;
-            } catch (\Exception $e) {
+                    if (get_class($e) == \Phramework\Exceptions\IncorrectParametersException::class) {
+                        $message .= 'Incorrect:' . PHP_EOL . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                    } elseif (get_class($e) == \Phramework\Exceptions\MissingParametersException::class) {
+                        $message .= 'Missing:' . PHP_EOL . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                    }
 
-                //@todo if verbose show more details (trace)
-                $message = $e->getMessage();
+                    //push message to error message
+                    $stats->errors[] = $message;
 
-                if ($arguments->debug) {
-                    $message .= PHP_EOL . $test->getTest()->getResponseBody();
+                    //Echo unsuccessful char
+                    if ($arguments->verbose) {
+                        echo sprintf(
+                            'E %s',
+                            $test->getFilename()
+                        ) . PHP_EOL;
+                    } else {
+                        echo 'E';
+                    }
+
+                    //print if immediate
+                    if ($arguments->immediate) {
+                        echo PHP_EOL . $message . PHP_EOL;
+                    }
+
+                    $stats->error += 1;
                 }
-                $message = sprintf(
-                    self::colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
-                    $test->getFilename(),
-                    $message
-                );
-
-                if (get_class($e) == \Phramework\Exceptions\IncorrectParametersException::class) {
-                    $message .= 'Incorrect:' . PHP_EOL . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
-                } elseif (get_class($e) == \Phramework\Exceptions\MissingParametersException::class) {
-                    $message .= 'Missing:' . PHP_EOL . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                ++$i;
+                //Allow only 80 characters per line
+                if (!($i % 79)) {
+                    echo PHP_EOL;
                 }
-
-                //push message to error message
-                $stats->errors[] = $message;
-
-                //Echo unsuccessful char
-                echo 'E';
-
-                //print if immediate
-                if ($arguments->immediate) {
-                    echo PHP_EOL . $message . PHP_EOL;
-                }
-
-                $stats->error += 1;
-            }
-            ++$i;
-            //Allow only 80 characters per line
-            if (!($i % 79)) {
-                echo PHP_EOL;
             }
         }
+
         echo PHP_EOL;
 
         if ($arguments['show-globals']->value) {
@@ -294,9 +355,13 @@ class Binary
         return 0;
     }
 
-    protected static function cmp($a, $b)
+    protected static function sortTest($a, $b)
     {
-        return ($a->getMeta()->order < $b->getMeta()->order ? -1 : 1);
+        return (
+            $a->getMeta()->order < $b->getMeta()->order
+            ? -1
+            : 1
+        );
     }
 
     /**

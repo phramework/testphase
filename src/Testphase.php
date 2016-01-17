@@ -21,7 +21,7 @@ use \Phramework\Validate\ObjectValidator;
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
- * @version 1.0.0
+ * @version 1.0.0-dev
  */
 class Testphase
 {
@@ -80,6 +80,7 @@ class Testphase
      * @param array       $headers     *[Optional]* HTTP request headers
      * @param string|null $requestBody *[Optional]* HTTP request body
      * @param boolean     $ruleJSON    *[Optional]* Response rule, expect JSON encoded response body
+     * @throws Phramework\Exceptions\IncorrectParametersException When method is not correct
      */
     public function __construct(
         $url,
@@ -91,7 +92,10 @@ class Testphase
         $this->url = $url;
 
         if (!is_string($method)) {
-            throw new \Exception('Method must be string');
+            throw new \Phramework\Exceptions\IncorrectParametersException(
+                ['method'],
+                'Method must be a string'
+            );
         }
 
         $this->method = $method;
@@ -460,7 +464,7 @@ class Testphase
         $reflection = new \ReflectionClass(Testphase::class);
         $comment = $reflection->getDocComment();
 
-        preg_match('/\@version ([\w\.]+)\n/', $comment, $matches);
+        preg_match('/\@version ([\w\.]+(:?\-[a-zA-Z0-9]+)?)\n/', $comment, $matches);
 
         if ($matches && count($matches) > 1) {
             return $matches[1];

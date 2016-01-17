@@ -29,6 +29,7 @@ use \Phramework\Validate\StringValidator;
 use \Phramework\Validate\URLValidator;
 
 /**
+ * Parse a test from a file
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @since 0.0.0
@@ -51,18 +52,19 @@ class TestParser
      * Parsed test
      * @var Testphase
      */
-    protected $test = null;
+    protected $testphase = null;
 
     /**
      * Get parsed test
-     * @return Testphase
+     * @return Testphase[]
+     * @throws Exception When test is not created
      */
     public function getTest()
     {
-        if ($this->test === null) {
+        if ($this->testphase === null) {
             throw new \Exception('Test is not created');
         }
-        return $this->test;
+        return $this->testphase;
     }
 
     protected $contentsParsed;
@@ -133,9 +135,17 @@ class TestParser
                     ->setDefault('GET'),
                 'headers' => (new ArrayValidator())
                     ->setDefault([]),
-                'body' => new AnyOf([
+                'body' => new OneOf([ // Allow objects, strings or array of them
                     new ObjectValidator(),
-                    new StringValidator
+                    new StringValidator,
+                    new ArrayValidator(
+                        0,
+                        null,
+                        new OneOf([
+                            new ObjectValidator(),
+                            new StringValidator
+                        ])
+                    )
                 ])
             ],
             ['url']
@@ -196,47 +206,73 @@ class TestParser
     }
 
     /**
+     * @todo clean up
      */
     public function createTest()
     {
         //Recursive search whole object
         $contentsParsed = $this->searchAndReplace($this->contentsParsed);
 
-        //Create a Testphase object using parsed rule
-        $test = (new Testphase(
-            $contentsParsed->request->url,
-            $contentsParsed->request->method,
-            $contentsParsed->request->headers,
-            (
-                isset($contentsParsed->request->body)
-                ? (
-                    is_object($contentsParsed->request->body)
-                    ? json_encode($contentsParsed->request->body)
-                    : $contentsParsed->request->body
-                )
-                : null
-            ),
-            true //json
-        ))
-        ->expectStatusCode($contentsParsed->response->statusCode)
-        ->expectResponseHeader($contentsParsed->response->headers);
+        $requestBody = null;
 
-        $test->expectJSON(
-            isset($contentsParsed->meta->JSONbody)
-            ? $contentsParsed->meta->JSONbody
-            : true
-        );
-
-        //Add rule objects to validate body
-        foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
-            if (is_string($ruleObject)) {
-                $ruleObject = json_decode($ruleObject);
+        $requestBodies = [];
+        
+        if (isset($contentsParsed->request->body)
+            && !empty($contentsParsed->request->body)
+        ) {
+            if (!is_array($contentsParsed->request->body)) {
+                //Work with array
+                $contentsParsed->request->body = [
+                    $contentsParsed->request->body
+                ];
             }
 
-            $test->expectObject(ObjectValidator::createFromObject($ruleObject));
+            foreach ($contentsParsed->request->body as $body) {
+                //Push to bodies
+                $requestBodies[] = (
+                    is_object($body)
+                    ? json_encode($body)
+                    : $body
+                );
+            }
         }
 
-        $this->test = $test;
+        $testphaseCollection = [];
+
+        //Incase there is no request body, then at least one test must be created
+        if (empty($requestBodies)) {
+            $requestBodies[] = null;
+        }
+        foreach ($requestBodies as $requestBody) {
+            //Create a Testphase object using parsed rule
+            $testphase = (new Testphase(
+                $contentsParsed->request->url,
+                $contentsParsed->request->method,
+                $contentsParsed->request->headers,
+                $requestBody
+            ))
+            ->expectStatusCode($contentsParsed->response->statusCode)
+            ->expectResponseHeader($contentsParsed->response->headers);
+
+            $testphase->expectJSON(
+                isset($contentsParsed->meta->JSONbody)
+                ? $contentsParsed->meta->JSONbody
+                : true
+            );
+
+            //Add rule objects to validate body
+            foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
+                if (is_string($ruleObject)) {
+                    $ruleObject = json_decode($ruleObject);
+                }
+
+                $testphase->expectObject(ObjectValidator::createFromObject($ruleObject));
+            }
+            $testphaseCollection[] = $testphase;
+        }
+
+        $this->testphase = $testphaseCollection;
+        //todo
         $this->export = $contentsParsed->response->export;
     }
 
