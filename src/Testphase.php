@@ -216,13 +216,18 @@ class Testphase
      * @param  callable|null $callback *[Optional]* Callback to execute after
      * completing the test rules
      * @return true On success
+     * @uses self::$base When url does not contain schema use base as prefix.
      */
     public function run($callback = null)
     {
         $flags = self::REQUEST_EMPTY_FLAG;
 
-        //Construct request url
-        $url = static::$base . $this->url;
+        //When url does not contain schema use base as prefix
+        if (parse_url($this->url, PHP_URL_SCHEME) !== null) {
+            $url = $this->url;
+        } else {
+            $url = static::$base . $this->url;
+        }
 
         //Is the request binary
         $binary = ($flags & self::REQUEST_BINARY) != 0;

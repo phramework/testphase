@@ -46,17 +46,27 @@ class Expression
     const PATTERN_ARRAY_INDEX = '[1-9]*[0-9]';
 
     /**
-     * @param  string $expression
-     * @return string[4]
+     * Get prefix and suffix
+     * @param  string $expressionType
+     * @return string[4] Returns the expression type prefix, suffix, pattern prefix and suffix.
+     * @example
+     * ```php
+     * list(
+     *     $prefix,
+     *     $suffix,
+     *     $patternPrefix,
+     *     $patternSuffix
+     * ) = Expression::getPrefixSuffix(Expression::EXPRESSION_TYPE_INLINE_REPLACE);
+     * ```
      */
-    public static function getPrefixSuffix($expression = Expression::EXPRESSION_TYPE_PLAIN)
+    public static function getPrefixSuffix($expressionType = Expression::EXPRESSION_TYPE_PLAIN)
     {
         $prefix = '';
         $suffix = '';
         $patternPrefix = '';
         $patternSuffix = '';
 
-        switch ($expression) {
+        switch ($expressionType) {
             case Expression::EXPRESSION_TYPE_PLAIN:
                 $patternPrefix = '^';
                 $patternSuffix = '$';
@@ -77,10 +87,10 @@ class Expression
     }
 
     /**
-     * @param string $expression
-     * @return string Returns a regular expession string
+     * @param string $expressionType
+     * @return string Returns regular expession
      */
-    public static function getExpression($expression = Expression::EXPRESSION_TYPE_PLAIN)
+    public static function getExpression($expressionType = Expression::EXPRESSION_TYPE_PLAIN)
     {
         //$keyExpression = '[a-zA-Z][a-zA-Z0-9\-_]{1,}';
 
@@ -93,16 +103,16 @@ class Expression
             $suffix,
             $patternPrefix,
             $patternSuffix
-        ) = self::getPrefixSuffix($expression);
+        ) = self::getPrefixSuffix($expressionType);
 
         $expression = sprintf(
             '/%s%s(?P<value>(?P<key>%s)(?:(?P<function>\((?P<parameters>%s)?\))|(?P<array>\[(?P<index>%s)\]))?)%s%s/',
             $patternPrefix,
-            preg_quote($prefix),
+            preg_quote($prefix, '/'),
             self::PATTERN_KEY,
             self::PATTERN_FUNCTION_PARAMETER,
             self::PATTERN_ARRAY_INDEX,
-            preg_quote($suffix),
+            preg_quote($suffix, '/'),
             $patternSuffix
         );
 

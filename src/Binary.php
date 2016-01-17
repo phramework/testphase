@@ -19,6 +19,8 @@ namespace Phramework\Testphase;
 use \Phramework\Testphase\Testphase;
 use \Phramework\Testphase\TestParser;
 use \Phramework\Testphase\Util;
+use \Phramework\Exceptions\MissingParametersException;
+use \Phramework\Exceptions\IncorrectParametersException;
 use \GetOptionKit\OptionCollection;
 use \GetOptionKit\OptionParser;
 use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
@@ -119,12 +121,23 @@ class Binary
             try {
                 $testParser = new TestParser($filename);
             } catch (\Exception $e) {
-                echo sprintf(
+                $message = sprintf(
                     'Failed to parse file "%s" %s With message: "%s"',
                     $filename,
                     PHP_EOL,
                     $e->getMessage()
                 ) . PHP_EOL;
+
+                if (get_class($e) == IncorrectParametersException::class) {
+                    $message .= PHP_EOL . 'Incorrect:' . PHP_EOL
+                        . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                } elseif (get_class($e) == MissingParametersException::class) {
+                    $message .= PHP_EOL . 'Missing:' . PHP_EOL
+                        . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                }
+
+                echo $message;
+
                 return 1;
             }
             $tests[] = $testParser;
@@ -290,10 +303,10 @@ class Binary
                         $message
                     );
 
-                    if (get_class($e) == \Phramework\Exceptions\IncorrectParametersException::class) {
+                    if (get_class($e) == IncorrectParametersException::class) {
                         $message .= 'Incorrect:' . PHP_EOL
                             . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
-                    } elseif (get_class($e) == \Phramework\Exceptions\MissingParametersException::class) {
+                    } elseif (get_class($e) == MissingParametersException::class) {
                         $message .= 'Missing:' . PHP_EOL
                             . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
                     }
@@ -348,8 +361,6 @@ class Binary
         echo ', ';
         Binary::output('Unsuccessful: ' . $stats->error . PHP_EOL, 'red');
 
-
-
         if ($stats->error > 0) {
             return (1);
         }
@@ -379,7 +390,11 @@ class Binary
             'yellow' => '1;33'
         ];
 
-        $c = array_key_exists($color, $colors) ? $colors[$color] : $colors['black'];
+        $c = (
+            array_key_exists($color, $colors)
+            ? $colors[$color]
+            : $colors['black']
+        );
 
         if (false && $arguments['no-colors']->value) {
             return $text;
