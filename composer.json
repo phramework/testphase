@@ -1,6 +1,6 @@
 {
   "name": "phramework/testphase",
-  "description": "API response testing tool for phramework",
+  "description": "API testing environment build for phramework and RESTful APIs",
   "license": "Apache-2.0",
   "homepage": "https://phramework.github.io/",
   "authors": [{
