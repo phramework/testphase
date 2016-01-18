@@ -249,10 +249,10 @@ class TestParser
             foreach ($combination as $combinationKey => $combinationValue) {
                 Globals::set($combinationKey, $combinationValue);
             }
-            
+
             //Recursive search whole object
             $contentsParsed = $this->searchAndReplace($this->contentsParsed);
-            
+
             $requestBody = null;
 
             $requestBodies = [];
@@ -363,7 +363,6 @@ class TestParser
 
                     //replace
                     $value = Globals::get($globalsKey);
-
                 } elseif (!!preg_match_all(
                     $pattern_inline_replace,
                     $value,
@@ -371,7 +370,6 @@ class TestParser
                 )) {
                     //Foreach variable replace in string
                     foreach ($matches['value'] as $globalsKey) {
-
                         $value = str_replace(
                             $prefix . $globalsKey . $suffix,
                             Globals::get($globalsKey),
@@ -384,86 +382,4 @@ class TestParser
 
         return $object;
     }
-
-/*
-    public static function getResponseBodyJsonapiResource($ofType = null)
-    {
-        return '{
-            "type": "object",
-            "properties": {
-                "data" : {
-                    "type": "object",
-                    "properties" : {
-                        "type" : {
-                            "type" : "string"
-                        },
-                        "id" : {
-                            "type" : "string"
-                        }
-                    },
-                    "required" : ["type", "id"]
-                },
-                "links" : {
-                    "type": "object",
-                    "properties":{
-                        "self": {
-                            "type": "url"
-                        },
-                        "related": {
-                            "type": "url"
-                        }
-                    },
-                    "required": ["self"]
-                }
-            },
-            "required": ["data", "links"]
-        }';
-    }
-
-    public static function getResponseBodyJsonapiCollection()
-    {
-        return '{
-            "type": "object",
-            "properties": {
-                "data" : {
-                    "type": "array"
-                },
-                "links" : {
-                    "type": "object",
-                    "properties":{
-                        "self": {
-                            "type": "url"
-                        },
-                        "related": {
-                            "type": "url"
-                        }
-                    },
-                    "required": ["self"]
-                }
-            },
-            "required": ["data", "links"]
-        }';
-    }
-
-    public static function getResponseBodyJsonapiException()
-    {
-        return '{
-            "type": "object"
-        }';
-    }
-
-    public static function getResponseBodyJsonapiRelasionshipsSelf()
-    {
-        return '{
-            "type": "object"
-        }';
-    }
-
-    public static function getResponseBodyJsonapiRelasionshipsRelated()
-    {
-        return '{
-            "type": "object"
-        }';
-    }
-    **/
 }

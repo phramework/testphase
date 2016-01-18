@@ -297,7 +297,6 @@ class Testphase
 
         foreach (explode("\n", $responseHeadersTemp) as $i => $line) {
             if ($i !== 0 && !empty($line)) {
-
                 if (count($parts = explode(': ', $line)) === 2) {
                     list($key, $value) = explode(': ', $line);
 
