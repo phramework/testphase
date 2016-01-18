@@ -264,7 +264,7 @@ class Testphase
             case 'POST': //On POST
                 curl_setopt($curl, CURLOPT_POST, true);
 
-                if (false && $this->requestBody && $form_encoded) { //Encode fields if required ( URL ENCODED )
+                if ($this->requestBody && $form_encoded) { //Encode fields if required (URL ENCODED)
                     curl_setopt(
                         $curl,
                         CURLOPT_POSTFIELDS,

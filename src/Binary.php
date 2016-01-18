@@ -168,14 +168,15 @@ class Binary
 
         //Execute tests
         foreach ($tests as $test) {
+
             //Check if subdir argument is set
-            if (isset($arguments->subdir) && $arguments->subdir->value !== null) {
+            if (isset($arguments->subdir) && $arguments->subdir !== null) {
                 //If so check if file name passes the given pattern
 
                 //Remove base dir from filename
                 $cleanFilename = trim(
                     str_replace(
-                        $arguments->dir->value,
+                        $arguments->dir,
                         '',
                         $test->getFilename()
                     ),
@@ -185,7 +186,7 @@ class Binary
                 $match = false;
 
                 //Check if any of the patterns ar matching
-                foreach ($arguments->subdir->value as $pattern) {
+                foreach ($arguments->subdir as $pattern) {
                     $pattern = '@' . $pattern . '@';
                     if (!!preg_match($pattern, $cleanFilename)) {
                         $match = $match || true;
@@ -221,6 +222,7 @@ class Binary
                 $stats->ignore += 1;
                 continue;
             }
+
 
             try {
                 //Complete test's testphase collection
@@ -304,7 +306,7 @@ class Binary
                     $message = $e->getMessage();
 
                     if ($arguments->debug) {
-                        $message .= PHP_EOL . $test->getTest()->getResponseBody();
+                        $message .= PHP_EOL . $testphase->getResponseBody();
                     }
                     $message = sprintf(
                         self::colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
@@ -356,7 +358,7 @@ class Binary
         }
 
         //dont print if immediate is true
-        if (!$arguments->immediate) {
+        if (!$arguments->immediate && !empty($stats->errors)) {
             echo 'Errors:' . PHP_EOL;
             foreach ($stats->errors as $e) {
                 echo $e . PHP_EOL;

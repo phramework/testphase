@@ -219,17 +219,6 @@ class TestParser
             ]
         );
     }
-    public static function combinations($object)
-    {
-        $combinations = [];
-        foreach ($object as $iteratorKey => $iteratorValue) {
-            $combinations[] = (object) [
-                $iteratorKey => $iteratorValue[0]
-            ];
-        }
-
-        return $combinations;
-    }
 
     /**
      * @todo clean up
@@ -239,26 +228,31 @@ class TestParser
     {
         $testphaseCollection = [];
 
-        //searchAndReplace in request->iterators first
-        $iterators = $this->searchAndReplace(
-            $this->contentsParsed->request->iterators
-        );
+        if (!empty((array)$this->contentsParsed->request->iterators)) {
+            //searchAndReplace in request->iterators first
+            $iterators = $this->searchAndReplace(
+                $this->contentsParsed->request->iterators
+            );
 
-        $combinations = self::combinations($iterators);
+            //replace back to contentsParsed
+            $this->contentsParsed->request->iterators = $iterators;
 
-        //replace back to contentsParsed
-        $this->contentsParsed->request->iterators = $iterators;
+            //Get combinations of iterator values
+            $combinations = Util::cartesian((array)$iterators);
+        } else {
+            //Add a single test with no combinations
+            $combinations = [[]];
+        }
 
         foreach ($combinations as $combination) {
+            //Set combination
             foreach ($combination as $combinationKey => $combinationValue) {
                 Globals::set($combinationKey, $combinationValue);
             }
-
-            //echo Globals::toString() . PHP_EOL;
-
+            
             //Recursive search whole object
             $contentsParsed = $this->searchAndReplace($this->contentsParsed);
-
+            
             $requestBody = null;
 
             $requestBodies = [];
@@ -282,8 +276,6 @@ class TestParser
                     );
                 }
             }
-
-
 
             //Incase there is no request body, then at least one test must be created
             if (empty($requestBodies)) {
@@ -315,10 +307,11 @@ class TestParser
 
                     $testphase->expectObject(ObjectValidator::createFromObject($ruleObject));
                 }
+
                 //push test
                 $testphaseCollection[] = $testphase;
 
-                //todo
+                //todo set only once
                 $this->export = $contentsParsed->response->export;
             }
         }
@@ -327,11 +320,20 @@ class TestParser
     }
 
     /**
+     * Replace incline and full replace key inside a test object
+     * @param object|array $inputObject
+     * @return object|array
      * @todo add special exception, when global is not found test should
      * be ignored with special warning (EG unavailable)
      */
-    private function searchAndReplace($object)
+    private function searchAndReplace($inputObject)
     {
+        if (is_object($inputObject)) {
+            $object = clone $inputObject;
+        } else {
+            $object = $inputObject;
+        }
+
         $pattern_replace        = Expression::getExpression(
             Expression::EXPRESSION_TYPE_REPLACE
         );
@@ -379,6 +381,7 @@ class TestParser
                 }
             }
         }
+
         return $object;
     }
 

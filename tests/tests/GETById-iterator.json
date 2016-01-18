@@ -1,11 +1,10 @@
 {
   "meta": {
     "description": "Get post",
-    "order": 0,
-    "ignore": true
+    "order": 0
   },
   "request": {
-    "url": "http://jsonplaceholder.typicode.com/posts/{{pId}}",
+    "url": "http://jsonplaceholder.typicode.com/posts/{{pId}}{{value}}",
     "method": "GET",
     "headers": [],
     "iterators": {

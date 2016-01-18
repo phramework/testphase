@@ -104,4 +104,35 @@ class UtilTest extends \PHPUnit_Framework_TestCase
             'Current file must be in array'
         );
     }
+
+    /**
+     * @covers Phramework\Testphase\Util::cartesian
+     */
+    public function testCartesian()
+    {
+        $input = [
+            'arm' => ['A', 'B', 'C']
+        ];
+
+        $return = Util::cartesian($input);
+
+        $this->assertInternalType('array', $return);
+
+        $this->assertCount(3, $return);
+
+        $input = [
+            'arm' => ['A', 'B', 'C'],
+            'gender' => ['Female', 'Male'],
+            'location' => ['Vancouver', 'Calgary'],
+        ];
+
+        $return = Util::cartesian($input);
+
+        $this->assertInternalType('array', $return);
+        $this->assertCount(3*2*2, $return);
+
+        $this->assertInternalType('array', $return[0]);
+
+        $this->assertCount(count($input), $return[0]);
+    }
 }

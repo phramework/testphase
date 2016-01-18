@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+use Phramework\Testphase\Globals;
+
 \Phramework\Testphase\Testphase::setBase('http://jsonplaceholder.typicode.com/');
 
-\Phramework\Testphase\Globals::set('getIds', [7, 1, 2, 3]);
+Globals::set('getIds', [7, 6]);
 
 //$testParser = new \Phramework\Testphase\TestParser('./tests/tests/GETById-iterator.json');
 

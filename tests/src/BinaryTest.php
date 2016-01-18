@@ -22,6 +22,8 @@ class BinaryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        Globals::set('getIds', [7, 6]);
+
         $argv = [
             __FILE__,
             '-d',
