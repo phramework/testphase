@@ -273,7 +273,6 @@ class Binary
                                 } else {
                                     $pathValue = $pathValue->{$p};
                                 }
-
                             }
 
                             Globals::set($key, $pathValue);
