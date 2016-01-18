@@ -31,7 +31,6 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-
         Testphase::setBase('http://localhost:8000/');
 
         $this->object = new Testphase(
@@ -39,7 +38,6 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             Phramework::METHOD_GET,
             $this->requestHeaders
         );
-
     }
 
     /**
@@ -48,7 +46,6 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-
     }
 
 
