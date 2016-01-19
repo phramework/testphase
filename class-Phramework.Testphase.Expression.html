@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>Class Phramework\Testphase\Expression | testphase</title>
+
+	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
+	<link rel="stylesheet" href="resources/style.css?70c1d062672daa3f906b72e4f5d03d4bc5c4174d">
+
+</head>
+
+<body>
+	<nav id="navigation" class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a href="index.html" class="navbar-brand">testphase</a>
+			</div>
+			<div class="collapse navbar-collapse">
+
+                <form id="search" class="navbar-form navbar-left" role="search">
+                    <input type="hidden" name="cx" value="">
+                    <input type="hidden" name="ie" value="UTF-8">
+                    <div class="form-group">
+                        <input type="text" name="q" class="search-query form-control" placeholder="Search">
+					</div>
+				</form>
+
+				<ul class="nav navbar-nav">
+					<li>
+						<a href="namespace-Phramework.Testphase.html" title="Summary of Phramework\Testphase"><span>Namespace</span></a>
+					</li>
+					<li class="active">
+<span>Class</span>					</li>
+
+					<li class="divider-vertical"></li>
+
+					<li>
+						<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+					</li>
+
+						<li>
+							<a href="annotation-group-deprecated.html" title="List of elements with deprecated annotation">
+								<span>Deprecated</span>
+							</a>
+						</li>
+						<li>
+							<a href="annotation-group-todo.html" title="List of elements with todo annotation">
+								<span>Todo</span>
+							</a>
+						</li>
+
+
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div id="left">
+	<div id="menu">
+
+		<div id="groups">
+				<h3>Namespaces</h3>
+			<ul>
+					<li class="active">
+						<a href="namespace-Phramework.html">
+							Phramework<span></span>
+						</a>
+							<ul>
+					<li>
+						<a href="namespace-Phramework.Exceptions.html">
+							Exceptions						</a>
+							</li>
+					<li class="active">
+						<a href="namespace-Phramework.Testphase.html">
+							Testphase						</a>
+							</li>
+					<li>
+						<a href="namespace-Phramework.Validate.html">
+							Validate						</a>
+							</li>
+								</ul></li>
+			</ul>
+		</div>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Phramework.Testphase.Binary.html">Binary</a></li>
+				<li class="active"><a href="class-Phramework.Testphase.Expression.html">Expression</a></li>
+				<li><a href="class-Phramework.Testphase.Globals.html">Globals</a></li>
+				<li><a href="class-Phramework.Testphase.TestParser.html">TestParser</a></li>
+				<li><a href="class-Phramework.Testphase.Testphase.html">Testphase</a></li>
+				<li><a href="class-Phramework.Testphase.Util.html">Util</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+	<div id="rightInner">
+<div id="content" class="class">
+	<h1>Class Expression</h1>
+
+
+	<div class="description">
+	<p>Expression methods and constants</p>
+	</div>
+
+
+
+
+
+
+
+
+
+	<div class="alert alert-info">
+		
+		
+		<b>Namespace:</b> <a href="namespace-Phramework.html">Phramework</a>\<a href="namespace-Phramework.Testphase.html">Testphase</a><br>
+		
+
+				<b>License:</b>
+				<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a><br>
+				<b>Author:</b>
+				Xenofon Spafaridis <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#x6e;o&#104;&#112;&#x6f;&#x6e;&#101;&#120;&#x40;&#x67;&#109;&#97;&#x69;&#x6c;.&#99;&#111;&#x6d;">&#x6e;o&#104;&#112;&#x6f;&#x6e;&#101;&#120;&#x40;&#x67;&#109;&#97;&#x69;&#x6c;.&#99;&#111;&#x6d;</a><br>
+				<b>Version:</b>
+				1.0.0<br>
+				<b>Since:</b>
+				1.0.0<br>
+			<b>Located at</b> Expression.php		<br>
+	</div>
+
+
+
+		<div class="panel panel-default">
+			<div class="panel-heading"><h2>Methods summary</h2></div>
+			<table class="summary table table-bordered table-striped methods" id="methods">
+		<tr data-order="getPrefixSuffix" id="_getPrefixSuffix">
+
+			<td class="attributes"><code>
+				 public static
+				string[4]
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_getPrefixSuffix">#</a>
+			<code>getPrefixSuffix( <span>string <var>$expressionType</var> = Expression::EXPRESSION_TYPE_PLAIN</span> )</code>
+
+			<div class="description short">
+				<p>Get prefix and suffix</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Get prefix and suffix</p>
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$expressionType</var></dt>
+						<dd></dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						string[4]<br>Returns the expression type prefix, suffix, pattern prefix and suffix.
+					</div>
+
+
+					<h4>Example</h4>
+					<div class="list">
+							<pre><span class="php-keyword1">list</span>(
+    <span class="php-var">$prefix</span>,
+    <span class="php-var">$suffix</span>,
+    <span class="php-var">$patternPrefix</span>,
+    <span class="php-var">$patternSuffix</span>
+) = Expression::getPrefixSuffix(Expression::EXPRESSION_TYPE_INLINE_REPLACE);</pre><br>
+					</div>
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="getExpression" id="_getExpression">
+
+			<td class="attributes"><code>
+				 public static
+				string
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_getExpression">#</a>
+			<code>getExpression( <span>string <var>$expressionType</var> = Expression::EXPRESSION_TYPE_PLAIN</span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$expressionType</var></dt>
+						<dd></dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						string<br>Returns regular expession
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="parse" id="_parse">
+
+			<td class="attributes"><code>
+				 public static
+				null|object
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_parse">#</a>
+			<code>parse( <span> <var>$value</var></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$value</var></dt>
+						<dd></dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						null|object
+					</div>
+
+
+					<h4>Example</h4>
+					<div class="list">
+							<pre><span class="php-var">$parsed</span> = Expression::parse(<span class="php-quote">'myFunction(10)'</span>);
+
+<span class="php-keyword2">print_r</span>(<span class="php-var">$parsed</span>);
+
+<span class="php-comment">//Will output</span>
+<span class="php-comment">//stdClass Object</span>
+<span class="php-comment">//(</span>
+<span class="php-comment">//    [key] =&gt; myFunction</span>
+<span class="php-comment">//    [mode] =&gt; function</span>
+<span class="php-comment">//    [parameters] =&gt; [6]</span>
+<span class="php-comment">//)</span></pre><br>
+					</div>
+
+
+			</div>
+			</div></td>
+		</tr>
+			</table>
+		</div>
+
+
+
+
+
+
+
+
+		<div class="panel panel-default">
+            <div class="panel-heading"><h2>Constants summary</h2></div>
+			<table class="summary table table-bordered table-striped constants" id="constants">
+			<tr data-order="EXPRESSION_TYPE_PLAIN" id="EXPRESSION_TYPE_PLAIN">
+
+				<td class="attributes"><code>string</code></td>
+				<td class="name">
+					<code>
+<b>EXPRESSION_TYPE_PLAIN</b>					</code>
+
+					<div class="description short">
+						<p>Expression of plain type</p>
+					</div>
+
+					<div class="description detailed hidden">
+						<p>Expression of plain type</p>
+
+					</div>
+				</td>
+				<td class="value">
+					<div>
+						<a href="#EXPRESSION_TYPE_PLAIN" class="anchor">#</a>
+						<code><span class="php-quote">'plain'</span></code>
+					</div>
+				</td>
+			</tr>
+			<tr data-order="EXPRESSION_TYPE_REPLACE" id="EXPRESSION_TYPE_REPLACE">
+
+				<td class="attributes"><code>string</code></td>
+				<td class="name">
+					<code>
+<b>EXPRESSION_TYPE_REPLACE</b>					</code>
+
+					<div class="description short">
+						<p>Expression of type "replace", used to replace the whole key with expression value.</p>
+					</div>
+
+					<div class="description detailed hidden">
+						<p>Expression of type "replace", used to replace the whole key with expression value.</p>
+
+					</div>
+				</td>
+				<td class="value">
+					<div>
+						<a href="#EXPRESSION_TYPE_REPLACE" class="anchor">#</a>
+						<code><span class="php-quote">'replace'</span></code>
+					</div>
+				</td>
+			</tr>
+			<tr data-order="EXPRESSION_TYPE_INLINE_REPLACE" id="EXPRESSION_TYPE_INLINE_REPLACE">
+
+				<td class="attributes"><code>string</code></td>
+				<td class="name">
+					<code>
+<b>EXPRESSION_TYPE_INLINE_REPLACE</b>					</code>
+
+					<div class="description short">
+						<p>Expression of type "inline_replace", used to inline replace the key with the expression value.</p>
+					</div>
+
+					<div class="description detailed hidden">
+						<p>Expression of type "inline_replace", used to inline replace the key with the expression value.</p>
+
+					</div>
+				</td>
+				<td class="value">
+					<div>
+						<a href="#EXPRESSION_TYPE_INLINE_REPLACE" class="anchor">#</a>
+						<code><span class="php-quote">'inline_replace'</span></code>
+					</div>
+				</td>
+			</tr>
+			<tr data-order="PATTERN_KEY" id="PATTERN_KEY">
+
+				<td class="attributes"><code>string</code></td>
+				<td class="name">
+					<code>
+<b>PATTERN_KEY</b>					</code>
+
+					<div class="description short">
+						<p>Regular expression pattern of keys</p>
+					</div>
+
+					<div class="description detailed hidden">
+						<p>Regular expression pattern of keys</p>
+
+					</div>
+				</td>
+				<td class="value">
+					<div>
+						<a href="#PATTERN_KEY" class="anchor">#</a>
+						<code><span class="php-quote">'[a-zA-Z][a-zA-Z0-9\-_]{1,}'</span></code>
+					</div>
+				</td>
+			</tr>
+			<tr data-order="PATTERN_FUNCTION_PARAMETER" id="PATTERN_FUNCTION_PARAMETER">
+
+				<td class="attributes"><code>string</code></td>
+				<td class="name">
+					<code>
+<b>PATTERN_FUNCTION_PARAMETER</b>					</code>
+
+					<div class="description short">
+						<p>Regular expression pattern of function parameters</p>
+					</div>
+
+					<div class="description detailed hidden">
+						<p>Regular expression pattern of function parameters</p>
+
+					</div>
+				</td>
+				<td class="value">
+					<div>
+						<a href="#PATTERN_FUNCTION_PARAMETER" class="anchor">#</a>
+						<code><span class="php-quote">'[a-zA-Z][a-zA-Z0-9\-_]{1,}|([\'\&quot;]?)[a-zA-Z0-9\-_]{1,}\5'</span></code>
+					</div>
+				</td>
+			</tr>
+			<tr data-order="PATTERN_ARRAY_INDEX" id="PATTERN_ARRAY_INDEX">
+
+				<td class="attributes"><code>string</code></td>
+				<td class="name">
+					<code>
+<b>PATTERN_ARRAY_INDEX</b>					</code>
+
+					<div class="description short">
+						<p>Regular expression pattern of array indices</p>
+					</div>
+
+					<div class="description detailed hidden">
+						<p>Regular expression pattern of array indices</p>
+
+					</div>
+				</td>
+				<td class="value">
+					<div>
+						<a href="#PATTERN_ARRAY_INDEX" class="anchor">#</a>
+						<code><span class="php-quote">'[1-9]*[0-9]'</span></code>
+					</div>
+				</td>
+			</tr>
+			</table>
+		</div>
+
+
+
+
+</div>
+	</div>
+
+	<div id="footer">
+		testphase API documentation generated by <a href="http://apigen.org">ApiGen</a>
+	</div>
+</div>
+<script src="resources/combined.js"></script>
+<script src="elementlist.js"></script>
+</body>
+</html>

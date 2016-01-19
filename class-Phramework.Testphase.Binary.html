@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Class Phramework\Testphase\TestParser | testphase</title>
+	<title>Class Phramework\Testphase\Binary | testphase</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?70c1d062672daa3f906b72e4f5d03d4bc5c4174d">
@@ -87,10 +87,10 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
-				<li><a href="class-Phramework.Testphase.Binary.html">Binary</a></li>
+				<li class="active"><a href="class-Phramework.Testphase.Binary.html">Binary</a></li>
 				<li><a href="class-Phramework.Testphase.Expression.html">Expression</a></li>
 				<li><a href="class-Phramework.Testphase.Globals.html">Globals</a></li>
-				<li class="active"><a href="class-Phramework.Testphase.TestParser.html">TestParser</a></li>
+				<li><a href="class-Phramework.Testphase.TestParser.html">TestParser</a></li>
 				<li><a href="class-Phramework.Testphase.Testphase.html">Testphase</a></li>
 				<li><a href="class-Phramework.Testphase.Util.html">Util</a></li>
 			</ul>
@@ -108,12 +108,12 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="class">
-	<h1>Class TestParser</h1>
+	<h1>Class Binary</h1>
 
 
 	<div class="description">
-	<p>Parse tests from file.
-Α TestParser instance may contain one or more Testphase instances.</p>
+	<p>This class is used by the script executed as binary.
+Construct method is responsible to parse the arguments passed to script.</p>
 	</div>
 
 
@@ -137,8 +137,10 @@
 				<b>Version:</b>
 				1.0.0<br>
 				<b>Since:</b>
-				0.0.0<br>
-			<b>Located at</b> TestParser.php		<br>
+				1.0.0<br>
+				<b>Todo:</b>
+				Add time and memory statistics<br>
+			<b>Located at</b> Binary.php		<br>
 	</div>
 
 
@@ -146,130 +148,31 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><h2>Methods summary</h2></div>
 			<table class="summary table table-bordered table-striped methods" id="methods">
-		<tr data-order="getExport" id="_getExport">
+		<tr data-order="getArgumentSpecifications" id="_getArgumentSpecifications">
 
 			<td class="attributes"><code>
-				 public 
-				
+				 public static
+				GetOptionKit\OptionCollection
 				
 				</code>
 			</td>
 
 			<td class="name"><div>
-			<a class="anchor" href="#_getExport">#</a>
-			<code>getExport( )</code>
+			<a class="anchor" href="#_getArgumentSpecifications">#</a>
+			<code>getArgumentSpecifications( )</code>
 
 			<div class="description short">
-				
+				<p>Get argument specifications</p>
 			</div>
 
 			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="getTest" id="_getTest">
-
-			<td class="attributes"><code>
-				 public 
-				<code><a href="class-Phramework.Testphase.Testphase.html">Phramework\Testphase\Testphase</a>[]</code>
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_getTest">#</a>
-			<code>getTest( )</code>
-
-			<div class="description short">
-				<p>Get parsed test</p>
-			</div>
-
-			<div class="description detailed hidden">
-				<p>Get parsed test</p>
+				<p>Get argument specifications</p>
 
 
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code><a href="class-Phramework.Testphase.Testphase.html">Phramework\Testphase\Testphase</a>[]</code>
-					</div>
-
-					<h4>Throws</h4>
-					<div class="list">
-						Exception<br>When test is not created
-					</div>
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="getMeta" id="_getMeta">
-
-			<td class="attributes"><code>
-				 public 
-				object
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_getMeta">#</a>
-			<code>getMeta( )</code>
-
-			<div class="description short">
-				<p>Get parsed test's meta object</p>
-			</div>
-
-			<div class="description detailed hidden">
-				<p>Get parsed test's meta object</p>
-
-
-
-					<h4>Returns</h4>
-					<div class="list">
-						object
-					</div>
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="getFilename" id="_getFilename">
-
-			<td class="attributes"><code>
-				 public 
-				string
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_getFilename">#</a>
-			<code>getFilename( )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-					<h4>Returns</h4>
-					<div class="list">
-						string
+						GetOptionKit\OptionCollection
 					</div>
 
 
@@ -289,45 +192,191 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___construct">#</a>
-			<code>__construct( <span>String <var>$filename</var></span> )</code>
+			<code>__construct( <span>array <var>$argv</var></span> )</code>
 
 			<div class="description short">
-				<p>Parse test informations from a json file
-this method will parse the file and prepare the meta object
-use createTest to complete creation of test</p>
+				
 			</div>
 
 			<div class="description detailed hidden">
-				<p>Parse test informations from a json file
-this method will parse the file and prepare the meta object
-use createTest to complete creation of test</p>
+				
 
 
 					<h4>Parameters</h4>
 					<div class="list"><dl>
-						<dt><var>$filename</var></dt>
-						<dd>JSON file containing the test</dd>
+						<dt><var>$argv</var></dt>
+						<dd>Array of arguments passed to script</dd>
 					</dl></div>
 
 
-					<h4>Throws</h4>
-					<div class="list">
-						<code><a href="class-Phramework.Exceptions.NotFoundException.html">Phramework\Exceptions\NotFoundException</a></code><br>When file is not found.<br>
-						Exception<br>When file contains not valid JSON.<br>
-						<code><a href="class-Phramework.Exceptions.MissingParametersException.html">Phramework\Exceptions\MissingParametersException</a></code><br>When required test properties are not set.<br>
-						<code><a href="class-Phramework.Exceptions.IncorrectParametersException.html">Phramework\Exceptions\IncorrectParametersException</a></code><br>When test properties are not correct.
-					</div>
 
-					<h4>Todo</h4>
+					<h4>Example</h4>
 					<div class="list">
-							Set $validatorRequest header's subtype<br>
+							<pre><span class="php-var">$binary</span> = <span class="php-keyword1">new</span> Binary([
+    __FILE__,
+    <span class="php-quote">'-d'</span>,
+    <span class="php-quote">'./tests/'</span>
+];
+
+<span class="php-var">$binary</span>-&gt;invoke();</pre><br>
 					</div>
 
 
 			</div>
 			</div></td>
 		</tr>
-		<tr data-order="createTest" id="_createTest">
+		<tr data-order="invoke" id="_invoke">
+
+			<td class="attributes"><code>
+				 public 
+				integer
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_invoke">#</a>
+			<code>invoke( )</code>
+
+			<div class="description short">
+				<p>Invoke scripts</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Invoke scripts</p>
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						integer<br><p>Returns indicate how the script exited.
+Normal exit is generally represented by a 0 return.</p>
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="getTestParserCollection" id="_getTestParserCollection">
+
+			<td class="attributes"><code>
+				 protected 
+				<code><a href="class-Phramework.Testphase.TestParser.html">Phramework\Testphase\TestParser</a>[]</code>
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_getTestParserCollection">#</a>
+			<code>getTestParserCollection( )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						<code><a href="class-Phramework.Testphase.TestParser.html">Phramework\Testphase\TestParser</a>[]</code>
+					</div>
+
+					<h4>Throws</h4>
+					<div class="list">
+						Exception
+					</div>
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="sortTestParser" id="_sortTestParser">
+
+			<td class="attributes"><code>
+				 public static
+				integer
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_sortTestParser">#</a>
+			<code>sortTestParser( <span><code><a href="class-Phramework.Testphase.TestParser.html">Phramework\Testphase\TestParser</a></code> <var>$a</var></span>, <span><code><a href="class-Phramework.Testphase.TestParser.html">Phramework\Testphase\TestParser</a></code> <var>$b</var></span> )</code>
+
+			<div class="description short">
+				<p>Sort TestParsers ascending</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Sort TestParsers ascending</p>
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$a</var></dt>
+						<dd></dd>
+						<dt><var>$b</var></dt>
+						<dd></dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						integer<br>Returns 1 if order of first TestParser is larger
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="colored" id="_colored">
+
+			<td class="attributes"><code>
+				 public 
+				string
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_colored">#</a>
+			<code>colored( <span>string <var>$text</var></span>, <span>string <var>$color</var></span> )</code>
+
+			<div class="description short">
+				<p>Returned colored text</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Returned colored text</p>
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$text</var></dt>
+						<dd></dd>
+						<dt><var>$color</var></dt>
+						<dd></dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						string
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="output" id="_output">
 
 			<td class="attributes"><code>
 				 public 
@@ -337,25 +386,27 @@ use createTest to complete creation of test</p>
 			</td>
 
 			<td class="name"><div>
-			<a class="anchor" href="#_createTest">#</a>
-			<code>createTest( )</code>
+			<a class="anchor" href="#_output">#</a>
+			<code>output( <span>string <var>$text</var></span>, <span>string <var>$color</var></span> )</code>
 
 			<div class="description short">
-				
+				<p>Print colored text</p>
 			</div>
 
 			<div class="description detailed hidden">
-				
+				<p>Print colored text</p>
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$text</var></dt>
+						<dd></dd>
+						<dt><var>$color</var></dt>
+						<dd></dd>
+					</dl></div>
 
 
 
-
-
-					<h4>Todo</h4>
-					<div class="list">
-							clean up<br>
-							implement combinations<br>
-					</div>
 
 
 			</div>
@@ -377,122 +428,26 @@ use createTest to complete creation of test</p>
 		<div class="panel panel-default">
             <div class="panel-heading"><h2>Properties summary</h2></div>
 			<table class="summary table table-bordered table-striped properties" id="properties">
-		<tr data-order="export" id="$export">
+		<tr data-order="arguments" id="$arguments">
 			<td class="attributes"><code>
 				protected  
-				object
+				GetOptionKit\OptionResult
 			</code></td>
 
 			<td class="name">
-<var>$export</var>
+<var>$arguments</var>
 				<div class="description short">
-					
+					<p>Parsed arguments passed to script</p>
 				</div>
 
 				<div class="description detailed hidden">
-					
+					<p>Parsed arguments passed to script</p>
 
 				</div>
 			</td>
 			<td class="value">
 				<div>
-					<a href="#$export" class="anchor">#</a>
-					<code></code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="testphaseCollection" id="$testphaseCollection">
-			<td class="attributes"><code>
-				protected  
-				<code><a href="class-Phramework.Testphase.Testphase.html">Phramework\Testphase\Testphase</a>[]</code>
-			</code></td>
-
-			<td class="name">
-<var>$testphaseCollection</var>
-				<div class="description short">
-					<p>Parsed test</p>
-				</div>
-
-				<div class="description detailed hidden">
-					<p>Parsed test</p>
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$testphaseCollection" class="anchor">#</a>
-					<code><span class="php-keyword1">null</span></code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="contentsParsed" id="$contentsParsed">
-			<td class="attributes"><code>
-				protected  
-				
-			</code></td>
-
-			<td class="name">
-<var>$contentsParsed</var>
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$contentsParsed" class="anchor">#</a>
-					<code></code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="meta" id="$meta">
-			<td class="attributes"><code>
-				protected  
-				object
-			</code></td>
-
-			<td class="name">
-<var>$meta</var>
-				<div class="description short">
-					<p>Parsed test's meta object</p>
-				</div>
-
-				<div class="description detailed hidden">
-					<p>Parsed test's meta object</p>
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$meta" class="anchor">#</a>
-					<code></code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="filename" id="$filename">
-			<td class="attributes"><code>
-				protected  
-				
-			</code></td>
-
-			<td class="name">
-<var>$filename</var>
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$filename" class="anchor">#</a>
+					<a href="#$arguments" class="anchor">#</a>
 					<code></code>
 				</div>
 			</td>
