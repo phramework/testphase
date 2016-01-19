@@ -125,7 +125,7 @@ class Binary
 
         try {
             $testParserCollection = $this->getTestParserCollection();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             echo $e->getMessage();
             return 1;
         }
@@ -387,11 +387,11 @@ class Binary
                 $testParser = new TestParser($filename);
             } catch (\Exception $e) {
                 $message = sprintf(
-                        'Failed to parse file "%s" %s With message: "%s"',
-                        $filename,
-                        PHP_EOL,
-                        $e->getMessage()
-                    ) . PHP_EOL;
+                    'Failed to parse file "%s" %s With message: "%s"',
+                    $filename,
+                    PHP_EOL,
+                    $e->getMessage()
+                ) . PHP_EOL;
 
                 if (get_class($e) == IncorrectParametersException::class) {
                     $message .= PHP_EOL . 'Incorrect:' . PHP_EOL
