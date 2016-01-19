@@ -54,4 +54,17 @@ class BinaryTest extends \PHPUnit_Framework_TestCase
     {
         $this->binary->invoke();
     }
+
+    /**
+     * @covers Phramework\Testphase\Binary::getArgumentSpecifications
+     */
+    public function getArgumentSpecifications()
+    {
+        $specifications = getArgumentSpecifications();
+
+        $this->assertInstanceOf(
+            \GetOptionKit\OptionCollection::class,
+            $specifications
+        );
+    }
 }

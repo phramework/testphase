@@ -32,18 +32,21 @@ use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @version 1.0.0
  * @since 1.0.0
+ * @todo Add time and memory statistics
  */
 class Binary
 {
     /**
-     * @var GetOptionKit\OptionResult
+     * Parsed arguments passed to script
+     * @var \GetOptionKit\OptionResult
      */
     protected $arguments;
 
     /**
-     * @param array $argv Array of arguments passed to script
+     * Get argument specifications
+     * @return OptionCollection
      */
-    public function __construct($argv)
+    public static function getArgumentSpecifications()
     {
         $specs = new OptionCollection;
         $specs->add('d|dir:', 'Tests directory path')
@@ -66,7 +69,25 @@ class Binary
         $specs->add('no-colors', 'No colors')->defaultValue(false);
         $specs->add('i|immediate', 'Show error output immediately as it appears')->defaultValue(false);
 
-        $parser = new OptionParser($specs);
+        return $specs;
+    }
+
+    /**
+     * @param array $argv Array of arguments passed to script
+     * @example
+     * ```php
+     * $binary = new Binary([
+     *     __FILE__,
+     *     '-d',
+     *     './tests/'
+     * ];
+     *
+     * $binary->invoke();
+     * ```
+     */
+    public function __construct($argv)
+    {
+        $parser = new OptionParser(static::getArgumentSpecifications());
 
         $this->arguments = $parser->parse($argv);
 
@@ -87,77 +108,31 @@ class Binary
         if ($arguments->help) {
             echo 'Help:' . PHP_EOL;
             $printer = new ConsoleOptionPrinter;
-            echo $printer->render($specs);
+            echo $printer->render(static::getArgumentSpecifications());
             return 0;
         } elseif ($arguments->debug) {
             echo 'Enabled options: ' . PHP_EOL;
 
             foreach ($arguments as $key => $spec) {
-                echo $spec . PHP_EOL;
+                echo $spec;
             }
         }
 
-        $dir = $arguments->dir;
-
-        $bootstrapFile = $arguments->bootstrap;
-
-        if ($bootstrapFile) {
+        //Include bootstrap file if set
+        if (($bootstrapFile = $arguments->bootstrap)) {
             require $bootstrapFile;
         }
 
-        //Get all .json files in directory
-        $testFiles = array_map(
-            function ($f) {
-                return str_replace('//', '/', $f);
-            },
-            Util::directoryToArray(
-                $dir,
-                true,
-                false,
-                true,
-                '/^\.|\.\.$/',
-                ['json'], //Only .json files
-                false
-            )
-        );
-
-        /**
-         * @var TestParser
-         */
-        $tests = [];
-
-        foreach ($testFiles as $filename) {
-            try {
-                $testParser = new TestParser($filename);
-            } catch (\Exception $e) {
-                $message = sprintf(
-                    'Failed to parse file "%s" %s With message: "%s"',
-                    $filename,
-                    PHP_EOL,
-                    $e->getMessage()
-                ) . PHP_EOL;
-
-                if (get_class($e) == IncorrectParametersException::class) {
-                    $message .= PHP_EOL . 'Incorrect:' . PHP_EOL
-                        . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
-                } elseif (get_class($e) == MissingParametersException::class) {
-                    $message .= PHP_EOL . 'Missing:' . PHP_EOL
-                        . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
-                }
-
-                echo $message;
-
-                return 1;
-            }
-            $tests[] = $testParser;
+        try {
+            $testParserCollection = $this->getTestParserCollection();
+        } catch(\Exception $e) {
+            echo $e->getMessage();
+            return 1;
         }
-
-        //Sort tests by order
-        uasort($tests, [self::class, 'sortTests']);
 
         //Statistics object
         $stats = (object)[
-            'tests' => count($tests),
+            'tests' => count($testParserCollection),
             'success' => 0,
             'error' => 0,
             'ignore' => 0,
@@ -166,8 +141,7 @@ class Binary
 
         $testIndex = 0;
 
-        //Execute tests
-        foreach ($tests as $test) {
+        foreach ($testParserCollection as $test) {
 
             //Check if subdir argument is set
             if (isset($arguments->subdir) && $arguments->subdir !== null) {
@@ -185,7 +159,7 @@ class Binary
 
                 $match = false;
 
-                //Check if any of the patterns ar matching
+                //Check if file name matches any of the subdir patterns
                 foreach ($arguments->subdir as $pattern) {
                     $pattern = '@' . $pattern . '@';
                     if (!!preg_match($pattern, $cleanFilename)) {
@@ -195,6 +169,7 @@ class Binary
                 }
 
                 if (!$match) {
+                    //Ignore
                     $stats->ignore += 1;
                     if ($arguments->verbose) {
                         echo sprintf(
@@ -241,10 +216,11 @@ class Binary
 
             //Include number of additional testphase collections
             $stats->tests += count($testphaseCollection) - 1;
-
+    
+            //Iterate though test parser's testphase collection
             foreach ($testphaseCollection as $testphase) {
                 try {
-                    $ok = $testphase->run(function (
+                    $testphase->run(function (
                         $responseStatusCode,
                         $responseHeaders,
                         $responseBody,
@@ -253,19 +229,17 @@ class Binary
                         $test,
                         $arguments
                     ) {
-                        //global $arguments;
-                        //global $test;
                         //todo move to TestParser
                         $export = $test->getExport();
 
-                        //Fetch all teest exports and add them as globals
+                        //Fetch all test exports and add them as globals
                         foreach ($export as $key => $value) {
                             $path = explode('.', $value);
 
                             $pathValue = $responseBodyObject;
 
                             foreach ($path as $p) {
-                                //@todo array index
+                                //@todo implement array index
                                 $arrayIndex = 0;
 
                                 if (is_array($pathValue)) {
@@ -301,7 +275,7 @@ class Binary
                     $stats->success += 1;
                 } catch (\Exception $e) {
 
-                    //@todo if verbose show more details (trace)
+                    //Error message
                     $message = $e->getMessage();
 
                     if ($arguments->debug) {
@@ -342,7 +316,7 @@ class Binary
                     $stats->error += 1;
                 }
                 ++$testIndex;
-                //Allow only 80 characters per line
+                //Show only 80 characters per line
                 if (!($testIndex % 79)) {
                     echo PHP_EOL;
                 }
@@ -356,7 +330,7 @@ class Binary
             echo Globals::toString() . PHP_EOL;
         }
 
-        //dont print if immediate is true
+        //don't print if immediate is true
         if (!$arguments->immediate && !empty($stats->errors)) {
             echo 'Errors:' . PHP_EOL;
             foreach ($stats->errors as $e) {
@@ -373,13 +347,78 @@ class Binary
         Binary::output('Unsuccessful: ' . $stats->error . PHP_EOL, 'red');
 
         if ($stats->error > 0) {
-            return (1);
+            return 1;
         }
 
         return 0;
     }
 
-    protected static function sortTests($a, $b)
+    /**
+     * @return TestParser[]
+     * @throws \Exception
+     */
+    protected function getTestParserCollection()
+    {
+        $dir = $this->arguments->dir;
+
+        //Get all .json files in given directory
+        $testFiles = array_map(
+            function ($f) {
+                return str_replace('//', '/', $f);
+            },
+            Util::directoryToArray(
+                $dir,
+                true,
+                false,
+                true,
+                '/^\.|\.\.$/',
+                ['json'], //Only .json files
+                false
+            )
+        );
+
+        /**
+         * @var TestParser[]
+         */
+        $testParserCollection = [];
+
+        foreach ($testFiles as $filename) {
+            try {
+                $testParser = new TestParser($filename);
+            } catch (\Exception $e) {
+                $message = sprintf(
+                        'Failed to parse file "%s" %s With message: "%s"',
+                        $filename,
+                        PHP_EOL,
+                        $e->getMessage()
+                    ) . PHP_EOL;
+
+                if (get_class($e) == IncorrectParametersException::class) {
+                    $message .= PHP_EOL . 'Incorrect:' . PHP_EOL
+                        . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                } elseif (get_class($e) == MissingParametersException::class) {
+                    $message .= PHP_EOL . 'Missing:' . PHP_EOL
+                        . json_encode($e->getParameters(), JSON_PRETTY_PRINT) . PHP_EOL;
+                }
+
+                throw new \Exception($message);
+            }
+            $testParserCollection[] = $testParser;
+        }
+
+        //Sort tests by order
+        uasort($testParserCollection, [self::class, 'sortTestParser']);
+
+        return $testParserCollection;
+    }
+
+    /**
+     * Sort TestParsers ascending
+     * @param \Phramework\Testphase\TestParser $a
+     * @param \Phramework\Testphase\TestParser $b
+     * @return int Returns 1 if order of first TestParser is larger
+     */
+    public static function sortTestParser(TestParser $a, TestParser $b)
     {
         return (
             $a->getMeta()->order < $b->getMeta()->order
@@ -389,15 +428,18 @@ class Binary
     }
 
     /**
-     * @todo add no-colors
+     * Returned colored text
+     * @param string $text
+     * @param string $color
+     * @return string
      */
-    public static function colored($text, $color)
+    public function colored($text, $color)
     {
         $colors = [
-            'black' => '0;30',
-            'red' => '0;31',
-            'green' => '0;32',
-            'blue' => '1;34',
+            'black'  => '0;30',
+            'red'    => '0;31',
+            'green'  => '0;32',
+            'blue'   => '1;34',
             'yellow' => '1;33'
         ];
 
@@ -407,15 +449,20 @@ class Binary
             : $colors['black']
         );
 
-        if (false && $arguments['no-colors']->value) {
+        if ($this->arguments->{'no-colors'}) {
             return $text;
         } else {
-            return "\033[". $c . "m" . $text . "\033[0m";
+            return "\033[". $c . 'm' . $text . "\033[0m";
         }
     }
 
-    public static function output($text, $color)
+    /**
+     * Print colored text
+     * @param string $text
+     * @param string $color
+     */
+    public function output($text, $color)
     {
-        echo Binary::colored($text, $color);
+        echo $this->colored($text, $color);
     }
 }

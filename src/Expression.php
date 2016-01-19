@@ -21,6 +21,7 @@ use \Phramework\Testphase\TestParser;
 use \Phramework\Testphase\Util;
 
 /**
+ * Expression methods and constants
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @version 1.0.0
@@ -41,8 +42,19 @@ class Expression
      */
     const EXPRESSION_TYPE_INLINE_REPLACE = 'inline_replace';
 
+    /**
+     * Regular expression pattern of keys
+     */
     const PATTERN_KEY = '[a-zA-Z][a-zA-Z0-9\-_]{1,}';
-    const PATTERN_FUNCTION_PARAMETER = self::PATTERN_KEY . '|([\'\"]?)' . '[a-zA-Z0-9\-_]{1,}' . '\5';
+
+    /**
+     * Regular expression pattern of function parameters
+     */
+    const PATTERN_FUNCTION_PARAMETER = '[a-zA-Z][a-zA-Z0-9\-_]{1,}|([\'\"]?)[a-zA-Z0-9\-_]{1,}\5';
+
+    /**
+     * Regular expression pattern of array indices
+     */
     const PATTERN_ARRAY_INDEX = '[1-9]*[0-9]';
 
     /**

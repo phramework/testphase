@@ -10,3 +10,4 @@ npm-debug.log
 localsettings.php
 build/
 /bin/*.symbolic.php
+.idea/**
