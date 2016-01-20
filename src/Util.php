@@ -47,6 +47,9 @@ class Util
      */
     public static function readableRandomString($length = 8)
     {
+
+        $length = intval($length);
+
         $consonants = [
             'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'
         ];

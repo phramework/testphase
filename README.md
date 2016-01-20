@@ -2,6 +2,7 @@
 API testing environment build for phramework and RESTful APIs
 
 [![Coverage Status](https://coveralls.io/repos/phramework/testphase/badge.svg?branch=master&service=github)](https://coveralls.io/github/phramework/testphase?branch=master) [![Build Status](https://travis-ci.org/phramework/testphase.svg?branch=master)](https://travis-ci.org/phramework/testphase)
+[![StyleCI](https://styleci.io/repos/46678784/shield)](https://styleci.io/repos/46678784)
 
 ## Usage
 Require package using composer

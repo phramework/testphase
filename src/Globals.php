@@ -58,7 +58,10 @@ class Globals
         static::$globals->{'rand-integer'} = function ($max = null) {
             if ($max === null) {
                 $max = getrandmax();
+            } else {
+                $max = intval($max);
             }
+
             return rand(0, $max);
         };
 
@@ -76,7 +79,8 @@ class Globals
     /**
      * Check if global variable exists
      * @param string $key
-     * @throws Exception
+     * @throws \Exception
+     * @return boolean
      */
     public static function exists($key)
     {

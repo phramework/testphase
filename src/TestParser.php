@@ -302,10 +302,10 @@ class TestParser
                 //Add rule objects to validate body
                 foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
                     if (is_string($ruleObject)) {
-                        $ruleObject = json_decode($ruleObject);
+                        $testphase->expectObject(ObjectValidator::createFromJSON($ruleObject));
+                    } else {
+                        $testphase->expectObject(ObjectValidator::createFromObject($ruleObject));
                     }
-
-                    $testphase->expectObject(ObjectValidator::createFromObject($ruleObject));
                 }
 
                 //push test
