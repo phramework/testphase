@@ -346,6 +346,10 @@ class Binary
         echo ', ';
         Binary::output('Unsuccessful: ' . $stats->error . PHP_EOL, 'red');
 
+
+        echo 'Memory usage: ' . (int)(memory_get_usage(true)/1048576) . ' MB' . PHP_EOL;
+        echo 'Elapsed time: ' . (time() - $_SERVER['REQUEST_TIME']) . ' s' . PHP_EOL;
+
         if ($stats->error > 0) {
             return 1;
         }

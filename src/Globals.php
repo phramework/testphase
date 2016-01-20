@@ -65,9 +65,9 @@ class Globals
             return rand(0, $max);
         };
 
-        static::$globals->{'rand-string'}  = [Util::class, 'readableRandomString'];
+        static::$globals->{'rand-string'} = [Util::class, 'readableRandomString'];
 
-        static::$globals->{'rand-hash'}    =  function () {
+        static::$globals->{'rand-hash'} =  function () {
             return sha1(rand() . mt_rand() . rand());
         };
 
