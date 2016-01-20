@@ -28,9 +28,14 @@ class Util
      * Check if given string is valid JSON string
      * @param  string  $string
      * @return boolean
+     * @note In php 7.0 json_decode has errors when string is empty
      */
     public static function isJSON($string)
     {
+        if (strlen($string) === 0) {
+            return false;
+        }
+
         $object = json_decode($string);
 
         return (is_string($string) && json_last_error() == JSON_ERROR_NONE

@@ -23,6 +23,14 @@ class UtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsJSON()
     {
+        $this->assertFalse(
+            Util::isJSON('')
+        );
+
+        $this->assertTrue(
+            Util::isJSON('""')
+        );
+
         $this->assertTrue(
             Util::isJSON('{"object" : "OK"}')
         );
