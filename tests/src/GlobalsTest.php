@@ -215,6 +215,29 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Phramework\Testphase\Globals::get
+     *
+     */
+    public function testGetTimestamp()
+    {
+        $return = Globals::get('timestamp');
+
+        $this->assertInternalType(
+            'callable',
+            $return,
+            'Expect to return a function'
+        );
+
+        $return = Globals::get('timestamp()');
+
+        $this->assertInternalType(
+            'integer',
+            $return,
+            'Expect to return integer'
+        );
+    }
+
+    /**
      * @covers Phramework\Testphase\Globals::exists
      */
     public function testExists()

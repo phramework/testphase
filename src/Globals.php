@@ -74,6 +74,14 @@ class Globals
         static::$globals->{'rand-boolean'} = function () {
             return (boolean)rand(0, 1);
         };
+
+        static::$globals->{'timestamp'} = function () {
+            return time();
+        };
+
+        static::$globals->{'microtime'} = function ($get_as_float = false) {
+            return microtime((bool)$get_as_float);
+        };
     }
 
     /**
@@ -108,8 +116,8 @@ class Globals
      *
      * Globals::get('myArray[1]'); //Get second array element
      * ```
-     * @throws Exception When expression key is invalid.
-     * @throws Phramework\Exceptions\NotFoundException When key is not found.
+     * @throws \Exception When expression key is invalid.
+     * @throws \Phramework\Exceptions\NotFoundException When key is not found.
      */
     public static function get($key = null, $operators = null)
     {
@@ -178,7 +186,7 @@ class Globals
      * Globals::get('dots()'); //Will return a string of 4 dots
      * Globals::get('dots(10)'); //Will return a string of 10 dots
      * ```
-     * @throws Exception When key is invalid, *see Expression::PATTERN_KEY*
+     * @throws \Exception When key is invalid, *see Expression::PATTERN_KEY*
      */
     public static function set($key, $value)
     {
@@ -202,7 +210,6 @@ class Globals
         $return = [];
 
         foreach (static::$globals as $key => $value) {
-            $valueString = '';
             $type = gettype($value);
 
             if (is_callable($value)) {
