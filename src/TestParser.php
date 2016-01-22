@@ -58,7 +58,7 @@ class TestParser
     /**
      * Get parsed test
      * @return Testphase[]
-     * @throws Exception When test is not created
+     * @throws \Exception When test is not created
      */
     public function getTest()
     {
@@ -101,10 +101,10 @@ class TestParser
      * use createTest to complete creation of test
      * @param String $filename JSON file containing the test
      * @todo Set $validatorRequest header's subtype
-     * @throws Phramework\Exceptions\NotFoundException When file is not found.
-     * @throws Exception When file contains not valid JSON.
-     * @throws Phramework\Exceptions\MissingParametersException When required test properties are not set.
-     * @throws Phramework\Exceptions\IncorrectParametersException When test properties are not correct.
+     * @throws \Phramework\Exceptions\NotFoundException When file is not found.
+     * @throws \Exception When file contains not valid JSON.
+     * @throws \Phramework\Exceptions\MissingParametersException When required test properties are not set.
+     * @throws \Phramework\Exceptions\IncorrectParametersException When test properties are not correct.
      */
     public function __construct($filename)
     {
@@ -277,7 +277,7 @@ class TestParser
                 }
             }
 
-            //Incase there is no request body, then at least one test must be created
+            //In case there is no request body, then at least one test must be created
             if (empty($requestBodies)) {
                 $requestBodies[] = null;
             }
@@ -303,6 +303,11 @@ class TestParser
                 foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
                     if (is_string($ruleObject)) {
                         $testphase->expectObject(ObjectValidator::createFromJSON($ruleObject));
+                    } else if (is_subclass_of(
+                        $ruleObject,
+                        \Phramework\Validate\BaseValidator::class
+                    )) {
+                        $testphase->expectObject($ruleObject);
                     } else {
                         $testphase->expectObject(ObjectValidator::createFromObject($ruleObject));
                     }
