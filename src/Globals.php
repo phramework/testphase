@@ -16,6 +16,7 @@
  */
 namespace Phramework\Testphase;
 
+use Phramework\Testphase\Exceptions\UnsetGlobalException;
 use \Phramework\Testphase\Testphase;
 use \Phramework\Testphase\TestParser;
 use \Phramework\Testphase\Util;
@@ -136,10 +137,7 @@ class Globals
             }
 
             if (!static::exists($parsed->key)) {
-                throw new \Phramework\Exceptions\NotFoundException(sprintf(
-                    'Key "%s" not found in globals',
-                    $parsed->key
-                ));
+                throw new UnsetGlobalException($parsed->key);
             }
 
             $global = static::$globals->{$parsed->key};

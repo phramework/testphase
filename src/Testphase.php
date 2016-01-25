@@ -21,7 +21,7 @@ use \Phramework\Validate\ObjectValidator;
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
- * @version 1.0.1
+ * @version 1.1.2
  */
 class Testphase
 {
@@ -474,7 +474,7 @@ class Testphase
      */
     public static function getVersion()
     {
-        $reflection = new \ReflectionClass(Testphase::class);
+        /*$reflection = new \ReflectionClass(Testphase::class);
         $comment = $reflection->getDocComment();
 
         preg_match('/\@version ([\w\.]+(:?\-[a-zA-Z0-9]+)?)\n/', $comment, $matches);
@@ -483,6 +483,8 @@ class Testphase
             return $matches[1];
         } else {
             throw new \Exception('Unable retrieve library`s version');
-        }
+        }*/
+
+        return '1.1.2';
     }
 }

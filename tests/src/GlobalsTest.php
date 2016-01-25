@@ -117,7 +117,7 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Phramework\Testphase\Globals::get
-     * @expectedException Phramework\Exceptions\NotFoundException
+     * @expectedException \Phramework\Testphase\Exceptions\UnsetGlobalException
      */
     public function testGetFailure3()
     {
@@ -126,6 +126,7 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testSetArray
+     * @params int[] $array
      * @covers Phramework\Testphase\Globals::get
      */
     public function testGetArray($array)

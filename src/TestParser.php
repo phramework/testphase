@@ -160,7 +160,8 @@ class TestParser
                     )
                 ])
             ],
-            ['url']
+            ['url'],
+            false
         );
 
         $validatorResponse = new ObjectValidator(
@@ -183,7 +184,8 @@ class TestParser
                     true //todo Validate key's pattern (using additionalProperties)
                 ))->setDefault((object)[])
             ],
-            ['statusCode']
+            ['statusCode'],
+            false
         );
 
         //Setup validator for parsed test
@@ -201,7 +203,8 @@ class TestParser
                 'request' => $validatorRequest,
                 'response' => $validatorResponse
             ],
-            ['request', 'response']
+            ['request', 'response'],
+            false
         );
 
         //Parse test file, using validator's rules
