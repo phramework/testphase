@@ -52,7 +52,6 @@ class Util
      */
     public static function readableRandomString($length = 8)
     {
-
         $length = intval($length);
 
         $consonants = [

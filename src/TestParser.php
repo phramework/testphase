@@ -306,7 +306,7 @@ class TestParser
                 foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
                     if (is_string($ruleObject)) {
                         $testphase->expectObject(ObjectValidator::createFromJSON($ruleObject));
-                    } else if (is_subclass_of(
+                    } elseif (is_subclass_of(
                         $ruleObject,
                         \Phramework\Validate\BaseValidator::class
                     )) {
