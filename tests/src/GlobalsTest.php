@@ -164,7 +164,6 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertSame($echoVariable, $return);
-
     }
 
     /**
