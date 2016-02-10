@@ -83,11 +83,12 @@ class Util
      * @param boolean $listFiles     *[Optional]* Include files on listing
      * @param string  $exclude       *[Optional]* Exclude paths that matches this
      * regular expression
-     * @param array   $allowed_filetypes *[Optional]* Allowed file extensions,
+     * @param array   $allowedFileTypes *[Optional]* Allowed file extensions,
      * default `[]` (allow all)
-     * @param boolean $relative_path *[Optional]* Return paths in relative form,
+     * @param boolean $relativePath *[Optional]* Return paths in relative form,
      * default `false`
      * @link https://github.com/phramework/phramework/blob/master/src/Models/Util.php Source
+     * @return array
      */
     public static function directoryToArray(
         $directory,
@@ -95,8 +96,8 @@ class Util
         $listDirs = false,
         $listFiles = true,
         $exclude = '',
-        $allowed_filetypes = [],
-        $relative_path = false
+        $allowedFileTypes = [],
+        $relativePath = false
     ) {
         $arrayItems = [];
         $skipByExclude = false;
@@ -111,9 +112,9 @@ class Util
                 if ($exclude) {
                     preg_match($exclude, $file, $skipByExclude);
                 }
-                if ($allowed_filetypes && !is_dir($directory . DIRECTORY_SEPARATOR . $file)) {
+                if ($allowedFileTypes && !is_dir($directory . DIRECTORY_SEPARATOR . $file)) {
                     $ext = strtolower(preg_replace('/^.*\.([^.]+)$/D', '$1', $file));
-                    if (!in_array($ext, $allowed_filetypes)) {
+                    if (!in_array($ext, $allowedFileTypes)) {
                         $skip = true;
                     }
                 }
@@ -128,14 +129,14 @@ class Util
                                     $listDirs,
                                     $listFiles,
                                     $exclude,
-                                    $allowed_filetypes,
-                                    $relative_path
+                                    $allowedFileTypes,
+                                    $relativePath
                                 )
                             );
                         }
                         if ($listDirs) {
                             $arrayItems[] = (
-                                $relative_path
+                                $relativePath
                                 ? $file
                                 : $directory . DIRECTORY_SEPARATOR . $file
                             );
@@ -143,7 +144,7 @@ class Util
                     } else {
                         if ($listFiles) {
                             $arrayItems[] = (
-                                $relative_path
+                                $relativePath
                                 ? $file
                                 : $directory . DIRECTORY_SEPARATOR . $file
                             );

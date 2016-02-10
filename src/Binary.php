@@ -80,7 +80,7 @@ class Binary
      *     __FILE__,
      *     '-d',
      *     './tests/'
-     * ];
+     * ]);
      *
      * $binary->invoke();
      * ```

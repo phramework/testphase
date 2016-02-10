@@ -147,17 +147,15 @@ class Globals
                     $functionParameters = [];
 
                     if (property_exists($parsed, 'parameters')) {
-                        $functionParameters = $parsed->parameters;
+                        $functionParameters = Globals::handleFunctionVariable($parsed->parameters);
                     }
 
                     return call_user_func_array(
                         $global,
                         $functionParameters
                     );
-                    //break;
                 case Globals::KEY_ARRAY:
-                    return $global[$parsed->index];
-                    //break;
+                    return $global[(int) Globals::handleArrayVariable($parsed->index)];
                 case Globals::KEY_VARIABLE:
                 default:
                     return $global;
@@ -165,6 +163,47 @@ class Globals
         }
 
         return static::$globals;
+    }
+
+    /**
+     * @param string[] $parameters
+     * @return mixed[]
+     */
+    public static function handleFunctionVariable($parameters)
+    {
+        return array_map(
+            function ($value) {
+                $isLiteral = ((string)(int)$value == $value || in_array((string) $value[0], ['\'', '"']));
+
+                $unquoted = trim($value, '\'"');
+
+                if ($isLiteral) {
+                    return $unquoted;
+                }
+
+                return Globals::get($unquoted);
+            },
+            $parameters
+        );
+    }
+
+    /**
+     * @param  string $value
+     * @return mixed
+     * @throws UnsetGlobalException
+     * @throws \Exception
+     */
+    public static function handleArrayVariable($value)
+    {
+        $isLiteral = ((string)(int)$value == $value || in_array((string) $value[0], ['\'', '"']));
+
+        $unquoted = trim($value, '\'"');
+
+        if ($isLiteral) {
+            return $unquoted;
+        }
+
+        return Globals::get($unquoted);
     }
 
     /**

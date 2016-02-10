@@ -125,6 +125,49 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Phramework\Testphase\Globals::get
+     */
+    public function testGetVariableAsArgument1()
+    {
+        $variableSize = '10';
+
+        Globals::set('variableSize', $variableSize);
+
+        $return = Globals::get('rand-string(variableSize)');
+
+        $this->assertSame(mb_strlen($return), (int)$variableSize);
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::get
+     */
+    public function testGetVariableAsArgument2()
+    {
+        Globals::set('echo', function ($value) {
+            return $value;
+        });
+
+        $echoVariable = Globals::get('rand-string()');
+
+        $return = Globals::get(sprintf(
+            'echo("%s")', //literal
+            $echoVariable
+        ));
+
+        $this->assertSame($echoVariable, $return);
+
+        Globals::set('echoVariable', $echoVariable);
+
+        $return = Globals::get(sprintf(
+            'echo(%s)', //literal
+            'echoVariable'
+        ));
+
+        $this->assertSame($echoVariable, $return);
+
+    }
+
+    /**
      * @depends testSetArray
      * @params int[] $array
      * @covers Phramework\Testphase\Globals::get
