@@ -168,6 +168,45 @@ class GlobalsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testSetArray
+     * @covers Phramework\Testphase\Globals::get
+     */
+    public function testGetVariableAsIndex($array)
+    {
+        $variableIndex = '1';
+
+        Globals::set('variableIndex', $variableIndex);
+
+        $return = Globals::get(sprintf(
+            'array[%s]',
+            'variableIndex'
+        ));
+
+        $this->assertSame($array[$variableIndex], $return);
+        
+        //literal integer
+        $return = Globals::get(sprintf(
+            'array[%s]',
+            2
+        ));
+
+        $this->assertSame($array[2], $return);
+    }
+
+    /**
+     * @covers Phramework\Testphase\Globals::get
+     * @expectedException \Exception
+     */
+    public function testGetVariableAsIndexFailure()
+    {
+        //literal
+        $return = Globals::get(sprintf(
+            'array["%s"]',
+            2
+        ));
+    }
+
+    /**
+     * @depends testSetArray
      * @params int[] $array
      * @covers Phramework\Testphase\Globals::get
      */

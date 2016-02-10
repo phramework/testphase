@@ -55,7 +55,7 @@ class Expression
     /**
      * Regular expression pattern of array indices
      */
-    const PATTERN_ARRAY_INDEX = '[1-9]*[0-9]';
+    const PATTERN_ARRAY_INDEX = '[a-zA-Z][a-zA-Z0-9\-_]{1,}|[1-9]*[0-9]'; //[1-9]*[0-9]
 
     /**
      * Get prefix and suffix
