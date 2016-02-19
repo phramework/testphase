@@ -119,7 +119,7 @@ class TestParser
 
         $contents = file_get_contents($filename);
 
-        //Check if contents are a valid jsonfile
+        //Check if contents are a valid JSON file
         if (!Util::isJSON($contents)) {
             throw new \Exception(sprintf(
                 'File "%s" isn\'t a valid JSON file',
@@ -199,7 +199,10 @@ class TestParser
                     'description' => new StringValidator(),
                     'JSONbody' => (new BooleanValidator())
                         ->setDefault(true)
-                ])),
+                ]))->setDefault((object) [
+                    'order' => 0,
+                    'JSONbody' => true
+                ]),
                 'request' => $validatorRequest,
                 'response' => $validatorResponse
             ],
@@ -212,20 +215,18 @@ class TestParser
             $contentsObject
         );
 
-        //Fix meta if not defined
+        //Fix meta if not defined TODO remove
         $this->meta = (
             isset($contentsParsed->meta)
             ? $contentsParsed->meta
             : (object)[
-                'order' => 0,
-                'JSONbody' => true
+
             ]
         );
     }
 
     /**
      * @todo clean up
-     * @todo implement combinations
      */
     public function createTest()
     {
@@ -241,7 +242,7 @@ class TestParser
             $this->contentsParsed->request->iterators = $iterators;
 
             //Get combinations of iterator values
-            $combinations = Util::cartesian((array)$iterators);
+            $combinations = Util::cartesian((array) $iterators);
         } else {
             //Add a single test with no combinations
             $combinations = [[]];

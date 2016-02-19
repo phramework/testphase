@@ -86,7 +86,7 @@ class Testphase
      * @param array       $headers     *[Optional]* HTTP request headers
      * @param string|null $requestBody *[Optional]* HTTP request body
      * @param boolean     $ruleJSON    *[Optional]* Response rule, expect JSON encoded response body
-     * @throws Phramework\Exceptions\IncorrectParametersException When method is not correct
+     * @throws \Phramework\Exceptions\IncorrectParametersException When method is not correct
      */
     public function __construct(
         $url,
@@ -217,6 +217,7 @@ class Testphase
      * completing the test rules
      * @return true On success
      * @uses self::$base When url does not contain schema use base as prefix.
+     * @throws \Exception
      */
     public function run($callback = null)
     {
@@ -283,7 +284,7 @@ class Testphase
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
                 break;
             default:
-                throw new \Exception('Unsupporter method');
+                throw new \Exception('Unsupported method');
         }
 
         //Get response
@@ -343,7 +344,7 @@ class Testphase
      * Add expected response header
      * @param  array[]|object $ruleHeaders
      * @return $this
-     * @throws Exception When $ruleHeaders is not an array
+     * @throws \Exception When $ruleHeaders is not an array
      */
     public function expectResponseHeader($ruleHeaders)
     {
@@ -485,6 +486,6 @@ class Testphase
             throw new \Exception('Unable retrieve library`s version');
         }*/
 
-        return '1.1.2';
+        return '1.3';
     }
 }

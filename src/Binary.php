@@ -16,6 +16,7 @@
  */
 namespace Phramework\Testphase;
 
+use Phramework\Testphase\Exceptions\UnsetGlobalException;
 use \Phramework\Testphase\Testphase;
 use \Phramework\Testphase\TestParser;
 use \Phramework\Testphase\Util;
@@ -135,7 +136,9 @@ class Binary
             'tests' => count($testParserCollection),
             'success' => 0,
             'error' => 0,
+            'failure' => 0,
             'ignore' => 0,
+            'incomplete' => 0,
             'errors' => []
         ];
 
@@ -198,6 +201,10 @@ class Binary
                 continue;
             }
 
+
+            if (isset($meta->incomplete) && $meta->incomplete) {
+                $stats->incomplete += 1;
+            }
 
             try {
                 //Complete test's testphase collection
@@ -273,6 +280,37 @@ class Binary
                         echo '.';
                     }
                     $stats->success += 1;
+                } catch (UnsetGlobalException $e) {
+
+                    //Error message
+                    $message = $e->getMessage();
+
+                    $message = sprintf(
+                        self::colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
+                        $test->getFilename(),
+                        $message
+                    );
+
+                    //push message to error message
+                    $stats->errors[] = $message;
+
+                    //Echo unsuccessful char
+                    if ($arguments->verbose) {
+                        echo sprintf(
+                                'F %s',
+                                $test->getFilename()
+                            ) . PHP_EOL;
+                    } else {
+                        echo 'F';
+                    }
+
+                    //print if immediate
+                    if ($arguments->immediate) {
+                        echo PHP_EOL . $message . PHP_EOL;
+                    }
+
+                    //Error message
+                    $stats->error += 1;
                 } catch (\Exception $e) {
 
                     //Error message
@@ -281,6 +319,7 @@ class Binary
                     if ($arguments->debug) {
                         $message .= PHP_EOL . $testphase->getResponseBody();
                     }
+
                     $message = sprintf(
                         self::colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
                         $test->getFilename(),
@@ -301,11 +340,11 @@ class Binary
                     //Echo unsuccessful char
                     if ($arguments->verbose) {
                         echo sprintf(
-                            'E %s',
+                            'F %s',
                             $test->getFilename()
                         ) . PHP_EOL;
                     } else {
-                        echo 'E';
+                        echo 'F';
                     }
 
                     //print if immediate
@@ -313,7 +352,7 @@ class Binary
                         echo PHP_EOL . $message . PHP_EOL;
                     }
 
-                    $stats->error += 1;
+                    $stats->failure += 1;
                 }
                 ++$testIndex;
                 //Show only 80 characters per line
@@ -344,7 +383,11 @@ class Binary
         echo ', ';
         Binary::output('Ignored: ' . $stats->ignore, 'yellow');
         echo ', ';
-        Binary::output('Unsuccessful: ' . $stats->error . PHP_EOL, 'red');
+        Binary::output('Incomplete: ' . $stats->incomplete, 'yellow');
+        echo ', ';
+        Binary::output('Error: ' . $stats->error, 'red');
+        echo ', ';
+        Binary::output('Failure: ' . $stats->failure . PHP_EOL, 'red');
 
 
         echo 'Memory usage: ' . (int)(memory_get_usage(true)/1048576) . ' MB' . PHP_EOL;
