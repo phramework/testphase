@@ -202,7 +202,7 @@ class Binary
             }
 
 
-            if (isset($meta->incomplete) && $meta->incomplete) {
+            if (isset($meta->incomplete) && $meta->incomplete !== false) {
                 $stats->incomplete += 1;
             }
 

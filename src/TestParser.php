@@ -198,7 +198,11 @@ class TestParser
                         ->setDefault(false),
                     'description' => new StringValidator(),
                     'JSONbody' => (new BooleanValidator())
-                        ->setDefault(true)
+                        ->setDefault(true),
+                    'incomplete' => (new OneOf([
+                        new BooleanValidator(),
+                        new StringValidator(1, 4096)
+                    ]))->setDefault(false),
                 ]))->setDefault((object) [
                     'order' => 0,
                     'JSONbody' => true

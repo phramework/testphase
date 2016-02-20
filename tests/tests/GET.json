@@ -1,7 +1,8 @@
 {
   "meta": {
     "description": "Get posts",
-    "order": -1
+    "order": -1,
+    "incomplete": false
   },
   "request": {
     "url": "http://jsonplaceholder.typicode.com/posts",
