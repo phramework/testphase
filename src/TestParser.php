@@ -96,8 +96,8 @@ class TestParser
     }
 
     /**
-     * Parse test informations from a json file
-     * this method will parse the file and prepare the meta object
+     * Parse test information from a json file
+     * this method will parse the file and prepare the  object
      * use createTest to complete creation of test
      * @param String $filename JSON file containing the test
      * @todo Set $validatorRequest header's subtype
@@ -176,6 +176,8 @@ class TestParser
                 ]),
                 'headers' => (new ObjectValidator())
                     ->setDefault((object)[]),
+                'timeout' => (new UnsignedIntegerValidator())
+                    ->setDefault(null),
                 'ruleObjects' => (new ArrayValidator())
                     ->setDefault([]),
                 'export' => (new ObjectValidator(
@@ -196,7 +198,8 @@ class TestParser
                         ->setDefault(0),
                     'ignore' => (new BooleanValidator())
                         ->setDefault(false),
-                    'description' => new StringValidator(),
+                    'description' => (new StringValidator())
+                        ->setDefault(null),
                     'JSONbody' => (new BooleanValidator())
                         ->setDefault(true),
                     'incomplete' => (new OneOf([
@@ -205,7 +208,10 @@ class TestParser
                     ]))->setDefault(false),
                 ]))->setDefault((object) [
                     'order' => 0,
-                    'JSONbody' => true
+                    'description' => null,
+                    'JSONbody' => true,
+                    'incomplete' => false,
+                    'ignore' => false
                 ]),
                 'request' => $validatorRequest,
                 'response' => $validatorResponse
@@ -219,14 +225,8 @@ class TestParser
             $contentsObject
         );
 
-        //Fix meta if not defined TODO remove
-        $this->meta = (
-            isset($contentsParsed->meta)
-            ? $contentsParsed->meta
-            : (object)[
-
-            ]
-        );
+        //Set testparser meta
+        $this->meta = $contentsParsed->meta;
     }
 
     /**
