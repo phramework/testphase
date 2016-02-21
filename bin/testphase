@@ -30,4 +30,4 @@ if (file_exists($autoload[0])) {
     exit(1);
 }
 
-return (new \Phramework\Testphase\Binary($argv))->invoke();
+exit((new \Phramework\Testphase\Binary($argv))->invoke());
