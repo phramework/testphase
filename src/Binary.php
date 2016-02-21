@@ -43,6 +43,8 @@ class Binary
      */
     protected $arguments;
 
+    protected $server = null;
+
     /**
      * Get argument specifications
      * @return OptionCollection
@@ -69,6 +71,9 @@ class Binary
         $specs->add('h|help', 'Show help')->defaultValue(false);
         $specs->add('no-colors', 'No colors')->defaultValue(false);
         $specs->add('i|immediate', 'Show error output immediately as it appears')->defaultValue(false);
+
+        $specs->add('server-host?', 'Server host')->defaultValue(null);
+        $specs->add('server-root',  'Server root path, default is ./public')->defaultValue('./public');
 
         return $specs;
     }
@@ -102,9 +107,19 @@ class Binary
      */
     public function invoke()
     {
-        echo 'testphase v' . Testphase::getVersion() . PHP_EOL;
-
         $arguments = $this->arguments;
+
+        if (($serverHost = $arguments->{'server-host'}) !== null) {
+            $this->server = new Server($serverHost, $arguments->{'server-root'});
+            $this->server->start();
+        }
+
+        //Include bootstrap file if set
+        if (($bootstrapFile = $arguments->bootstrap)) {
+            require $bootstrapFile;
+        }
+
+        echo 'testphase v' . Testphase::getVersion() . PHP_EOL;
 
         if ($arguments->help) {
             echo 'Help:' . PHP_EOL;
@@ -119,16 +134,11 @@ class Binary
             }
         }
 
-        //Include bootstrap file if set
-        if (($bootstrapFile = $arguments->bootstrap)) {
-            require $bootstrapFile;
-        }
-
         try {
             $testParserCollection = $this->getTestParserCollection();
         } catch (\Exception $e) {
             echo $e->getMessage();
-            return 1;
+            return $this->stop(1);
         }
 
         //Statistics object
@@ -216,7 +226,7 @@ class Binary
                     PHP_EOL,
                     $e->getMessage()
                 ) . PHP_EOL;
-                return 1;
+                return $this->stop(1);
             }
 
             $testphaseCollection = $test->getTest();
@@ -394,13 +404,21 @@ class Binary
         echo 'Elapsed time: ' . (time() - $_SERVER['REQUEST_TIME']) . ' s' . PHP_EOL;
 
         if ($stats->error > 0) {
-            return 1;
+            return $this->stop(1);
         }
         if ($stats->failure > 0) {
-            return 2;
+            return $this->stop(2);
         }
 
-        return 0;
+        return $this->stop(0);
+    }
+
+    protected function stop($returnCode) {
+        if ($this->server !== null) {
+            $this->server->stop();
+        }
+
+        return $returnCode;
     }
 
     /**
