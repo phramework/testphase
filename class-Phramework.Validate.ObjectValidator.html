@@ -73,8 +73,14 @@
 							</li>
 					<li>
 						<a href="namespace-Phramework.Testphase.html">
-							Testphase						</a>
+							Testphase<span></span>
+						</a>
+							<ul>
+					<li>
+						<a href="namespace-Phramework.Testphase.Exceptions.html">
+							Exceptions						</a>
 							</li>
+								</ul></li>
 					<li class="active">
 						<a href="namespace-Phramework.Validate.html">
 							Validate						</a>
@@ -169,10 +175,6 @@
 				Implement patternProperties<br>
 				<b>Todo:</b>
 				Implement additionalProperties "additionalProperties": { "type": "string" }<br>
-				<b>Todo:</b>
-				Implement dependencies<br>
-				<b>Todo:</b>
-				Can it have default?<br>
 			<b>Located at</b> ObjectValidator.php		<br>
 	</div>
 
@@ -192,7 +194,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___construct">#</a>
-			<code>__construct( <span>object <var>$properties</var> = []</span>, <span>string[] <var>$required</var> = []</span>, <span>object|boolean|null <var>$additionalProperties</var> = <span class="php-keyword1">null</span></span>, <span>integer <var>$minProperties</var> = <span class="php-num">0</span></span>, <span>integer <var>$maxProperties</var> = <span class="php-keyword1">null</span> </span> )</code>
+			<code>__construct( <span>object <var>$properties</var> = []</span>, <span>string[] <var>$required</var> = []</span>, <span>object|boolean|null <var>$additionalProperties</var> = <span class="php-keyword1">null</span></span>, <span>integer <var>$minProperties</var> = <span class="php-num">0</span></span>, <span>integer <var>$maxProperties</var> = <span class="php-keyword1">null</span></span>, <span>object|null <var>$dependencies</var> = <span class="php-keyword1">null</span> </span> )</code>
 
 			<div class="description short">
 				
@@ -214,9 +216,15 @@
 						<dd><em>[Optional]</em> Default is 0</dd>
 						<dt><var>$maxProperties</var></dt>
 						<dd><em>[Optional]</em> Default is null</dd>
+						<dt><var>$dependencies</var></dt>
+						<dd></dd>
 					</dl></div>
 
 
+					<h4>Throws</h4>
+					<div class="list">
+						Exception
+					</div>
 
 
 					<h4>Overrides</h4>
@@ -264,7 +272,7 @@
 					</div>
 					<h4>Todo</h4>
 					<div class="list">
-							clean up failure of recurvice objects<br>
+							clean up failure of recursive objects<br>
 					</div>
 
 
@@ -418,15 +426,19 @@ and return a clean object</p>
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_getTypeAttributes">getTypeAttributes()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_parseStatic">parseStatic()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_registerValidator">registerValidator()</a></code>, 
+				<code><a href="class-Phramework.Validate.BaseValidator.html#_runValidateCallback">runValidateCallback()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_setDefault">setDefault()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_setDescription">setDescription()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_setEnum">setEnum()</a></code>, 
+				<code><a href="class-Phramework.Validate.BaseValidator.html#_setNot">setNot()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_setTitle">setTitle()</a></code>, 
+				<code><a href="class-Phramework.Validate.BaseValidator.html#_setValidateCallback">setValidateCallback()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_toArray">toArray()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_toJSON">toJSON()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_toObject">toObject()</a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#_validateCommon">validateCommon()</a></code>, 
-				<code><a href="class-Phramework.Validate.BaseValidator.html#_validateEnum">validateEnum()</a></code>
+				<code><a href="class-Phramework.Validate.BaseValidator.html#_validateEnum">validateEnum()</a></code>, 
+				<code><a href="class-Phramework.Validate.BaseValidator.html#_validateNot">validateNot()</a></code>
 			</p>
 		</div>
 
@@ -476,12 +488,12 @@ and return a clean object</p>
 <var>$typeAttributes</var>
 				<div class="description short">
 					<p>Validator's attributes
-Can be overwriten</p>
+Can be overwritten</p>
 				</div>
 
 				<div class="description detailed hidden">
 					<p>Validator's attributes
-Can be overwriten</p>
+Can be overwritten</p>
 
 				</div>
 			</td>
@@ -493,7 +505,8 @@ Can be overwriten</p>
     <span class="php-quote">'maxProperties'</span>,
     <span class="php-quote">'required'</span>,
     <span class="php-quote">'properties'</span>,
-    <span class="php-quote">'additionalProperties'</span>
+    <span class="php-quote">'additionalProperties'</span>,
+    <span class="php-quote">'dependencies'</span>
 ]</code>
 				</div>
 			</td>
@@ -506,7 +519,8 @@ Can be overwriten</p>
 			<p class="elementList">
 				<code><a href="class-Phramework.Validate.BaseValidator.html#$attributes"><var>$attributes</var></a></code>, 
 				<code><a href="class-Phramework.Validate.BaseValidator.html#$commonAttributes"><var>$commonAttributes</var></a></code>, 
-				<code><a href="class-Phramework.Validate.BaseValidator.html#$default"><var>$default</var></a></code>
+				<code><a href="class-Phramework.Validate.BaseValidator.html#$default"><var>$default</var></a></code>, 
+				<code><a href="class-Phramework.Validate.BaseValidator.html#$validateCallback"><var>$validateCallback</var></a></code>
 			</p>
 		</div>
 
@@ -542,6 +556,24 @@ Can be overwriten</p>
 <var>$maxProperties</var>
 				<div class="description short">
 					<p>Minimum number of properties</p>
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+		</tr>
+		<tr data-order="dependencies" id="m$dependencies">
+			<td class="attributes"><code>
+				public  
+				object
+			</code></td>
+
+			<td class="name">
+<var>$dependencies</var>
+				<div class="description short">
+					<p>Dependencies</p>
 				</div>
 
 				<div class="description detailed hidden">

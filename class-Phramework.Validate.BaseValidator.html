@@ -73,8 +73,14 @@
 							</li>
 					<li>
 						<a href="namespace-Phramework.Testphase.html">
-							Testphase						</a>
+							Testphase<span></span>
+						</a>
+							<ul>
+					<li>
+						<a href="namespace-Phramework.Testphase.Exceptions.html">
+							Exceptions						</a>
 							</li>
+								</ul></li>
 					<li class="active">
 						<a href="namespace-Phramework.Validate.html">
 							Validate						</a>
@@ -196,12 +202,12 @@
 			<code>parseStatic( <span>mixed <var>$value</var></span> )</code>
 
 			<div class="description short">
-				<p>This static method will instanciate a new object as validation model
+				<p>This static method will instantiate a new object as validation model
 to parse the input value</p>
 			</div>
 
 			<div class="description detailed hidden">
-				<p>This static method will instanciate a new object as validation model
+				<p>This static method will instantiate a new object as validation model
 to parse the input value</p>
 
 
@@ -286,7 +292,7 @@ to parse the input value</p>
 						<dt><var>$value</var></dt>
 						<dd>Value to validate</dd>
 						<dt><var>$validateResult</var></dt>
-						<dd>$return Current ValidateResult status</dd>
+						<dd>Current ValidateResult status</dd>
 					</dl></div>
 
 					<h4>Returns</h4>
@@ -304,6 +310,49 @@ to parse the input value</p>
 			</div>
 			</div></td>
 		</tr>
+		<tr data-order="runValidateCallback" id="_runValidateCallback">
+
+			<td class="attributes"><code>
+				 protected 
+				<code><a href="class-Phramework.Validate.ValidateResult.html">Phramework\Validate\ValidateResult</a></code>
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_runValidateCallback">#</a>
+			<code>runValidateCallback( <span><code><a href="class-Phramework.Validate.ValidateResult.html">Phramework\Validate\ValidateResult</a></code> <var>$validateResult</var></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$validateResult</var></dt>
+						<dd></dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						<code><a href="class-Phramework.Validate.ValidateResult.html">Phramework\Validate\ValidateResult</a></code>
+					</div>
+
+
+					<h4>Todo</h4>
+					<div class="list">
+							<p>May cause issues when parent validator calls
+this method and then child type casts the returned value (see number and integer validator)</p><br>
+					</div>
+
+
+			</div>
+			</div></td>
+		</tr>
 		<tr data-order="validateEnum" id="_validateEnum">
 
 			<td class="attributes"><code>
@@ -315,7 +364,7 @@ to parse the input value</p>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_validateEnum">#</a>
-			<code>validateEnum( <span>mixed <var>$value</var></span> )</code>
+			<code>validateEnum( <span>mixed <var>$value</var></span>, <span>mixed <var>$parsedValue</var></span> )</code>
 
 			<div class="description short">
 				<p>Common helper method to validate against "enum" keyword</p>
@@ -329,6 +378,8 @@ to parse the input value</p>
 					<div class="list"><dl>
 						<dt><var>$value</var></dt>
 						<dd>Value to validate</dd>
+						<dt><var>$parsedValue</var></dt>
+						<dd>$value Parsed value from previous validators</dd>
 					</dl></div>
 
 					<h4>Returns</h4>
@@ -349,6 +400,50 @@ to parse the input value</p>
 					<div class="list">
 							provide support for objects and arrays<br>
 					</div>
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="validateNot" id="_validateNot">
+
+			<td class="attributes"><code>
+				 protected 
+				<code><a href="class-Phramework.Validate.ValidateResult.html">Phramework\Validate\ValidateResult</a></code>
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_validateNot">#</a>
+			<code>validateNot( <span>mixed <var>$value</var></span>, <span>mixed <var>$parsedValue</var></span> )</code>
+
+			<div class="description short">
+				<p>Common helper method to validate against "not" keyword</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Common helper method to validate against "not" keyword</p>
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$value</var></dt>
+						<dd>Value to validate</dd>
+						<dt><var>$parsedValue</var></dt>
+						<dd>$value Parsed value from previous validators</dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						<code><a href="class-Phramework.Validate.ValidateResult.html">Phramework\Validate\ValidateResult</a></code>
+					</div>
+
+					<h4>Throws</h4>
+					<div class="list">
+						Exception
+					</div>
+
 
 
 			</div>
@@ -434,11 +529,11 @@ to parse the input value</p>
 			<code>__construct( )</code>
 
 			<div class="description short">
-				
+				<p>BaseValidator constructor.</p>
 			</div>
 
 			<div class="description detailed hidden">
-				
+				<p>BaseValidator constructor.</p>
 
 
 
@@ -495,7 +590,7 @@ to parse the input value</p>
 
 			<td class="attributes"><code>
 				 public 
-				<code><a href="class-Phramework.Validate.BaseValidator.html">Phramework\Validate\BaseValidator</a></code>
+				
 				
 				</code>
 			</td>
@@ -522,7 +617,7 @@ to parse the input value</p>
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code><a href="class-Phramework.Validate.BaseValidator.html">Phramework\Validate\BaseValidator</a></code><br>Return's this validator object
+						<br>$this
 					</div>
 
 					<h4>Throws</h4>
@@ -562,6 +657,10 @@ to parse the input value</p>
 						<dd></dd>
 					</dl></div>
 
+					<h4>Returns</h4>
+					<div class="list">
+						<br>$this
+					</div>
 
 
 
@@ -596,7 +695,53 @@ to parse the input value</p>
 						<dd></dd>
 					</dl></div>
 
+					<h4>Returns</h4>
+					<div class="list">
+						<br>$this
+					</div>
 
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="setNot" id="_setNot">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_setNot">#</a>
+			<code>setNot( <span><code><a href="class-Phramework.Validate.BaseValidator.html">Phramework\Validate\BaseValidator</a></code>|null <var>$not</var></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$not</var></dt>
+						<dd></dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						<br>$this
+					</div>
+
+					<h4>Throws</h4>
+					<div class="list">
+						Exception
+					</div>
 
 
 
@@ -630,6 +775,10 @@ to parse the input value</p>
 						<dd></dd>
 					</dl></div>
 
+					<h4>Returns</h4>
+					<div class="list">
+						<br>$this
+					</div>
 
 
 
@@ -664,8 +813,70 @@ to parse the input value</p>
 						<dd></dd>
 					</dl></div>
 
+					<h4>Returns</h4>
+					<div class="list">
+						<br>$this
+					</div>
 
 
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="setValidateCallback" id="_setValidateCallback">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_setValidateCallback">#</a>
+			<code>setValidateCallback( <span>callable <var>$callback</var></span> )</code>
+
+			<div class="description short">
+				<p>Set validation callback, this</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Set validation callback, this</p>
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$callback</var></dt>
+						<dd>Callback method may have two arguments, first is</dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						<br>$this
+					</div>
+
+					<h4>Throws</h4>
+					<div class="list">
+						Exception<br>When callback is not callable
+					</div>
+
+					<h4>Since</h4>
+					<div class="list">
+							0.6.0<br>
+					</div>
+					<h4>Example</h4>
+					<div class="list">
+							<pre><span class="php-comment">//Will increase the parsed value by one</span>
+<span class="php-var">$validator</span> = (<span class="php-keyword1">new</span> IntegerValidator())
+    -&gt;setValidateCallback(<span class="php-keyword1">function</span> (<span class="php-var">$validateResult</span>, <span class="php-var">$validator</span>) {
+        <span class="php-var">$validateResult</span>-&gt;value = <span class="php-var">$validateResult</span>-&gt;value + <span class="php-num">1</span>;
+
+        <span class="php-keyword1">return</span> <span class="php-var">$validateResult</span>;
+    });
+
+<span class="php-var">$parsed</span> = <span class="php-var">$validator</span>-&gt;parse(<span class="php-num">5</span>); <span class="php-comment">//Expect 6</span></pre><br>
+					</div>
 
 
 			</div>
@@ -772,7 +983,7 @@ All validators MUST extend <code>BaseValidator</code> class</p></dd>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_createFromObjectForAdditional">#</a>
-			<code>createFromObjectForAdditional( <span>stdClass <var>$object</var></span> )</code>
+			<code>createFromObjectForAdditional( <span>object <var>$object</var></span> )</code>
 
 			<div class="description short">
 				<p>Helper method.
@@ -812,7 +1023,7 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_createFromObject">#</a>
-			<code>createFromObject( <span>stdClass <var>$object</var></span> )</code>
+			<code>createFromObject( <span>object <var>$object</var></span> )</code>
 
 			<div class="description short">
 				<p>Create validator from validation object</p>
@@ -871,7 +1082,7 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 					<h4>Parameters</h4>
 					<div class="list"><dl>
 						<dt><var>$array</var></dt>
-						<dd>$object Validation array</dd>
+						<dd>Validation array</dd>
 					</dl></div>
 
 					<h4>Returns</h4>
@@ -909,7 +1120,7 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 					<h4>Parameters</h4>
 					<div class="list"><dl>
 						<dt><var>$json</var></dt>
-						<dd>$object Validation json encoded object</dd>
+						<dd>Validation json encoded object</dd>
 					</dl></div>
 
 					<h4>Returns</h4>
@@ -938,7 +1149,7 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_toJSON">#</a>
-			<code>toJSON( <span> <var>$JSON_PRETTY_PRINT</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code>toJSON( <span>boolean <var>$JSON_PRETTY_PRINT</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				<p>Export validator to json encoded string</p>
@@ -948,6 +1159,11 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 				<p>Export validator to json encoded string</p>
 
 
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$JSON_PRETTY_PRINT</var></dt>
+						<dd><em>[Optional]</em></dd>
+					</dl></div>
 
 					<h4>Returns</h4>
 					<div class="list">
@@ -964,7 +1180,7 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 
 			<td class="attributes"><code>
 				 public 
-				stdClass
+				object
 				
 				</code>
 			</td>
@@ -984,7 +1200,7 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 
 					<h4>Returns</h4>
 					<div class="list">
-						stdClass
+						object
 					</div>
 
 
@@ -1042,6 +1258,30 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 		<div class="panel panel-default">
             <div class="panel-heading"><h2>Properties summary</h2></div>
 			<table class="summary table table-bordered table-striped properties" id="properties">
+		<tr data-order="validateCallback" id="$validateCallback">
+			<td class="attributes"><code>
+				protected  
+				callable|null
+			</code></td>
+
+			<td class="name">
+<var>$validateCallback</var>
+				<div class="description short">
+					
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+			<td class="value">
+				<div>
+					<a href="#$validateCallback" class="anchor">#</a>
+					<code><span class="php-keyword1">null</span></code>
+				</div>
+			</td>
+		</tr>
 		<tr data-order="type" id="$type">
 			<td class="attributes"><code>
 				protected static 
@@ -1052,12 +1292,12 @@ Used to create anyOf, allOf and oneOf validators from objects</p>
 <var>$type</var>
 				<div class="description short">
 					<p>Validator's type
-Must be overwriten, default is 'string'</p>
+Must be overwritten, default is 'string'</p>
 				</div>
 
 				<div class="description detailed hidden">
 					<p>Validator's type
-Must be overwriten, default is 'string'</p>
+Must be overwritten, default is 'string'</p>
 
 				</div>
 			</td>
@@ -1078,12 +1318,12 @@ Must be overwriten, default is 'string'</p>
 <var>$typeAttributes</var>
 				<div class="description short">
 					<p>Validator's attributes
-Can be overwriten</p>
+Can be overwritten</p>
 				</div>
 
 				<div class="description detailed hidden">
 					<p>Validator's attributes
-Can be overwriten</p>
+Can be overwritten</p>
 
 				</div>
 			</td>
@@ -1104,11 +1344,11 @@ Can be overwriten</p>
 			<td class="name">
 <var>$commonAttributes</var>
 				<div class="description short">
-					<p>Common valdator attributes</p>
+					<p>Common validator attributes</p>
 				</div>
 
 				<div class="description detailed hidden">
-					<p>Common valdator attributes</p>
+					<p>Common validator attributes</p>
 
 				</div>
 			</td>
@@ -1121,7 +1361,8 @@ Can be overwriten</p>
     <span class="php-quote">'default'</span>,
     <span class="php-quote">'format'</span>,
     <span class="php-quote">'enum'</span>,
-    <span class="php-quote">'validateType'</span> <span class="php-comment">//non standard attribute, can be used in combination with enum</span>
+    <span class="php-quote">'validateType'</span>, <span class="php-comment">//non standard attribute, can be used in combination with enum</span>
+    <span class="php-quote">'not'</span>
 ]</code>
 				</div>
 			</td>

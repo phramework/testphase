@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Class Phramework\Exceptions\NotFoundException | testphase</title>
+	<title>Class Phramework\Testphase\Exceptions\UnsetGlobalException | testphase</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?70c1d062672daa3f906b72e4f5d03d4bc5c4174d">
@@ -28,7 +28,7 @@
 
 				<ul class="nav navbar-nav">
 					<li>
-						<a href="namespace-Phramework.Exceptions.html" title="Summary of Phramework\Exceptions"><span>Namespace</span></a>
+						<a href="namespace-Phramework.Testphase.Exceptions.html" title="Summary of Phramework\Testphase\Exceptions"><span>Namespace</span></a>
 					</li>
 					<li class="active">
 <span>Class</span>					</li>
@@ -67,16 +67,16 @@
 							Phramework<span></span>
 						</a>
 							<ul>
-					<li class="active">
+					<li>
 						<a href="namespace-Phramework.Exceptions.html">
 							Exceptions						</a>
 							</li>
-					<li>
+					<li class="active">
 						<a href="namespace-Phramework.Testphase.html">
 							Testphase<span></span>
 						</a>
 							<ul>
-					<li>
+					<li class="active">
 						<a href="namespace-Phramework.Testphase.Exceptions.html">
 							Exceptions						</a>
 							</li>
@@ -96,17 +96,7 @@
 
 			<h3>Exceptions</h3>
 			<ul>
-				<li><a href="class-Phramework.Exceptions.DatabaseException.html">DatabaseException</a></li>
-				<li><a href="class-Phramework.Exceptions.ForbiddenException.html">ForbiddenException</a></li>
-				<li><a href="class-Phramework.Exceptions.IncorrectParametersException.html">IncorrectParametersException</a></li>
-				<li><a href="class-Phramework.Exceptions.MethodNotAllowedException.html">MethodNotAllowedException</a></li>
-				<li><a href="class-Phramework.Exceptions.MissingParametersException.html">MissingParametersException</a></li>
-				<li class="active"><a href="class-Phramework.Exceptions.NotFoundException.html">NotFoundException</a></li>
-				<li><a href="class-Phramework.Exceptions.NotImplementedException.html">NotImplementedException</a></li>
-				<li><a href="class-Phramework.Exceptions.PermissionException.html">PermissionException</a></li>
-				<li><a href="class-Phramework.Exceptions.RequestException.html">RequestException</a></li>
-				<li><a href="class-Phramework.Exceptions.ServerException.html">ServerException</a></li>
-				<li><a href="class-Phramework.Exceptions.UnauthorizedException.html">UnauthorizedException</a></li>
+				<li class="active"><a href="class-Phramework.Testphase.Exceptions.UnsetGlobalException.html">UnsetGlobalException</a></li>
 			</ul>
 
 
@@ -119,14 +109,11 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="class">
-	<h1>Class NotFoundException</h1>
+	<h1>Class UnsetGlobalException</h1>
 
 
 	<div class="description">
-	<p>Not found exception</p>
-
-<p>The server has not found anything matching the Request-URI.
-No indication is given of whether the condition is temporary or permanent.</p>
+	<p>Exception used for unset variables key in Phramework\Testphase\Globals</p>
 	</div>
 
 	<dl class="tree well">
@@ -139,7 +126,7 @@ Exception
 		</dd>
 		<dd style="padding-left:30px">
 			<img src="resources/inherit.png" alt="Extended by">
-<b><span>Phramework\Exceptions\NotFoundException</span></b>			
+<b><span>Phramework\Testphase\Exceptions\UnsetGlobalException</span></b>			
 			
 			
 		</dd>
@@ -155,14 +142,10 @@ Exception
 	<div class="alert alert-info">
 		
 		
-		<b>Namespace:</b> <a href="namespace-Phramework.html">Phramework</a>\<a href="namespace-Phramework.Exceptions.html">Exceptions</a><br>
-		
+		<b>Namespace:</b> <a href="namespace-Phramework.html">Phramework</a>\<a href="namespace-Phramework.Testphase.html">Testphase</a>\<a href="namespace-Phramework.Testphase.Exceptions.html">Exceptions</a><br>
+		<b>Package:</b> Phramework\Testphase\Exceptions<br>
 
-				<b>License:</b>
-				<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a><br>
-				<b>Author:</b>
-				Xenofon Spafaridis <a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#x6e;o&#104;&#112;&#x6f;&#x6e;&#101;&#120;&#x40;&#x67;&#109;&#97;&#x69;&#x6c;.&#99;&#111;&#x6d;">&#x6e;o&#104;&#112;&#x6f;&#x6e;&#101;&#120;&#x40;&#x67;&#109;&#97;&#x69;&#x6c;.&#99;&#111;&#x6d;</a><br>
-			<b>Located at</b> NotFoundException.php		<br>
+			<b>Located at</b> Exceptions/UnsetGlobalException.php		<br>
 	</div>
 
 
@@ -181,7 +164,43 @@ Exception
 
 			<td class="name"><div>
 			<a class="anchor" href="#___construct">#</a>
-			<code>__construct( <span> <var>$message</var></span>, <span> <var>$code</var> = <span class="php-num">404</span></span> )</code>
+			<code>__construct( <span>string <var>$key</var></span> )</code>
+
+			<div class="description short">
+				<p>UnsetGlobalException constructor.</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>UnsetGlobalException constructor.</p>
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$key</var></dt>
+						<dd>Missing variable key</dd>
+					</dl></div>
+
+
+
+
+					<h4>Overrides</h4>
+					<div class="list"><code>Exception::__construct</code></div>
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="getKey" id="_getKey">
+
+			<td class="attributes"><code>
+				 public 
+				string
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_getKey">#</a>
+			<code>getKey( )</code>
 
 			<div class="description short">
 				
@@ -192,11 +211,13 @@ Exception
 
 
 
+					<h4>Returns</h4>
+					<div class="list">
+						string<br>Missing variable key
+					</div>
 
 
 
-					<h4>Overrides</h4>
-					<div class="list"><code>Exception::__construct</code></div>
 
 			</div>
 			</div></td>
@@ -230,6 +251,32 @@ Exception
 
 		<div class="panel panel-default">
             <div class="panel-heading"><h2>Properties summary</h2></div>
+			<table class="summary table table-bordered table-striped properties" id="properties">
+		<tr data-order="key" id="$key">
+			<td class="attributes"><code>
+				protected  
+				
+			</code></td>
+
+			<td class="name">
+<var>$key</var>
+				<div class="description short">
+					
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+			<td class="value">
+				<div>
+					<a href="#$key" class="anchor">#</a>
+					<code></code>
+				</div>
+			</td>
+		</tr>
+			</table>
 		</div>
 
 		<div class="panel panel-default">

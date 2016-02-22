@@ -73,8 +73,14 @@
 							</li>
 					<li class="active">
 						<a href="namespace-Phramework.Testphase.html">
-							Testphase						</a>
+							Testphase<span></span>
+						</a>
+							<ul>
+					<li>
+						<a href="namespace-Phramework.Testphase.Exceptions.html">
+							Exceptions						</a>
 							</li>
+								</ul></li>
 					<li>
 						<a href="namespace-Phramework.Validate.html">
 							Validate						</a>
@@ -90,6 +96,7 @@
 				<li><a href="class-Phramework.Testphase.Binary.html">Binary</a></li>
 				<li><a href="class-Phramework.Testphase.Expression.html">Expression</a></li>
 				<li><a href="class-Phramework.Testphase.Globals.html">Globals</a></li>
+				<li><a href="class-Phramework.Testphase.Server.html">Server</a></li>
 				<li><a href="class-Phramework.Testphase.TestParser.html">TestParser</a></li>
 				<li><a href="class-Phramework.Testphase.Testphase.html">Testphase</a></li>
 				<li class="active"><a href="class-Phramework.Testphase.Util.html">Util</a></li>
@@ -176,6 +183,10 @@
 					</div>
 
 
+					<h4>Note</h4>
+					<div class="list">
+							In php 7.0 json_decode has errors when string is empty<br>
+					</div>
 
 
 			</div>
@@ -227,14 +238,14 @@
 
 			<td class="attributes"><code>
 				 public static
-				
+				array
 				
 				</code>
 			</td>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_directoryToArray">#</a>
-			<code>directoryToArray( <span>string <var>$directory</var></span>, <span>boolean <var>$recursive</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$listDirs</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$listFiles</var> = <span class="php-keyword1">true</span></span>, <span>string <var>$exclude</var> = <span class="php-quote">''</span></span>, <span>array <var>$allowed_filetypes</var> = []</span>, <span>boolean <var>$relative_path</var> = <span class="php-keyword1">false</span> </span> )</code>
+			<code>directoryToArray( <span>string <var>$directory</var></span>, <span>boolean <var>$recursive</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$listDirs</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$listFiles</var> = <span class="php-keyword1">true</span></span>, <span>string <var>$exclude</var> = <span class="php-quote">''</span></span>, <span>array <var>$allowedFileTypes</var> = []</span>, <span>boolean <var>$relativePath</var> = <span class="php-keyword1">false</span> </span> )</code>
 
 			<div class="description short">
 				<p>Get an array that represents directory tree</p>
@@ -257,14 +268,18 @@
 						<dt><var>$exclude</var></dt>
 						<dd><p><em>[Optional]</em> Exclude paths that matches this
 regular expression</p></dd>
-						<dt><var>$allowed_filetypes</var></dt>
+						<dt><var>$allowedFileTypes</var></dt>
 						<dd><p><em>[Optional]</em> Allowed file extensions,
 default <code>[]</code> (allow all)</p></dd>
-						<dt><var>$relative_path</var></dt>
+						<dt><var>$relativePath</var></dt>
 						<dd><p><em>[Optional]</em> Return paths in relative form,
 default <code>false</code></p></dd>
 					</dl></div>
 
+					<h4>Returns</h4>
+					<div class="list">
+						array
+					</div>
 
 
 					<h4>Link</h4>
