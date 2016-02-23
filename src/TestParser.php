@@ -132,7 +132,7 @@ class TestParser
 
         //Setup validator, to validate and parse the test file
 
-        $validatorRequest = new ObjectValidator(
+        $requestValidator = new ObjectValidator(
             [
                 'url' => new StringValidator(1, 2048),
                 'method' => (new StringValidator())
@@ -164,7 +164,7 @@ class TestParser
             false
         );
 
-        $validatorResponse = new ObjectValidator(
+        $responseValidator = new ObjectValidator(
             [
                 'statusCode' => new AnyOf([
                     new UnsignedIntegerValidator(100, 999),
@@ -193,28 +193,32 @@ class TestParser
         //Setup validator for parsed test
         $validator = new ObjectValidator(
             [
-                'meta' => (new ObjectValidator([
-                    'order' => (new IntegerValidator(-99999999, 99999999))
-                        ->setDefault(0),
-                    'ignore' => (new BooleanValidator())
-                        ->setDefault(false),
-                    'description' => (new StringValidator())
-                        ->setDefault(null),
-                    'JSONbody' => (new BooleanValidator())
-                        ->setDefault(true),
-                    'incomplete' => (new OneOf([
-                        new BooleanValidator(),
-                        new StringValidator(1, 4096)
-                    ]))->setDefault(false),
-                ]))->setDefault((object) [
+                'meta' => (new ObjectValidator(
+                    [
+                        'order' => (new IntegerValidator(-99999999, 99999999))
+                            ->setDefault(0),
+                        'ignore' => (new BooleanValidator())
+                            ->setDefault(false),
+                        'description' => (new StringValidator())
+                            ->setDefault(null),
+                        'JSONbody' => (new BooleanValidator())
+                            ->setDefault(true),
+                        'incomplete' => (new OneOf([
+                            new BooleanValidator(),
+                            new StringValidator(1, 4096)
+                        ]))->setDefault(false),
+                    ],
+                    [],
+                    false
+                ))->setDefault((object) [
                     'order' => 0,
                     'description' => null,
                     'JSONbody' => true,
                     'incomplete' => false,
                     'ignore' => false
                 ]),
-                'request' => $validatorRequest,
-                'response' => $validatorResponse
+                'request' => $requestValidator,
+                'response' => $responseValidator
             ],
             ['request', 'response'],
             false
