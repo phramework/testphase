@@ -16,18 +16,18 @@
  */
 namespace Phramework\Testphase;
 
-use \Phramework\Validate\AnyOf;
+use Phramework\Validate\AnyOf;
 use Phramework\Validate\BaseValidator;
-use \Phramework\Validate\OneOf;
-use \Phramework\Validate\AllOf;
-use \Phramework\Validate\ObjectValidator;
-use \Phramework\Validate\IntegerValidator;
-use \Phramework\Validate\UnsignedIntegerValidator;
-use \Phramework\Validate\ArrayValidator;
-use \Phramework\Validate\EnumValidator;
-use \Phramework\Validate\BooleanValidator;
-use \Phramework\Validate\StringValidator;
-use \Phramework\Validate\URLValidator;
+use Phramework\Validate\OneOf;
+use Phramework\Validate\AllOf;
+use Phramework\Validate\ObjectValidator;
+use Phramework\Validate\IntegerValidator;
+use Phramework\Validate\UnsignedIntegerValidator;
+use Phramework\Validate\ArrayValidator;
+use Phramework\Validate\EnumValidator;
+use Phramework\Validate\BooleanValidator;
+use Phramework\Validate\StringValidator;
+use Phramework\Validate\URLValidator;
 
 /**
  * Parse tests from file.
@@ -306,7 +306,7 @@ class TestParser
                     $requestBody
                 ))
                 ->expectStatusCode($contentsParsed->response->statusCode)
-                ->expectResponseHeader($contentsParsed->response->headers);
+                ->expectHeader($contentsParsed->response->headers);
 
                 $testphase->expectJSON(
                     isset($contentsParsed->meta->JSONbody)

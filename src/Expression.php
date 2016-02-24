@@ -16,10 +16,6 @@
  */
 namespace Phramework\Testphase;
 
-use \Phramework\Testphase\Testphase;
-use \Phramework\Testphase\TestParser;
-use \Phramework\Testphase\Util;
-
 /**
  * Expression methods and constants
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0

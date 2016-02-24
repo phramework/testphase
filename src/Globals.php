@@ -17,9 +17,6 @@
 namespace Phramework\Testphase;
 
 use Phramework\Testphase\Exceptions\UnsetGlobalException;
-use \Phramework\Testphase\Testphase;
-use \Phramework\Testphase\TestParser;
-use \Phramework\Testphase\Util;
 
 /**
  * Global variables
@@ -244,6 +241,10 @@ class Globals
      */
     public static function toString()
     {
+        if (static::$globals === null) {
+            static::initializeGlobals();
+        }
+
         $return = [];
 
         foreach (static::$globals as $key => $value) {

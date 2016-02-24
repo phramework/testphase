@@ -38,7 +38,7 @@
       }
     }],
     "export": {
-      "postId": "id"
+      "postId": "/0/id"
     }
   }
 }

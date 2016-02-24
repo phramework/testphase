@@ -34,8 +34,8 @@
       "required": ["id", "title"]
     }],
     "export": {
-      "newPostId": "id",
-      "newPostTitle": "title"
+      "newPostId": "/id",
+      "newPostTitle": "/title"
     }
   }
 }

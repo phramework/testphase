@@ -27,6 +27,9 @@
         "type": "string"
       },
       "/0/id" : 1
+    },
+    "export" : {
+      "postId" : "/1/id"
     }
   }
 }

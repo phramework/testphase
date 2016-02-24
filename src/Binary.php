@@ -17,14 +17,16 @@
 namespace Phramework\Testphase;
 
 use Phramework\Testphase\Exceptions\UnsetGlobalException;
-use \Phramework\Testphase\Testphase;
-use \Phramework\Testphase\TestParser;
-use \Phramework\Testphase\Util;
-use \Phramework\Exceptions\MissingParametersException;
-use \Phramework\Exceptions\IncorrectParametersException;
-use \GetOptionKit\OptionCollection;
-use \GetOptionKit\OptionParser;
-use \GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
+use Phramework\Testphase\Report\StatusReport;
+use Phramework\Testphase\Testphase;
+use Phramework\Testphase\TestParser;
+use Phramework\Testphase\Util;
+use Phramework\Exceptions\MissingParametersException;
+use Phramework\Exceptions\IncorrectParametersException;
+use GetOptionKit\OptionCollection;
+use GetOptionKit\OptionParser;
+use GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
+use Rs\Json\Pointer;
 
 /**
  * This class is used by the script executed as binary.
@@ -109,6 +111,7 @@ class Binary
     {
         $arguments = $this->arguments;
 
+        //Start build-in php server if server-host is set
         if (($serverHost = $arguments->{'server-host'}) !== null) {
             $this->server = new Server($serverHost, $arguments->{'server-root'});
             $this->server->start();
@@ -154,7 +157,7 @@ class Binary
 
         $testIndex = 0;
 
-        foreach ($testParserCollection as $test) {
+        foreach ($testParserCollection as $testParser) {
 
             //Check if subdir argument is set
             if (isset($arguments->subdir) && $arguments->subdir !== null) {
@@ -165,7 +168,7 @@ class Binary
                     str_replace(
                         $arguments->dir,
                         '',
-                        $test->getFilename()
+                        $testParser->getFilename()
                     ),
                     '/'
                 );
@@ -187,7 +190,7 @@ class Binary
                     if ($arguments->verbose) {
                         echo sprintf(
                             'I %s',
-                            $test->getFilename()
+                            $testParser->getFilename()
                         ) . PHP_EOL;
                     } else {
                         echo 'I';
@@ -196,13 +199,13 @@ class Binary
                 }
             }
 
-            $meta = $test->getMeta();
+            $meta = $testParser->getMeta();
 
             if (isset($meta->ignore) && $meta->ignore) {
                 if ($arguments->verbose) {
                     echo sprintf(
                         'I %s',
-                        $test->getFilename()
+                        $testParser->getFilename()
                     ) . PHP_EOL;
                 } else {
                     echo 'I';
@@ -211,33 +214,68 @@ class Binary
                 continue;
             }
 
-
             if (isset($meta->incomplete) && $meta->incomplete !== false) {
                 $stats->incomplete += 1;
             }
 
             try {
                 //Complete test's testphase collection
-                $test->createTest();
+                $testParser->createTest();
             } catch (\Exception $e) {
                 echo sprintf(
                     'Unable to create test from file "%s" %s With message: "%s"',
-                    $test->getFilename(),
+                    $testParser->getFilename(),
                     PHP_EOL,
                     $e->getMessage()
                 ) . PHP_EOL;
                 return $this->stop(1);
             }
 
-            $testphaseCollection = $test->getTest();
+            $testphaseCollection = $testParser->getTest();
 
-            //Include number of additional testphase collections
+            //Include number of additional testphase collections (-1 because, one is already counted)
             $stats->tests += count($testphaseCollection) - 1;
-    
+
+            $testphaseIndex = 0;
+
             //Iterate though test parser's testphase collection
             foreach ($testphaseCollection as $testphase) {
                 try {
-                    $testphase->run(function (
+                    /**
+                     * @var StatusReport
+                     */
+                    $statusReport = $testphase->run();
+
+                    if ($statusReport->getStatus() == StatusReport::STATUS_SUCCESS) {
+                        $stats->success += 1;
+                    }
+
+                    //Echo successful char
+                    if ($arguments->verbose) {
+                        echo sprintf(
+                            '. %s%s',
+                            $testParser->getFilename(),
+                            ($testphaseIndex === 0 ? '' : ' (' . $testphaseIndex . ')' )
+                        ) . PHP_EOL;
+                    } else {
+                        echo '.';
+                    }
+
+                    $responseBody = $statusReport->getResponse()->getBody();
+
+                    //TODO only when is json
+                    $export = $testParser->getExport();
+
+                    $jsonPointer = new Pointer($responseBody);
+
+                    //Fetch all test exports and add them as globals
+                    foreach ($export as $globalKey => $pointer) {
+                        $value = $jsonPointer->get($pointer);
+                        Globals::set($globalKey, $value);
+                    }
+
+
+                    /*function (
                         $responseStatusCode,
                         $responseHeaders,
                         $responseBody,
@@ -280,16 +318,9 @@ class Binary
                         }
                     });
 
-                    //Echo successful char
-                    if ($arguments->verbose) {
-                        echo sprintf(
-                            '. %s',
-                            $test->getFilename()
-                        ) . PHP_EOL;
-                    } else {
-                        echo '.';
-                    }
-                    $stats->success += 1;
+
+                    $stats->success += 1;*/
+
                 } catch (UnsetGlobalException $e) {
 
                     //Error message
@@ -297,7 +328,7 @@ class Binary
 
                     $message = sprintf(
                         self::colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
-                        $test->getFilename(),
+                        $testParser->getFilename(),
                         $message
                     );
 
@@ -308,7 +339,7 @@ class Binary
                     if ($arguments->verbose) {
                         echo sprintf(
                                 'F %s',
-                                $test->getFilename()
+                                $testParser->getFilename()
                             ) . PHP_EOL;
                     } else {
                         echo 'F';
@@ -332,7 +363,7 @@ class Binary
 
                     $message = sprintf(
                         self::colored('Test "%s" failed with message', 'red') . PHP_EOL . ' %s' . PHP_EOL,
-                        $test->getFilename(),
+                        $testParser->getFilename(),
                         $message
                     );
 
@@ -351,7 +382,7 @@ class Binary
                     if ($arguments->verbose) {
                         echo sprintf(
                             'F %s',
-                            $test->getFilename()
+                            $testParser->getFilename()
                         ) . PHP_EOL;
                     } else {
                         echo 'F';
@@ -366,9 +397,11 @@ class Binary
                 }
                 ++$testIndex;
                 //Show only 80 characters per line
-                if (!($testIndex % 79)) {
+                if (!$arguments->verbose && !($testIndex % 79)) {
                     echo PHP_EOL;
                 }
+
+                ++$testphaseIndex;
             }
         }
 

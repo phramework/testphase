@@ -73,7 +73,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Phramework\Testphase\Testphase::__construct
-     * @expectedException Phramework\Exceptions\IncorrectParametersException
+     * @expectedException \Phramework\Exceptions\IncorrectParametersException
      */
     public function testConstructFailure1()
     {
@@ -146,15 +146,15 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::expectResponseHeader
+     * @covers Phramework\Testphase\Testphase::expectHeader
      */
     public function testExpectResponseHeader()
     {
-        $this->object->expectResponseHeader([
+        $this->object->expectHeader([
             'Content-Type' => 'application/vnd.api+json;charset=utf-8'
         ]);
 
-        $o = $this->object->expectResponseHeader((object)[
+        $o = $this->object->expectHeader((object)[
             'Content-Type' => 'application/vnd.api+json;charset=utf-8'
         ]);
 
@@ -162,12 +162,12 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::expectResponseHeader
+     * @covers Phramework\Testphase\Testphase::expectHeader
      * @expectedException Exception
      */
     public function testExpectResponseHeaderFailure1()
     {
-        $this->object->expectResponseHeader(
+        $this->object->expectHeader(
             'application/vnd.api+json;charset=utf-8'
         );
     }
@@ -207,7 +207,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             $this->requestHeaders
         ))
         ->expectStatusCode(440) //wrong
-        ->expectResponseHeader([
+        ->expectHeader([
             'Content-Type' => 'application/vnd.api+json;charset=utf-8'
         ])
         ->expectJSON()

@@ -14,71 +14,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Phramework\Testphase;
+namespace Phramework\Testphase\Report;
+
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
- * @todo add log
+ * @todo add index ??
  */
-class Server
+class Request
 {
     /**
      * @var string
      */
-    protected $pid;
+    private $url;
+
+    private $headers;
+
+    /**
+     * HTTP request method
+     * @var string
+     */
+    private $method;
+
     /**
      * @var string
      */
-    protected $host;
-    /**
-     * @var string
-     */
-    protected $root;
+    private $body;
 
-    /**
-     * Server constructor.
-     * @param string $host
-     * @param string $root
-     */
-    public function __construct($host, $root = './public')
-    {
-        $this->host = $host;
-        $this->root = $root;
+    public function __construct(
+        $url,
+        $method,
+        $headers,
+        $body
+    ) {
+        $this->url      = $url;
+        $this->method   = $method;
+        $this->headers  = $headers;
+        $this->body     =  $body;
     }
 
     /**
-     * Start server
+     * @return string
      */
-    public function start()
+    public function getUrl()
     {
-        $command = sprintf(
-            'php -S %s -t %s',
-            $this->host,
-            $this->root
-        );
-
-        echo sprintf(
-            'Start server %s at root %s...',
-            $this->host,
-            $this->root
-        ) . PHP_EOL;
-
-        $this->pid = exec("$command > /dev/null 2>&1 & echo $!; ", $output);
+        return $this->url;
     }
 
     /**
-     * Stop server
+     * @return mixed
      */
-    public function stop()
+    public function getHeaders()
     {
-        echo 'Stop server...' . PHP_EOL;
+        return $this->headers;
+    }
 
-        $command = sprintf(
-            'kill -9 %s',
-            $this->pid
-        );
+    /**
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
 
-        exec($command);
+    /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
     }
 }

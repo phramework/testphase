@@ -17,17 +17,24 @@
 namespace Phramework\Testphase;
 
 use Phramework\Testphase\Exceptions\RuleException;
+use Phramework\Testphase\Report\Request;
+use Phramework\Testphase\Report\Response;
+use Phramework\Testphase\Report\StatusReport;
 use Phramework\Validate\BaseValidator;
-use \Phramework\Validate\ObjectValidator;
 use Rs\Json\Pointer;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
- * @version 1.1.2
+ * @version 2.0.0
  */
 class Testphase
 {
+    /**
+     * @var callable[]
+     */
+    private static $globalCallbacks = [];
+
     /**
      * Base API url
      * @var string
@@ -55,7 +62,7 @@ class Testphase
     /**
      * @var string|null
      */
-    private $requestBody;
+    private $body;
 
     /**
      * @var int[]
@@ -82,7 +89,6 @@ class Testphase
      */
     private $timeout = null;
 
-
     /**
      * @var boolean
      */
@@ -92,43 +98,6 @@ class Testphase
      * @var boolean
      */
     private $inspectOnFailure = false;
-
-    /**
-     * @param string      $url
-     *     Request url, without the base part, (see setBase method)
-     * @param string      $method      *[Optional]* HTTP request method
-     * @param array       $headers     *[Optional]* HTTP request headers
-     * @param string|null $requestBody *[Optional]* HTTP request body
-     * @param boolean     $ruleJSON    *[Optional]* Response rule, expect JSON encoded response body
-     * @throws \Phramework\Exceptions\IncorrectParametersException When method is not correct
-     */
-    public function __construct(
-        $url,
-        $method = 'GET',
-        $headers = [],
-        $requestBody = null,
-        $ruleJSON = false
-    ) {
-        $this->url = $url;
-
-        if (!is_string($method)) {
-            throw new \Phramework\Exceptions\IncorrectParametersException(
-                ['method'],
-                'Method must be a string'
-            );
-        }
-
-        $this->method = $method;
-
-        $this->headers = $headers;
-
-        //not for GET
-        $this->requestBody = $requestBody;
-
-        $this->ruleJSON = $ruleJSON;
-
-        $this->rules = (object) [];
-    }
 
     /**
      * @var int
@@ -146,104 +115,40 @@ class Testphase
     private $responseBody;
 
     /**
-     * Handle renspose, test response against provided rules
-     * @param  int $responseStatusCode
-     * @param  array $responseHeaders
-     * @param  string $responseBody
-     * @param  callable|null
-     * @throws \Exception
-     * @return boolean True on success
+     * @param string      $url
+     *     Request url, without the base part, (see setBase method)
+     * @param string      $method      *[Optional]* HTTP request method
+     * @param array       $headers     *[Optional]* HTTP request headers
+     * @param string|null $body *[Optional]* HTTP request body
+     * @param boolean     $ruleJSON    *[Optional]* Response rule, expect JSON encoded response body
+     * @throws \Phramework\Exceptions\IncorrectParametersException When method is not correct
      */
-    private function handleResponse(
-        $responseStatusCode,
-        $responseHeaders,
-        $responseBody,
-        $callback
+    public function __construct(
+        $url,
+        $method = 'GET',
+        $headers = [],
+        $body = null,
+        $ruleJSON = false
     ) {
-        if (!in_array($responseStatusCode, $this->ruleStatusCode, true)) {
-            throw new \Exception(sprintf(
-                'Expected status code "%s" got "%s"',
-                implode(' or ', $this->ruleStatusCode),
-                $responseStatusCode
-            ));
+        $this->url = $url;
+
+        if (!is_string($method)) {
+            throw new \Phramework\Exceptions\IncorrectParametersException(
+                ['method'],
+                'Method must be a string'
+            );
         }
 
-        foreach ($this->ruleHeaders as $headerKey => $headerValue) {
-            if (!isset($responseHeaders[$headerKey])) {
-                throw new \Exception(sprintf(
-                    'Expected header "%s" is not set',
-                    $headerKey
-                ));
-            }
+        $this->method = $method;
 
-            if ($headerValue != $responseHeaders[$headerKey]) {
-                throw new \Exception(sprintf(
-                    'Expected header value "%s" for header "%s" got "%s"',
-                    $headerValue,
-                    $headerKey,
-                    $responseHeaders[$headerKey]
-                ));
-            }
-        }
+        $this->headers = $headers;
 
-        if ($this->ruleJSON && !Util::isJSON($responseBody)) {
-            //Ignore isJSON body on "204 No Content" when it's empty
-            if ($responseStatusCode != 204 || !empty($responseBody)) {
-                throw new \Exception(sprintf(
-                    'Expected valid JSON response Body'
-                ));
-            }
-        }
+        //not for GET
+        $this->body = $body;
 
-        if ($this->ruleJSON) {
-            $responseBodyObject = json_decode($responseBody);
+        $this->ruleJSON = $ruleJSON;
 
-            //todo Throw rule object exception
-            foreach ($this->ruleObjects as $ruleObject) {
-                $ruleObject->parse($responseBodyObject);
-            }
-
-            $jsonPointer = new Pointer($responseBody);
-            foreach ($this->rules as $pointer => $rule) {
-                //try {
-                    //get value from pointer
-                    $value = $jsonPointer->get($pointer);
-                //} catch (Pointer\NonexistentValueReferencedException $e) {
-                //    //todo
-                //    throw new RuleException($e->getMessage());
-                //}
-
-                if (is_subclass_of($rule, BaseValidator::class)) {
-                    $rule->parse($value);
-                } else { //literal value
-                    if ($value != $rule) {
-                        throw new RuleException('invalid value for rule' . $pointer);
-                    }
-                }
-                //TODO
-            }
-        }
-
-        if ($callback) {
-            if ($this->ruleJSON) {
-                call_user_func(
-                    $callback,
-                    $responseStatusCode,
-                    $responseHeaders,
-                    $responseBody,
-                    $responseBodyObject
-                );
-            } else {
-                call_user_func(
-                    $callback,
-                    $responseStatusCode,
-                    $responseHeaders,
-                    $responseBody
-                );
-            }
-        }
-
-        return true;
+        $this->rules = (object) [];
     }
 
     /**
@@ -251,7 +156,7 @@ class Testphase
      * Will execute the request and apply all defined rules to validate the response
      * @param  callable|null $callback *[Optional]* Callback to execute after
      * completing the test rules
-     * @return true On success
+     * @return StatusReport
      * @uses self::$base When url does not contain schema use base as prefix.
      * @throws \Exception
      */
@@ -284,7 +189,7 @@ class Testphase
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, true);
         //curl_setopt($curl, CURLOPT_VERBOSE, true);
-        //Set timeout values ( in seconds )
+        //Set timeout values (in seconds)
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, static::$SETTING_CURLOPT_CONNECTTIMEOUT);
         curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
         curl_setopt($curl, CURLOPT_NOSIGNAL, 1);
@@ -306,20 +211,20 @@ class Testphase
             case 'POST': //On POST
                 curl_setopt($curl, CURLOPT_POST, true);
 
-                if ($this->requestBody && $form_encoded) { //Encode fields if required (URL ENCODED)
+                if ($this->body && $form_encoded) { //Encode fields if required (URL ENCODED)
                     curl_setopt(
                         $curl,
                         CURLOPT_POSTFIELDS,
-                        http_build_query($this->requestBody)
+                        http_build_query($this->body)
                     );
-                } elseif ($this->requestBody) {
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestBody);
+                } elseif ($this->body) {
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $this->body);
                 }
                 break;
             case 'PUT': //On PUT
             case 'PATCH': //On PATCH
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->method);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestBody);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->body);
                 break;
             case 'DELETE': //On DELETE
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
@@ -328,8 +233,10 @@ class Testphase
                 throw new \Exception('Unsupported method');
         }
 
+        $start = time();
         //Get response
         $response = curl_exec($curl);
+        $end = time();
         //Get response code
         $responseStatusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
@@ -347,6 +254,8 @@ class Testphase
             }
         }
 
+        //todo get timeout error CURLE_OPERATION_TIMEDOUT (28) https://curl.haxx.se/libcurl/c/libcurl-errors.html
+
         $responseBody = substr($response, $headerSize);
 
         curl_close($curl);
@@ -356,11 +265,140 @@ class Testphase
         $this->responseBody = $responseBody;
 
         return $this->handleResponse(
-            $responseStatusCode,
-            $responseHeaders,
-            $responseBody,
+            new Response(
+                ($end - $start),
+                $responseStatusCode,
+                $responseHeaders,
+                $responseBody
+            ),
             $callback
         );
+    }
+
+    /**
+     * Handle response, test response against provided rules
+     * @param int           $time
+     * @param int           $responseStatusCode
+     * @param array         $responseHeaders
+     * @param string        $responseBody
+     * @param callable|null $callback
+     * @throws \Exception
+     * @return Report\StatusReport
+     */
+    private function handleResponse(
+        Response $response,
+        $callback
+    ) {
+        $headers = $response->getHeaders();
+
+        if (!in_array($response->getStatusCode(), $this->ruleStatusCode, true)) {
+            throw new \Exception(sprintf(
+                'Expected status code "%s" got "%s"',
+                implode(' or ', $this->ruleStatusCode),
+                $response->getStatusCode()
+            ));
+        }
+
+        foreach ($this->ruleHeaders as $headerKey => $headerValue) {
+            if (!isset($headers[$headerKey])) {
+                throw new \Exception(sprintf(
+                    'Expected header "%s" is not set',
+                    $headerKey
+                ));
+            }
+
+            if ($headerValue != $headers[$headerKey]) {
+                throw new \Exception(sprintf(
+                    'Expected header value "%s" for header "%s" got "%s"',
+                    $headerValue,
+                    $headerKey,
+                    $headers[$headerKey]
+                ));
+            }
+        }
+
+        $body = $response->getBody();
+
+        if ($this->ruleJSON && !Util::isJSON($body)) {
+            //Ignore isJSON body on "204 No Content" when it's empty
+            if ($response->getStatusCode() != 204 || !empty($body)) {
+                throw new \Exception(sprintf(
+                    'Expected valid JSON response Body'
+                ));
+            }
+        }
+
+        if ($this->ruleJSON) {
+            $responseBodyObject = json_decode($body);
+
+            //todo Throw rule object exception
+            foreach ($this->ruleObjects as $ruleObject) {
+                $ruleObject->parse($responseBodyObject);
+            }
+
+            $jsonPointer = new Pointer($body);
+            foreach ($this->rules as $pointer => $rule) {
+                //try {
+                //get value from pointer
+                $value = $jsonPointer->get($pointer);
+                //} catch (Pointer\NonexistentValueReferencedException $e) {
+                //    //todo
+                //    throw new RuleException($e->getMessage());
+                //}
+
+                if (is_subclass_of($rule, BaseValidator::class)) {
+                    $rule->parse($value);
+                } else { //literal value
+                    if ($value != $rule) {
+                        throw new RuleException('invalid value for rule' . $pointer);
+                    }
+                }
+                //TODO
+            }
+        }
+
+        $callbackArguments = [
+            $response
+        ];
+
+        //Call callback
+        if ($callback !== null) {
+            call_user_func_array(
+                $callback,
+                $callbackArguments
+            );
+        }
+
+        //Call global callbacks
+        foreach (static::$globalCallbacks as $globalCallback) {
+            call_user_func_array(
+                $globalCallback,
+                $callbackArguments
+            );
+        }
+
+        return new Report\StatusReport(
+            Report\StatusReport::STATUS_SUCCESS,
+            new Request(
+                $this->url,
+                $this->method,
+                $this->headers,
+                $this->body
+            ),
+            $response
+        );
+    }
+
+    /**
+     * @param callable $callable
+     * @throws \Exception
+     */
+    public static function addGlobalCallback($callable) {
+        if (!is_callable($callable)) {
+            throw new \Exception('Not a callable');
+        }
+
+        static::$globalCallbacks[] = $callable;
     }
 
     /**
@@ -387,10 +425,10 @@ class Testphase
      * @return $this
      * @throws \Exception When $ruleHeaders is not an array
      */
-    public function expectResponseHeader($ruleHeaders)
+    public function expectHeader($ruleHeaders)
     {
         if (is_object($ruleHeaders)) {
-            $ruleHeaders = (array)$ruleHeaders;
+            $ruleHeaders = (array) $ruleHeaders;
         }
 
         if (!is_array($ruleHeaders)) {
@@ -448,12 +486,10 @@ class Testphase
      * @param string $pointer
      * @param string|BaseValidator $value Literal value or instance of BaseValidator
      * @return $this
+     * @todo Validate path ?
      */
     public function expectRule($pointer, $value)
     {
-
-        //TODO Validate path ?
-
         if (empty((array) $this->rules)) {
             $this->rules = new \stdClass();
         }
@@ -557,6 +593,6 @@ class Testphase
             throw new \Exception('Unable retrieve library`s version');
         }*/
 
-        return '1.4';
+        return '2.0.0-dev';
     }
 }
