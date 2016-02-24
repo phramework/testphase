@@ -315,7 +315,7 @@ class TestParser
                 );
 
                 //Add rules
-                foreach ($contentsParsed->response->rules as $path => $ruleValue) {
+                foreach ($contentsParsed->response->rules as $pointer => $ruleValue) {
                     if (is_string($ruleValue) && Util::isJSON($ruleValue)) {
                         $ruleValue = BaseValidator::createFromJSON($ruleValue);
                     } elseif (is_object($ruleValue)) {
@@ -330,7 +330,7 @@ class TestParser
                     }
 
                     //Push rule
-                    $testphase->expectRule($path, $ruleValue);
+                    $testphase->expectRule($pointer, $ruleValue);
                 }
 
                 //Add rule objects to validate body

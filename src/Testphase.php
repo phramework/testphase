@@ -154,7 +154,7 @@ class Testphase
      * @throws \Exception
      * @return boolean True on success
      */
-    private function handle(
+    private function handleResponse(
         $responseStatusCode,
         $responseHeaders,
         $responseBody,
@@ -198,16 +198,16 @@ class Testphase
         if ($this->ruleJSON) {
             $responseBodyObject = json_decode($responseBody);
 
-            //Throw ruleobject exception
+            //todo Throw rule object exception
             foreach ($this->ruleObjects as $ruleObject) {
                 $ruleObject->parse($responseBodyObject);
             }
 
             $jsonPointer = new Pointer($responseBody);
-            foreach ($this->rules as $path => $rule) {
+            foreach ($this->rules as $pointer => $rule) {
                 //try {
                     //get value from pointer
-                    $value = $jsonPointer->get($path);
+                    $value = $jsonPointer->get($pointer);
                 //} catch (Pointer\NonexistentValueReferencedException $e) {
                 //    //todo
                 //    throw new RuleException($e->getMessage());
@@ -217,10 +217,9 @@ class Testphase
                     $rule->parse($value);
                 } else { //literal value
                     if ($value != $rule) {
-                        throw new RuleException('invalid value for rule' . $path);
+                        throw new RuleException('invalid value for rule' . $pointer);
                     }
                 }
-                echo "expect $path" . PHP_EOL;
                 //TODO
             }
         }
@@ -356,7 +355,7 @@ class Testphase
         $this->responseHeaders = $responseHeaders;
         $this->responseBody = $responseBody;
 
-        return $this->handle(
+        return $this->handleResponse(
             $responseStatusCode,
             $responseHeaders,
             $responseBody,
@@ -446,11 +445,11 @@ class Testphase
     }
 
     /**
-     * @param string $path
+     * @param string $pointer
      * @param string|BaseValidator $value Literal value or instance of BaseValidator
      * @return $this
      */
-    public function expectRule($path, $value)
+    public function expectRule($pointer, $value)
     {
 
         //TODO Validate path ?
@@ -459,7 +458,7 @@ class Testphase
             $this->rules = new \stdClass();
         }
 
-        $this->rules->{$path} = $value;
+        $this->rules->{$pointer} = $value;
 
         return $this;
     }
