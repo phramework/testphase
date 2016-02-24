@@ -17,6 +17,7 @@
 namespace Phramework\Testphase;
 
 use \Phramework\Validate\AnyOf;
+use Phramework\Validate\BaseValidator;
 use \Phramework\Validate\OneOf;
 use \Phramework\Validate\AllOf;
 use \Phramework\Validate\ObjectValidator;
@@ -175,9 +176,11 @@ class TestParser
                     )
                 ]),
                 'headers' => (new ObjectValidator())
-                    ->setDefault((object)[]),
+                    ->setDefault((object) []),
                 'timeout' => (new UnsignedIntegerValidator())
                     ->setDefault(null),
+                'rules' => (new ObjectValidator())
+                    ->setDefault((object) []),
                 'ruleObjects' => (new ArrayValidator())
                     ->setDefault([]),
                 'export' => (new ObjectValidator(
@@ -310,6 +313,25 @@ class TestParser
                     ? $contentsParsed->meta->JSONbody
                     : true
                 );
+
+                //Add rules
+                foreach ($contentsParsed->response->rules as $path => $ruleValue) {
+                    if (is_string($ruleValue) && Util::isJSON($ruleValue)) {
+                        $ruleValue = BaseValidator::createFromJSON($ruleValue);
+                    } elseif (is_object($ruleValue)) {
+                        $ruleValue = BaseValidator::createFromObject($ruleValue);
+                    } elseif (is_subclass_of(
+                        $ruleValue,
+                        \Phramework\Validate\BaseValidator::class
+                    )) {
+                        //do nothing
+                    } else {
+                        //do nothing
+                    }
+
+                    //Push rule
+                    $testphase->expectRule($path, $ruleValue);
+                }
 
                 //Add rule objects to validate body
                 foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {

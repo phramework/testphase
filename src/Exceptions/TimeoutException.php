@@ -17,32 +17,10 @@
 namespace Phramework\Testphase\Exceptions;
 
 /**
- * Exception used for unset variables key in Phramework\Testphase\Globals
+ * @since 2.0.0
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  */
-class UnsetGlobalException extends \Exception
+class TimeoutException extends \Exception
 {
-    protected $key;
-    /**
-     * UnsetGlobalException constructor.
-     * @param string $key Missing variable key
-     */
-    public function __construct($key)
-    {
-        parent::__construct(sprintf(
-            'Unset variable "%s" in testphase Globals',
-            $key
-        ));
-
-        $this->key = $key;
-    }
-
-    /**
-     * @return string Missing variable key
-     */
-    public function getKey()
-    {
-        return $this->key;
-    }
 }

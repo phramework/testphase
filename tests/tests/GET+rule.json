@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "description": "Get posts",
+    "order": -1,
+    "incomplete": false
+  },
+  "request": {
+    "url": "http://jsonplaceholder.typicode.com/posts",
+    "method": "GET",
+    "headers": [
+      "Accept: application/json"
+    ]
+  },
+  "response": {
+    "statusCode": 200,
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8"
+    },
+    "rules": {
+      "/0/userId" : {
+        "type": "integer"
+      },
+      "/0" : {
+        "type": "object"
+      },
+      "/0/title" : {
+        "type": "string"
+      },
+      "/0/id" : 1
+    }
+  }
+}

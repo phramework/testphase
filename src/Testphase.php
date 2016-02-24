@@ -16,7 +16,10 @@
  */
 namespace Phramework\Testphase;
 
+use Phramework\Testphase\Exceptions\RuleException;
+use Phramework\Validate\BaseValidator;
 use \Phramework\Validate\ObjectValidator;
+use Rs\Json\Pointer;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
@@ -70,6 +73,17 @@ class Testphase
     private $ruleObjects = [];
 
     /**
+     * @var object
+     */
+    private $rules;
+
+    /**
+     * @var int|null
+     */
+    private $timeout = null;
+
+
+    /**
      * @var boolean
      */
     private $ruleJSON = false;
@@ -112,6 +126,8 @@ class Testphase
         $this->requestBody = $requestBody;
 
         $this->ruleJSON = $ruleJSON;
+
+        $this->rules = (object) [];
     }
 
     /**
@@ -179,12 +195,33 @@ class Testphase
             }
         }
 
-        //Add extra rules ??
         if ($this->ruleJSON) {
             $responseBodyObject = json_decode($responseBody);
 
+            //Throw ruleobject exception
             foreach ($this->ruleObjects as $ruleObject) {
                 $ruleObject->parse($responseBodyObject);
+            }
+
+            $jsonPointer = new Pointer($responseBody);
+            foreach ($this->rules as $path => $rule) {
+                //try {
+                    //get value from pointer
+                    $value = $jsonPointer->get($path);
+                //} catch (Pointer\NonexistentValueReferencedException $e) {
+                //    //todo
+                //    throw new RuleException($e->getMessage());
+                //}
+
+                if (is_subclass_of($rule, BaseValidator::class)) {
+                    $rule->parse($value);
+                } else { //literal value
+                    if ($value != $rule) {
+                        throw new RuleException('invalid value for rule' . $path);
+                    }
+                }
+                echo "expect $path" . PHP_EOL;
+                //TODO
             }
         }
 
@@ -233,8 +270,13 @@ class Testphase
         //Is the request binary
         $binary = ($flags & self::REQUEST_BINARY) != 0;
 
-        //If the request paramters form encoded
+        //If the request parameters form encoded
         $form_encoded = false; //!(($flags & self::REQUEST_NOT_URL_ENCODED) != 0);
+
+        $timeout = static::$SETTING_CURLOPT_TIMEOUT;
+        if ($this->timeout !== null) {
+            $timeout = $this->timeout;
+        }
 
         //Initialize curl
         $curl = curl_init();
@@ -245,7 +287,7 @@ class Testphase
         //curl_setopt($curl, CURLOPT_VERBOSE, true);
         //Set timeout values ( in seconds )
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, static::$SETTING_CURLOPT_CONNECTTIMEOUT);
-        curl_setopt($curl, CURLOPT_TIMEOUT, static::$SETTING_CURLOPT_TIMEOUT);
+        curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
         curl_setopt($curl, CURLOPT_NOSIGNAL, 1);
 
         //Security options
@@ -392,6 +434,36 @@ class Testphase
         return $this;
     }
 
+    /**
+     * @param integer $timeout
+     * @return $this
+     */
+    public function expectTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     * @param string|BaseValidator $value Literal value or instance of BaseValidator
+     * @return $this
+     */
+    public function expectRule($path, $value)
+    {
+
+        //TODO Validate path ?
+
+        if (empty((array) $this->rules)) {
+            $this->rules = new \stdClass();
+        }
+
+        $this->rules->{$path} = $value;
+
+        return $this;
+    }
+
     const REQUEST_EMPTY_FLAG = 0;
     const REQUEST_BINARY = 1;
     const REQUEST_NOT_URL_ENCODED = 2;
@@ -486,6 +558,6 @@ class Testphase
             throw new \Exception('Unable retrieve library`s version');
         }*/
 
-        return '1.3';
+        return '1.4';
     }
 }

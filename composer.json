@@ -14,7 +14,8 @@
     "phramework/exceptions": "0.*",
     "ext-curl": "*",
     "ext-json": "*",
-    "corneltek/getoptionkit": "~2"
+    "corneltek/getoptionkit": "~2",
+    "php-jsonpointer/php-jsonpointer": "1.*"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "*",
