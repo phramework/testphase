@@ -266,11 +266,13 @@ class Testphase
 
         return $this->handleResponse(
             new Response(
-                ($end - $start),
                 $responseStatusCode,
                 $responseHeaders,
-                $responseBody
+                $responseBody,
+                $end,
+                ($end - $start)
             ),
+            $start,
             $callback
         );
     }
@@ -287,6 +289,7 @@ class Testphase
      */
     private function handleResponse(
         Response $response,
+        $start,
         $callback
     ) {
         $headers = $response->getHeaders();
@@ -383,7 +386,8 @@ class Testphase
                 $this->url,
                 $this->method,
                 $this->headers,
-                $this->body
+                $this->body,
+                $start
             ),
             $response
         );

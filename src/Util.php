@@ -156,6 +156,27 @@ class Util
         }
         return $arrayItems;
     }
+
+    /**
+     * Delete all contents from a directory
+     * @param string $directory Directory path
+     * @param boolean $DELETE_DIRECTORY *[Optional]*, if is set directory will be deleted too.
+     * @return boolean
+     */
+    public static function deleteDirectoryContents($directory, $DELETE_DIRECTORY = false)
+    {
+        $files = array_diff(scandir($directory), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $directory .  $file;
+            (
+                is_dir($path)
+                ? self::delete_directory_contents($path, true)
+                : unlink($path)
+            );
+        }
+        return $DELETE_DIRECTORY ? rmdir($directory) : true;
+    }
+
     /**
      * Cartesian product
      * @param  array $input [description]

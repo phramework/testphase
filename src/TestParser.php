@@ -210,6 +210,11 @@ class TestParser
                             new BooleanValidator(),
                             new StringValidator(1, 4096)
                         ]))->setDefault(false),
+                        'dependencies' => (new ArrayValidator(
+                            0,
+                            null,
+                            new StringValidator() //File
+                        ))->setDefault([]),
                     ],
                     [],
                     false
@@ -218,7 +223,8 @@ class TestParser
                     'description' => null,
                     'JSONbody' => true,
                     'incomplete' => false,
-                    'ignore' => false
+                    'ignore' => false,
+                    'dependencies' => []
                 ]),
                 'request' => $requestValidator,
                 'response' => $responseValidator

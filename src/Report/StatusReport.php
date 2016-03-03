@@ -22,7 +22,7 @@ namespace Phramework\Testphase\Report;
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @since 2.0.0
  */
-class StatusReport
+class StatusReport implements \JsonSerializable
 {
     const STATUS_SUCCESS    = 'success';
     const STATUS_ERROR      = 'error';
@@ -77,5 +77,14 @@ class StatusReport
     public function getRequest()
     {
         return $this->request;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'status'   => $this->status,
+            'request'  => $this->request,
+            'response' => $this->response
+        ];
     }
 }

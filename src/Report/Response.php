@@ -20,7 +20,7 @@ namespace Phramework\Testphase\Report;
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  */
-class Response
+class Response implements \JsonSerializable
 {
     /**
      * @var int
@@ -38,23 +38,31 @@ class Response
     private $body;
 
     /**
-     * Time in seconds
+     * Duration in seconds
      * @var int
      */
-    private $time;
+    private $duration;
+
+    /**
+     * Response timestamp
+     * @var int
+     */
+    private $timestamp;
 
     //output ??
 
     public function __construct(
-        $time,
         $statusCode,
         $headers,
-        $body
+        $body,
+        $timestamp,
+        $duration
     ) {
-        $this->time       = $time;
         $this->statusCode = $statusCode;
         $this->headers    = $headers;
         $this->body       = $body;
+        $this->timestamp  = $timestamp;
+        $this->duration   = $duration;
     }
 
     /**
@@ -87,5 +95,18 @@ class Response
     public function getTime()
     {
         return $this->time;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }

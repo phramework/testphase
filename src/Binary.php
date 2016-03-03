@@ -68,6 +68,10 @@ class Binary
         $specs->add('v|verbose', 'Verbose output')
             ->defaultValue(false);
 
+        $specs->add('report:?', 'Report output directory')
+            ->isa('String')
+            ->defaultValue(null);
+
         $specs->add('show-globals', 'Show values of global variables')->defaultValue(false);
         $specs->add('debug', 'Show debug messages')->defaultValue(false);
         $specs->add('h|help', 'Show help')->defaultValue(false);
@@ -157,9 +161,11 @@ class Binary
 
         $testIndex = 0;
 
-        foreach ($testParserCollection as $testParser) {
+        $executedTestparserFiles = [];
+        $executedTestphase = [];
 
-            //Check if subdir argument is set
+        foreach ($testParserCollection as $testParser) {
+            //Check if subdir (sub directory) argument is set
             if (isset($arguments->subdir) && $arguments->subdir !== null) {
                 //If so check if file name passes the given pattern
 
@@ -218,6 +224,11 @@ class Binary
                 $stats->incomplete += 1;
             }
 
+            if (!empty($meta->dependencies)) {
+                //TODO
+                var_dump('dependencies are set!');
+            }
+
             try {
                 //Complete test's testphase collection
                 $testParser->createTest();
@@ -236,6 +247,7 @@ class Binary
             //Include number of additional testphase collections (-1 because, one is already counted)
             $stats->tests += count($testphaseCollection) - 1;
 
+            //Used when a TestParser contains multiple Testphase objects
             $testphaseIndex = 0;
 
             //Iterate though test parser's testphase collection
@@ -246,6 +258,8 @@ class Binary
                      */
                     $statusReport = $testphase->run();
 
+                    $executedTestphase[] = $statusReport;
+
                     if ($statusReport->getStatus() == StatusReport::STATUS_SUCCESS) {
                         $stats->success += 1;
                     }
@@ -255,7 +269,11 @@ class Binary
                         echo sprintf(
                             '. %s%s',
                             $testParser->getFilename(),
-                            ($testphaseIndex === 0 ? '' : ' (' . $testphaseIndex . ')' )
+                            (
+                                $testphaseIndex === 0
+                                ? ''
+                                : ' (' . $testphaseIndex . ')'
+                            )
                         ) . PHP_EOL;
                     } else {
                         echo '.';
@@ -263,63 +281,22 @@ class Binary
 
                     $responseBody = $statusReport->getResponse()->getBody();
 
-                    //TODO only when is json
-                    $export = $testParser->getExport();
+                    if ($testParser->getMeta()->JSONbody) {
+                        //TODO only when is json
+                        $export = $testParser->getExport();
 
-                    $jsonPointer = new Pointer($responseBody);
-
-                    //Fetch all test exports and add them as globals
-                    foreach ($export as $globalKey => $pointer) {
-                        $value = $jsonPointer->get($pointer);
-                        Globals::set($globalKey, $value);
-                    }
-
-
-                    /*function (
-                        $responseStatusCode,
-                        $responseHeaders,
-                        $responseBody,
-                        $responseBodyObject = null
-                    ) use (
-                        $test,
-                        $arguments
-                    ) {
-                        //todo move to TestParser
-                        $export = $test->getExport();
+                        $jsonPointer = new Pointer($responseBody);
 
                         //Fetch all test exports and add them as globals
-                        foreach ($export as $key => $value) {
-                            $path = explode('.', $value);
-
-                            $pathValue = $responseBodyObject;
-
-                            foreach ($path as $p) {
-                                //@todo implement array index
-                                $arrayIndex = 0;
-
-                                if (is_array($pathValue)) {
-                                    $pathValue = $pathValue[$arrayIndex]->{$p};
-                                } else {
-                                    $pathValue = $pathValue->{$p};
-                                }
-                            }
-
-                            Globals::set($key, $pathValue);
+                        foreach ($export as $globalKey => $pointer) {
+                            $value = $jsonPointer->get($pointer);
+                            Globals::set($globalKey, $value);
                         }
+                    }
 
-                        if ($arguments->debug) {
-                            echo 'Response Status Code:' . PHP_EOL;
-                            echo $responseStatusCode . PHP_EOL;
-                            echo 'Response Headers:' . PHP_EOL;
-                            print_r($responseHeaders);
-                            echo PHP_EOL;
-                            echo 'Response Body:' . PHP_EOL;
-                            echo json_encode($responseBodyObject, JSON_PRETTY_PRINT) . PHP_EOL;
-                        }
-                    });
-
-
-                    $stats->success += 1;*/
+                    if ($arguments->debug) {
+                        //TODO
+                    }
 
                 } catch (UnsetGlobalException $e) {
 
@@ -338,9 +315,9 @@ class Binary
                     //Echo unsuccessful char
                     if ($arguments->verbose) {
                         echo sprintf(
-                                'F %s',
-                                $testParser->getFilename()
-                            ) . PHP_EOL;
+                            'F %s',
+                            $testParser->getFilename()
+                        ) . PHP_EOL;
                     } else {
                         echo 'F';
                     }
@@ -395,6 +372,7 @@ class Binary
 
                     $stats->failure += 1;
                 }
+
                 ++$testIndex;
                 //Show only 80 characters per line
                 if (!$arguments->verbose && !($testIndex % 79)) {
@@ -403,7 +381,11 @@ class Binary
 
                 ++$testphaseIndex;
             }
+
+            $executedTestparserFiles[] = $testParser->getFilename();
         }
+
+        var_dump($executedTestparserFiles);
 
         echo PHP_EOL;
 
@@ -436,9 +418,27 @@ class Binary
         echo 'Memory usage: ' . (int)(memory_get_usage(true)/1048576) . ' MB' . PHP_EOL;
         echo 'Elapsed time: ' . (time() - $_SERVER['REQUEST_TIME']) . ' s' . PHP_EOL;
 
+        if ($arguments->report !== null) {
+            Util::deleteDirectoryContents($arguments->report);
+
+            $i = 0;
+            foreach ($executedTestphase as $executed) {
+
+
+                $report = json_encode($executed, JSON_PRETTY_PRINT);
+
+                $f = fopen($arguments->report .  $i . '.json', 'w');
+
+                fputs($f, $report);
+                fclose($f);
+                ++$i;
+            }
+        }
+
         if ($stats->error > 0) {
             return $this->stop(1);
         }
+
         if ($stats->failure > 0) {
             return $this->stop(2);
         }
@@ -446,6 +446,11 @@ class Binary
         return $this->stop(0);
     }
 
+    /**
+     * Prepare to close
+     * @param $returnCode
+     * @return mixed
+     */
     protected function stop($returnCode) {
         if ($this->server !== null) {
             $this->server->stop();

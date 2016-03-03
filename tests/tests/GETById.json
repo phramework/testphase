@@ -4,7 +4,7 @@
     "order": 0
   },
   "request": {
-    "url": "http://jsonplaceholder.typicode.com/posts/{{postId}}",
+    "url": "http://jsonplaceholder.typicode.com/posts/{{timestamp()}}",
     "method": "GET",
     "headers": []
   },

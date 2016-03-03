@@ -22,7 +22,7 @@ namespace Phramework\Testphase\Report;
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @todo add index ??
  */
-class Request
+class Request implements \JsonSerializable
 {
     /**
      * @var string
@@ -42,16 +42,24 @@ class Request
      */
     private $body;
 
+    /**
+     * Request timestamp
+     * @var int
+     */
+    private $timestamp;
+
     public function __construct(
         $url,
         $method,
         $headers,
-        $body
+        $body,
+        $timestamp
     ) {
-        $this->url      = $url;
-        $this->method   = $method;
-        $this->headers  = $headers;
-        $this->body     =  $body;
+        $this->url       = $url;
+        $this->method    = $method;
+        $this->headers   = $headers;
+        $this->body      = $body;
+        $this->timestamp = $timestamp;
     }
 
     /**
@@ -84,5 +92,18 @@ class Request
     public function getBody()
     {
         return $this->body;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }

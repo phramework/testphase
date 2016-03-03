@@ -73,11 +73,11 @@ class Globals
             return (boolean)rand(0, 1);
         };
 
-        static::$globals->{'timestamp'} = function () {
-            return time();
+        static::$globals->{'timestamp'} = function ($offset = 0) {
+            return time() + $offset;
         };
 
-        static::$globals->{'microtime'} = function ($get_as_float = false) {
+        static::$globals->{'microtimestamp'} = function ($get_as_float = false) {
             return microtime((bool)$get_as_float);
         };
     }
