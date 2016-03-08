@@ -16,6 +16,7 @@
  */
 namespace Phramework\Testphase;
 
+use Phramework\Testphase\Exceptions\HeaderException;
 use Phramework\Testphase\Exceptions\RuleException;
 use Phramework\Testphase\Report\Request;
 use Phramework\Testphase\Report\Response;
@@ -66,21 +67,24 @@ class Testphase
 
     /**
      * @var int[]
+     * @deprecated since 2.0.0
      */
     private $ruleStatusCode = [200];
 
     /**
      * @var array
+     * @deprecated since 2.0.0
      */
     private $ruleHeaders = [];
 
     /**
      * @var array
+     * @deprecated since 2.0.0
      */
     private $ruleObjects = [];
 
     /**
-     * @var object
+     * @var Rule\Rule[]
      */
     private $rules;
 
@@ -148,7 +152,7 @@ class Testphase
 
         $this->ruleJSON = $ruleJSON;
 
-        $this->rules = (object) [];
+        $this->rules = [];
     }
 
     /**
@@ -304,19 +308,37 @@ class Testphase
 
         foreach ($this->ruleHeaders as $headerKey => $headerValue) {
             if (!isset($headers[$headerKey])) {
-                throw new \Exception(sprintf(
+                /*throw new \Exception(sprintf(
                     'Expected header "%s" is not set',
                     $headerKey
-                ));
+                ));*/
+
+                throw new HeaderException(
+                    sprintf(
+                        'Expected header "%s" is not set',
+                        $headerKey
+                    ),
+                    $headerKey
+                );
             }
 
             if ($headerValue != $headers[$headerKey]) {
-                throw new \Exception(sprintf(
+                throw new HeaderException(
+                    sprintf(
+                        'Expected header value "%s" for header "%s" got "%s"',
+                        $headerValue,
+                        $headerKey,
+                        $headers[$headerKey]
+                    ),
+                    $headerKey
+                );
+
+                /*throw new \Exception(sprintf(
                     'Expected header value "%s" for header "%s" got "%s"',
                     $headerValue,
                     $headerKey,
                     $headers[$headerKey]
-                ));
+                ));*/
             }
         }
 
@@ -340,7 +362,9 @@ class Testphase
             }
 
             $jsonPointer = new Pointer($body);
-            foreach ($this->rules as $pointer => $rule) {
+            foreach ($this->rules as $rule) {
+                //TODO
+                $pointer = trim('/body', $rule->getPointer());
                 //try {
                 //get value from pointer
                 $value = $jsonPointer->get($pointer);
@@ -350,12 +374,13 @@ class Testphase
                 //}
 
                 if (is_subclass_of($rule, BaseValidator::class)) {
-                    $rule->parse($value);
-                } else { //literal value
-                    if ($value != $rule) {
-                        throw new RuleException('invalid value for rule' . $pointer);
-                    }
+                    $rule->getSchema()->parse($value);
                 }
+                //} else { //literal value
+                //    if ($value != $rule) {
+                //        throw new RuleException('invalid value for rule' . $rule->getPointer());
+                //    }
+                //}
                 //TODO
             }
         }
@@ -410,6 +435,7 @@ class Testphase
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      * @param  int|int[] $statusCode
      * @return $this
+     * @deprecated
      */
     public function expectStatusCode($statusCode)
     {
@@ -428,6 +454,7 @@ class Testphase
      * @param  array[]|object $ruleHeaders
      * @return $this
      * @throws \Exception When $ruleHeaders is not an array
+     * @deprecated
      */
     public function expectHeader($ruleHeaders)
     {
@@ -467,6 +494,7 @@ class Testphase
      * Object validator, as an additional set of rules to validate the response.
      * @param  BaseValidator $object Validator object
      * @return $this
+     * @deprecated
      */
     public function expectObject($object)
     {
@@ -487,18 +515,13 @@ class Testphase
     }
 
     /**
-     * @param string $pointer
-     * @param string|BaseValidator $value Literal value or instance of BaseValidator
+     * @param Rule\Rule $rule
      * @return $this
-     * @todo Validate path ?
      */
-    public function expectRule($pointer, $value)
+    public function expectRule(Rule\Rule $rule)
     {
-        if (empty((array) $this->rules)) {
-            $this->rules = new \stdClass();
-        }
 
-        $this->rules->{$pointer} = $value;
+        $this->rules[] = $rule;
 
         return $this;
     }

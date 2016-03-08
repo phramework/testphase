@@ -17,16 +17,16 @@
       "Content-Type": "application/json; charset=utf-8"
     },
     "rules": {
-      "/0/userId" : {
+      "/body/0/userId" : {
         "type": "integer"
       },
-      "/0" : {
+      "/body/0" : {
         "type": "object"
       },
-      "/0/title" : {
+      "/body/0/title" : {
         "type": "string"
       },
-      "/0/id" : 1
+      "/body/0/id" : 1
     },
     "export" : {
       "postId" : "/1/id"

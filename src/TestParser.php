@@ -181,7 +181,7 @@ class TestParser
                     ->setDefault(null),
                 'rules' => (new ObjectValidator())
                     ->setDefault((object) []),
-                'ruleObjects' => (new ArrayValidator())
+                'body' => (new ArrayValidator())
                     ->setDefault([]),
                 'export' => (new ObjectValidator(
                     [],
@@ -333,14 +333,15 @@ class TestParser
                         //do nothing
                     } else {
                         //do nothing
+                        $ruleValue = new EnumValidator([$ruleValue]);
                     }
 
                     //Push rule
-                    $testphase->expectRule($pointer, $ruleValue);
+                    $testphase->expectRule(new Rule\Rule($pointer, $ruleValue));
                 }
 
                 //Add rule objects to validate body
-                foreach ($contentsParsed->response->ruleObjects as $key => $ruleObject) {
+                foreach ($contentsParsed->response->body as $key => $ruleObject) {
                     if (is_string($ruleObject)) {
                         $testphase->expectObject(ObjectValidator::createFromJSON($ruleObject));
                     } elseif (is_subclass_of(

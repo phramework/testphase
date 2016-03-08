@@ -16,7 +16,7 @@
     "headers": {
       "Content-Type": "application/json; charset=utf-8"
     },
-    "ruleObjects": [{
+    "body": [{
       "type": "array",
       "items": {
         "type": "object",

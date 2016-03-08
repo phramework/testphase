@@ -4,13 +4,13 @@
     "order": 0
   },
   "request": {
-    "url": "http://jsonplaceholder.typicode.com/posts/{{timestamp()}}",
+    "url": "http://jsonplaceholder.typicode.com/posts/{{postId}}",
     "method": "GET",
     "headers": []
   },
   "response": {
     "statusCode": [200, 201, 204],
-    "ruleObjects": [{
+    "body": [{
       "type": "object",
       "properties": {
         "userId": {

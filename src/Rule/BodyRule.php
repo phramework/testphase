@@ -14,17 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace Phramework\Testphase\Exceptions;
 
-/***
- * @since 2.0.0
+namespace Phramework\Testphase\Rule;
+
+use Phramework\Testphase\Util;
+
+
+/**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  */
-class HeaderException extends RuleException
+class BodyRule extends Rule
 {
-    public function __construct($message, $path)
+    public function __construct($pointer, $schema, $message = '')
     {
-        parent::__construct($message, 'headers/' . $path);
+        if (!Util::startsWith($pointer, '/body/')) {
+            $pointer = str_replace(
+                '//',
+                '/',
+                '/body/' . $pointer
+            );
+        }
+
+        parent::__construct($pointer, $schema, $message);
     }
 }

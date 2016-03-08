@@ -23,4 +23,12 @@ namespace Phramework\Testphase\Exceptions;
  */
 class RuleException extends \Exception
 {
+    private $path;
+
+    public function __construct($message, $path)
+    {
+        parent::__construct($message);
+
+        $this->path = $path;
+    }
 }
