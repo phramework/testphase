@@ -16,6 +16,7 @@
  */
 namespace Phramework\Testphase;
 
+use Phramework\Testphase\Rule\BodyRule;
 use Phramework\Validate\AnyOf;
 use Phramework\Validate\BaseValidator;
 use Phramework\Validate\OneOf;
@@ -342,16 +343,21 @@ class TestParser
 
                 //Add rule objects to validate body
                 foreach ($contentsParsed->response->body as $key => $ruleObject) {
-                    if (is_string($ruleObject)) {
-                        $testphase->expectObject(ObjectValidator::createFromJSON($ruleObject));
+
+                    if (is_string($ruleObject) && Util::isJSON($ruleObject)) {
+                        $rule = ObjectValidator::createFromJSON($ruleObject);
                     } elseif (is_subclass_of(
                         $ruleObject,
                         \Phramework\Validate\BaseValidator::class
                     )) {
-                        $testphase->expectObject($ruleObject);
+                        $rule = $ruleObject;
                     } else {
-                        $testphase->expectObject(ObjectValidator::createFromObject($ruleObject));
+                        $rule = ObjectValidator::createFromObject($ruleObject);
                     }
+
+                    json_encode($rule);
+
+                    $testphase->expectRule(new BodyRule('', $rule));
                 }
 
                 //push test

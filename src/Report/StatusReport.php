@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2015-2016 Xenofon Spafaridis
  *
@@ -45,14 +44,28 @@ class StatusReport implements \JsonSerializable
      */
     private $request;
 
+    /**
+     * @var RuleReport[]
+     */
+    private $ruleReport;
+
+    /**
+     * StatusReport constructor.
+     * @param string $status
+     * @param Request $request
+     * @param Response $response
+     * @param array $ruleReport
+     */
     public function __construct(
         $status,
         Request $request,
-        Response $response
+        Response $response,
+        array $ruleReport = []
     ) {
-        $this->status   = $status;
-        $this->request  = $request;
-        $this->response = $response;
+        $this->status     = $status;
+        $this->request    = $request;
+        $this->response   = $response;
+        $this->ruleReport = $ruleReport;
     }
 
     /**
@@ -82,9 +95,10 @@ class StatusReport implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'status'   => $this->status,
-            'request'  => $this->request,
-            'response' => $this->response
+            'status'     => $this->status,
+            'request'    => $this->request,
+            'response'   => $this->response,
+            'ruleReport' => $this->ruleReport
         ];
     }
 }

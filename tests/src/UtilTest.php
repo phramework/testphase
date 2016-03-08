@@ -16,10 +16,16 @@
  */
 namespace Phramework\Testphase;
 
+/**
+ * Class UtilTest
+ * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
+ * @author Xenofon Spafaridis <nohponex@gmail.com>
+ * @coversDefaultClass Util
+ */
 class UtilTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Phramework\Testphase\Util::isJSON
+     * @covers ::isJSON
      */
     public function testIsJSON()
     {
@@ -53,7 +59,7 @@ class UtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Util::readableRandomString
+     * @covers ::readableRandomString
      */
     public function testReadableRandomString()
     {
@@ -71,7 +77,7 @@ class UtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Util::directoryToArray
+     * @covers ::directoryToArray
      */
     public function testDirectoryToArray()
     {
@@ -114,7 +120,7 @@ class UtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Util::cartesian
+     * @covers ::cartesian
      */
     public function testCartesian()
     {
@@ -142,5 +148,33 @@ class UtilTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $return[0]);
 
         $this->assertCount(count($input), $return[0]);
+    }
+
+    /**
+     * @covers ::startsWith
+     */
+    public function testStartsWith()
+    {
+        $string = 'abcdef';
+
+        $this->assertTrue( Util::startsWith($string, 'ab'));
+        $this->assertTrue( Util::startsWith($string, ''));
+        $this->assertFalse(Util::startsWith($string, 'cd'));
+        $this->assertFalse(Util::startsWith($string, 'ef'));
+        $this->assertFalse(Util::startsWith('',      $string));
+    }
+
+    /**
+     * @covers ::startsWith
+     */
+    public function testEndsWith()
+    {
+        $string = 'abcdef';
+
+        $this->assertFalse(Util::endsWith($string, 'ab'));
+        $this->assertTrue( Util::endsWith($string, ''));
+        $this->assertFalse(Util::endsWith($string, 'cd'));
+        $this->assertTrue( Util::endsWith($string, 'ef'));
+        $this->assertFalse(Util::endsWith('',      $string));
     }
 }

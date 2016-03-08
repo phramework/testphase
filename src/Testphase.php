@@ -20,6 +20,7 @@ use Phramework\Testphase\Exceptions\HeaderException;
 use Phramework\Testphase\Exceptions\RuleException;
 use Phramework\Testphase\Report\Request;
 use Phramework\Testphase\Report\Response;
+use Phramework\Testphase\Report\RuleReport;
 use Phramework\Testphase\Report\StatusReport;
 use Phramework\Validate\BaseValidator;
 use Rs\Json\Pointer;
@@ -283,10 +284,6 @@ class Testphase
 
     /**
      * Handle response, test response against provided rules
-     * @param int           $time
-     * @param int           $responseStatusCode
-     * @param array         $responseHeaders
-     * @param string        $responseBody
      * @param callable|null $callback
      * @throws \Exception
      * @return Report\StatusReport
@@ -342,6 +339,13 @@ class Testphase
             }
         }
 
+        /**
+         * @var RuleReport
+         */
+        $ruleReport = [];
+
+        $success = true;
+
         $body = $response->getBody();
 
         if ($this->ruleJSON && !Util::isJSON($body)) {
@@ -368,20 +372,34 @@ class Testphase
                 //try {
                 //get value from pointer
                 $value = $jsonPointer->get($pointer);
+
                 //} catch (Pointer\NonexistentValueReferencedException $e) {
                 //    //todo
                 //    throw new RuleException($e->getMessage());
                 //}
 
-                if (is_subclass_of($rule, BaseValidator::class)) {
-                    $rule->getSchema()->parse($value);
+                if (is_subclass_of($rule->getSchema(), BaseValidator::class)) {
+                    $validateResult = $rule->getSchema()->validate(json_decode($value));
+
+                    $success = $success && $validateResult->status;
+
+                    $ruleReport[] = new RuleReport(
+                        $rule,
+                        $validateResult->status,
+                        $validateResult->errorObject
+                    );
                 }
-                //} else { //literal value
-                //    if ($value != $rule) {
-                //        throw new RuleException('invalid value for rule' . $rule->getPointer());
-                //    }
-                //}
-                //TODO
+                /*} else { //literal value
+                    if ($value != $rule->getSchema()) {
+
+                        //TODO
+                        $ruleReport[] = new RuleReport(
+                            $rule,
+                            false,
+                            new RuleException('invalid value for rule' . $rule->getPointer())
+                        );
+                    }
+                }*/
             }
         }
 
@@ -406,7 +424,11 @@ class Testphase
         }
 
         return new Report\StatusReport(
-            Report\StatusReport::STATUS_SUCCESS,
+            (
+                $success === true
+                ? Report\StatusReport::STATUS_SUCCESS
+                : Report\StatusReport::STATUS_FAILURE
+            ),
             new Request(
                 $this->url,
                 $this->method,
@@ -414,7 +436,8 @@ class Testphase
                 $this->body,
                 $start
             ),
-            $response
+            $response,
+            $ruleReport
         );
     }
 

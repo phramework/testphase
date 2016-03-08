@@ -24,8 +24,9 @@ use Phramework\Validate\BaseValidator;
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
+ * @since 2.0.0
  */
-class Rule
+class Rule implements \JsonSerializable
 {
     /**
      * @var string
@@ -54,7 +55,7 @@ class Rule
 
         $found = false;
         foreach ($topMembers as $member) {
-            $found |= Util::startsWith($pointer, '/' . $member);
+            $found = $found || Util::startsWith($pointer, '/' . $member);
         }
 
         if (!$found) {
@@ -90,4 +91,17 @@ class Rule
         return $this->schema;
     }
 
+    public function jsonSerialize()
+    {
+        $vars = [
+            'pointer' => $this->pointer,
+            'schema'  => $this->schema
+        ];
+
+        if (!empty($this->message)) {
+            $vars['message'] = $this->message;
+        }
+
+        return $vars;
+    }
 }

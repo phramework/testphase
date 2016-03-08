@@ -160,8 +160,13 @@ class Binary
         ];
 
         $testIndex = 0;
-
+        /**
+         * @var string[]
+         */
         $executedTestparserFiles = [];
+        /**
+         * @var StatusReport[]
+         */
         $executedTestphase = [];
 
         foreach ($testParserCollection as $testParser) {
@@ -262,23 +267,35 @@ class Binary
 
                     if ($statusReport->getStatus() == StatusReport::STATUS_SUCCESS) {
                         $stats->success += 1;
-                    }
 
-                    //Echo successful char
-                    if ($arguments->verbose) {
-                        echo sprintf(
-                            '. %s%s',
-                            $testParser->getFilename(),
-                            (
-                                $testphaseIndex === 0
-                                ? ''
-                                : ' (' . $testphaseIndex . ')'
-                            )
-                        ) . PHP_EOL;
-                    } else {
-                        echo '.';
-                    }
+                        //Echo successful char
+                        if ($arguments->verbose) {
+                            echo sprintf(
+                                    '. %s%s',
+                                    $testParser->getFilename(),
+                                    (
+                                    $testphaseIndex === 0
+                                        ? ''
+                                        : ' (' . $testphaseIndex . ')'
+                                    )
+                                ) . PHP_EOL;
+                        } else {
+                            echo '.';
+                        }
+                    } elseif ($statusReport->getStatus() == StatusReport::STATUS_FAILURE) {
+                        $stats->failure += 1;
 
+                        //Echo unsuccessful char
+                        if ($arguments->verbose) {
+                            echo sprintf(
+                                'F %s',
+                                $testParser->getFilename()
+                            ) . PHP_EOL;
+                        } else {
+                            echo 'F';
+                        }
+                    }
+                    
                     $responseBody = $statusReport->getResponse()->getBody();
 
                     if ($testParser->getMeta()->JSONbody) {
