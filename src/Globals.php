@@ -17,6 +17,7 @@
 namespace Phramework\Testphase;
 
 use Phramework\Testphase\Exceptions\UnsetGlobalException;
+use Phramework\Util\Util;
 
 /**
  * Global variables

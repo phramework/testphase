@@ -18,7 +18,7 @@
 
 namespace Phramework\Testphase\Rule;
 
-use Phramework\Testphase\Util;
+use Phramework\Util\Util;
 use Phramework\Validate\BaseValidator;
 
 /**
@@ -59,7 +59,9 @@ class Rule implements \JsonSerializable
         }
 
         if (!$found) {
-            throw new \Exception('Invalid pointer, must start with one of ' . implode(',', $topMembers));
+            throw new \Exception(
+                'Invalid pointer, must start with one of ' . implode(',', $topMembers)
+            );
         }
 
         $this->pointer = $pointer;

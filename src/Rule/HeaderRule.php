@@ -16,9 +16,7 @@
  */
 
 namespace Phramework\Testphase\Rule;
-
-use Phramework\Testphase\Util;
-
+use Phramework\Util\Util;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0

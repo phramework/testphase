@@ -9,13 +9,14 @@
     "homepage": "https://nohponex.gr"
   }],
   "require": {
-    "php": ">=5.6",
+    "php": ">=7",
     "phramework/validate": "0.*",
     "phramework/exceptions": "0.*",
     "ext-curl": "*",
     "ext-json": "*",
     "corneltek/getoptionkit": "~2",
-    "php-jsonpointer/php-jsonpointer": "1.*"
+    "php-jsonpointer/php-jsonpointer": "1.*",
+    "phramework/util": "dev-master"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "*",

@@ -22,6 +22,7 @@ use Phramework\Testphase\Report\Request;
 use Phramework\Testphase\Report\Response;
 use Phramework\Testphase\Report\RuleReport;
 use Phramework\Testphase\Report\StatusReport;
+use Phramework\Util\Util;
 use Phramework\Validate\BaseValidator;
 use Rs\Json\Pointer;
 

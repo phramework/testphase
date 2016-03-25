@@ -20,12 +20,12 @@ use Phramework\Testphase\Exceptions\UnsetGlobalException;
 use Phramework\Testphase\Report\StatusReport;
 use Phramework\Testphase\Testphase;
 use Phramework\Testphase\TestParser;
-use Phramework\Testphase\Util;
 use Phramework\Exceptions\MissingParametersException;
 use Phramework\Exceptions\IncorrectParametersException;
 use GetOptionKit\OptionCollection;
 use GetOptionKit\OptionParser;
 use GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
+use Phramework\Util\File;
 use Rs\Json\Pointer;
 
 /**
@@ -432,11 +432,24 @@ class Binary
         Binary::output('Failure: ' . $stats->failure . PHP_EOL, 'red');
 
 
-        echo 'Memory usage: ' . (int)(memory_get_usage(true)/1048576) . ' MB' . PHP_EOL;
-        echo 'Elapsed time: ' . (time() - $_SERVER['REQUEST_TIME']) . ' s' . PHP_EOL;
+        echo sprintf(
+            'Memory usage: %s MB' . PHP_EOL,
+            (int)(memory_get_usage(true)/1048576)
+        );
 
+        echo sprintf(
+            'Elapsed time: %s s' . PHP_EOL,
+            (time() - $_SERVER['REQUEST_TIME'])
+        );
+
+        //Output report
         if ($arguments->report !== null) {
-            Util::deleteDirectoryContents($arguments->report);
+            File::deleteDirectoryContents($arguments->report);
+
+            //Check if report directory exists
+            if (!file_exists($arguments->report)) {
+                mkdir($arguments->report);
+            }
 
             $i = 0;
             foreach ($executedTestphase as $executed) {
@@ -489,7 +502,7 @@ class Binary
             function ($f) {
                 return str_replace('//', '/', $f);
             },
-            Util::directoryToArray(
+            File::directoryToArray(
                 $dir,
                 true,
                 false,

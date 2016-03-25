@@ -16,8 +16,7 @@
  */
 
 namespace Phramework\Testphase\Rule;
-
-use Phramework\Testphase\Util;
+use Phramework\Util\Util;
 
 
 /**
