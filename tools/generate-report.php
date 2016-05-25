@@ -1,0 +1,231 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Phramework\Testphase\TestParser;
+use Phramework\Util\File;
+use GetOptionKit\OptionCollection;
+use GetOptionKit\OptionParser;
+use GetOptionKit\OptionPrinter\ConsoleOptionPrinter;
+
+$specs = new OptionCollection;
+
+$specs->add('d|dir:', 'Tests directory path')
+    ->isa('String');
+
+$specs->add('s|subdir?', 'Optional, subdirectory')
+    ->isa('String')
+    ->defaultValue('');
+
+$specs->add('o|out:', 'Report output path')
+    ->isa('String');
+
+$specs->add('h|help', 'Show help')
+    ->defaultValue(false);
+
+$parser = new OptionParser($specs);
+
+$arguments = $parser->parse($argv);
+
+if ($arguments->help) {
+    echo 'Help:' . PHP_EOL;
+    $printer = new ConsoleOptionPrinter;
+    echo $printer->render($specs);
+
+    return 0;
+}
+
+if (empty($arguments->dir)) {
+    echo '--dir is required, use --help for help' . PHP_EOL;
+    return 2;
+}
+
+if (empty($arguments->out)) {
+    echo '--out is required, use --help for help' . PHP_EOL;
+    return 2;
+}
+
+$path   = $arguments->dir;
+
+$subDir = $arguments->subdir;
+
+$testDir = str_replace('//', '/', $path . '/'.  $subDir);
+
+var_dump($testDir);
+
+if (!file_exists($testDir)) {
+    throw new Exception('Testphase directory not found');
+}
+
+$testFiles = File::directoryToArray(
+    $testDir,
+    true,
+    false,
+    true,
+    '/^\.|\.\.$/',
+    ['json'],
+    false
+);
+
+
+/**
+ * @var \Phramework\Testphase\TestParser[]
+ */
+$testParserCollection = [];
+
+$report = str_replace(
+    '//',
+    '/',
+    sprintf(
+        '%s/report%s.html',
+        $arguments->out,
+        (
+            empty($subDir)
+            ? ''
+            : '-' . $subDir
+        )
+    )
+);
+
+$f = fopen($report, 'w');
+
+if ($f === false) {
+    throw new Exception('Unable to create report file');
+}
+
+fwrite(
+    $f,
+    sprintf(
+        <<<'TAG'
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>testphase report%s</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+TAG
+        ,
+        (
+        empty($subDir)
+            ? ''
+            : ' - ' . $subDir
+        )
+    )
+);
+
+fwrite($f, '<div class="table-responsive"><table class="table table-striped table-condensed"><tr>');
+
+$headers = ['order', 'file', 'ignore', 'description', 'incomplete'];
+
+array_map(
+    function ($h) use ($f) {
+        fwrite(
+            $f,
+            sprintf(
+                '<th>%s</th>',
+                $h
+            )
+        );
+    },
+    $headers
+);
+
+
+foreach ($testFiles as $filename) {
+    $testParser = new TestParser($filename);
+
+    $testParserCollection[] = $testParser;
+
+}
+
+uasort(
+    $testParserCollection,
+    [\Phramework\Testphase\Binary::class, 'sortTestParser']
+);
+
+$converter = new \League\CommonMark\CommonMarkConverter();
+
+foreach ($testParserCollection as $t) {
+
+    $meta = $t->getMeta();
+
+    $class = '';
+
+    if ($meta->incomplete) {
+        $class = 'warning';
+    }
+    if ($meta->ignore) {
+        $class = 'danger';
+    }
+
+    fwrite(
+        $f,
+        sprintf(
+            '<tr class="%s">',
+            $class
+        )
+    );
+
+
+    fwrite(
+        $f,
+        sprintf(
+            '<td><code>%s</code></td>',
+            $meta->order
+        )
+    );
+    fwrite(
+        $f,
+        sprintf(
+            '<td><code>%s</code></td>',
+            str_replace($testDir, '', $t->getFilename())
+        )
+    );
+    fwrite(
+        $f,
+        sprintf(
+            '<td>%s</td>',
+            (
+            $meta->ignore
+                ? 'yes'
+                : ''
+            )
+        )
+    );
+    fwrite(
+        $f,
+        sprintf(
+            '<td>%s</td>',
+            $converter->convertToHtml(
+                $meta->description
+            )
+        )
+    );
+    fwrite(
+        $f,
+        sprintf(
+            '<td>%s</td>',
+            (
+            $meta->incomplete == true
+                ? 'yes'
+                : $converter->convertToHtml(
+                $meta->incomplete
+            )
+            )
+        )
+    );
+
+    fwrite(
+        $f,
+        '</tr>'
+    );
+}
+
+fwrite($f, '</table>');
+fwrite($f, '</div></body></html>');
+
+fclose($f);
+
+echo 'Report saved ' . $report . PHP_EOL;

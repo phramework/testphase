@@ -11,3 +11,4 @@ localsettings.php
 build/
 /bin/*.symbolic.php
 .idea/**
+tests/report/*.html
