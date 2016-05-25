@@ -52,8 +52,6 @@ $subDir = $arguments->subdir;
 
 $testDir = str_replace('//', '/', $path . '/'.  $subDir);
 
-var_dump($testDir);
-
 if (!file_exists($testDir)) {
     throw new Exception('Testphase directory not found');
 }

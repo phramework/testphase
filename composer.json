@@ -55,9 +55,10 @@
       "start=\"file://\";end=\"doc/index.html\"; echo \"\nOpen $start$(pwd)/$end\" in browser..."
     ],
     "run": "php ./bin/testphase -d ./tests/tests -b ./tests/tests/Bootstrap.php --show-globals --verbose",
-    "report": "./tools/generate-report.php --dir ./tests/tests/ --out ./tests/report"
+    "report": "php ./bin/testphase-report --dir ./tests/tests/ --out ./tests/report"
   },
   "bin": [
-    "bin/testphase"
+    "bin/testphase",
+    "bin/testphase-report"
   ]
 }
