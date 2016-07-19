@@ -281,7 +281,10 @@ class Testphase
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestBody);
                 break;
             case 'DELETE': //On DELETE
-                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->method);
+                if ($this->requestBody) {
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $this->requestBody);
+                }
                 break;
             default:
                 throw new \Exception('Unsupported method');
