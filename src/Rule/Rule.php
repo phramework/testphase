@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2015-2016 Xenofon Spafaridis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 namespace Phramework\Testphase\Rule;
 
 use Phramework\Util\Util;
@@ -25,9 +23,22 @@ use Phramework\Validate\BaseValidator;
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @since 2.0.0
+ * @version 3.0.0
  */
 class Rule implements \JsonSerializable
 {
+    const ROOT_HEADER      = '/header';
+    const ROOT_BODY        = '/body';
+    const ROOT_STATUS_CODE = '/statusCode';
+    const ROOT_TIMEOUT     = '/timeout';
+
+    const ROOT = [
+        self::ROOT_HEADER,
+        self::ROOT_BODY,
+        self::ROOT_STATUS_CODE,
+        self::ROOT_TIMEOUT,
+    ];
+
     /**
      * @var string
      */
@@ -47,24 +58,26 @@ class Rule implements \JsonSerializable
      * @param string $pointer JSON pointer
      * @param BaseValidator $schema
      * @param string $message
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         string $pointer,
         BaseValidator $schema,
-        string $message = ''
+        string $message = null
     ) {
-        $topMembers = ['header/', 'body/', 'statusCode/'];
-
         $found = false;
-        foreach ($topMembers as $member) {
-            $found = $found || Util::startsWith($pointer, '/' . $member);
+        foreach (static::ROOT as $member) {
+            $found = Util::startsWith($pointer, $member);
+            if ($found) {
+                break;
+            }
         }
 
         if (!$found) {
-            throw new \Exception(
-                'Invalid pointer, must start with one of ' . implode(',', $topMembers)
-            );
+            throw new \InvalidArgumentException(sprintf(
+                'Invalid pointer, must start with one of %s',
+                implode(',', static::ROOT)
+            ));
         }
 
         $this->pointer = $pointer;

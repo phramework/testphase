@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2015 - 2016 Xenofon Spafaridis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ use Phramework\Testphase\Report\ResponseReport;
 use Phramework\Testphase\Report\RuleReport;
 use Phramework\Testphase\Report\TestphaseReport;
 use Phramework\Testphase\Rule\Rule;
+use Phramework\Testphase\Rule\StatusCodeRule;
 use Phramework\Util\Util;
 use Phramework\Validate\BaseValidator;
 use Rs\Json\Pointer;
@@ -34,13 +35,8 @@ use Rs\Json\Pointer;
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @version 3.0.0
  */
-class Testphase extends RawEndpoint
+class Testphase extends AbstractTestphase
 {
-    /**
-     * @var callable[]
-     */
-    private static $globalCallbacks = [];
-
     /**
      * Base API url
      * @var string
@@ -67,6 +63,7 @@ class Testphase extends RawEndpoint
 
     /**
      * @var Rule[]
+     * @since 2.0.0
      */
     private $rules;
 
@@ -170,57 +167,10 @@ class Testphase extends RawEndpoint
      * @return TestphaseReport
      */
     private function handleResponse(
-        \Phramework\Testphase\HTTPResponse $response,
+        HTTPResponse $response,
         int $start,
         int $end
     ) : TestphaseReport {
-        $headers = $response->getHeaders();
-
-        if (!in_array($response->getStatusCode(), $this->ruleStatusCode, true)) {
-            //todo convert to header rule
-            throw new \Exception(sprintf(
-                'Expected status code "%s" got "%s"',
-                implode(' or ', $this->ruleStatusCode),
-                $response->getStatusCode()
-            ));
-        }
-
-        foreach ($this->ruleHeaders as $headerKey => $headerValue) {
-            if (!isset($headers[$headerKey])) {
-                /*throw new \Exception(sprintf(
-                    'Expected header "%s" is not set',
-                    $headerKey
-                ));*/
-
-                throw new HeaderException(
-                    sprintf(
-                        'Expected header "%s" is not set',
-                        $headerKey
-                    ),
-                    $headerKey
-                );
-            }
-
-            if ($headerValue != $headers[$headerKey]) {
-                throw new HeaderException(
-                    sprintf(
-                        'Expected header value "%s" for header "%s" got "%s"',
-                        $headerValue,
-                        $headerKey,
-                        $headers[$headerKey]
-                    ),
-                    $headerKey
-                );
-
-                /*throw new \Exception(sprintf(
-                    'Expected header value "%s" for header "%s" got "%s"',
-                    $headerValue,
-                    $headerKey,
-                    $headers[$headerKey]
-                ));*/
-            }
-        }
-
         /**
          * @var RuleReport
          */
@@ -243,73 +193,40 @@ class Testphase extends RawEndpoint
             }
         }
 
-        if ($this->ruleJSON) {
-            $responseBodyObject = json_decode($body);
-
-            //todo Throw rule object exception
-            foreach ($this->ruleObjects as $ruleObject) {
-                $ruleObject->parse($responseBodyObject);
-            }
-
-            $jsonPointer = new Pointer($body);
-            foreach ($this->rules as $rule) {
-                //TODO
-                if (substr($rule->getPointer(), 0, strlen('/body')) === '/body') {
-                    $pointer = substr(
-                        $rule->getPointer(),
-                        strlen('/body')
-                    );
-                }
-
-                //$pointer = $rule->getPointer();
-                //try {
-                //get value from pointer
-                if ($pointer === '/') {
-                    $value = $responseBodyObject;
-                } else {
-                    $value = $jsonPointer->get($pointer);
-                    $value = json_decode(json_encode($value)); //array to object
-                }
-
-                //} catch (Pointer\NonexistentValueReferencedException $e) {
-                //    //todo
-                //    throw new RuleException($e->getMessage());
-                //}
-
-                //if (is_subclass_of($rule->getSchema(), BaseValidator::class)) {
-                    $validateResult = $rule->getSchema()->validate($value);
-
-                    $reportStatus = $reportStatus && $validateResult->status;
-
-                    $ruleReport[] = new RuleReport(
-                        $rule,
-                        $validateResult->status,
-                        $validateResult->exception ?? null
-                    );
-                //}
-                /*} else { //literal value
-                    if ($value != $rule->getSchema()) {
-
-                        //TODO
-                        $ruleReport[] = new RuleReport(
-                            $rule,
-                            false,
-                            new RuleException('invalid value for rule' . $rule->getPointer())
-                        );
-                    }
-                }*/
-            }
-        }
-
-        $callbackArguments = [
-            $response
+        $target = (object) [
+            trim(Rule::ROOT_HEADER, '/')      => $response->getHeaders(),
+            trim(Rule::ROOT_STATUS_CODE, '/') => $response->getStatusCode(),
+            trim(Rule::ROOT_BODY, '/')        => $this->ruleJSON ? json_decode($body) : $body,
+            trim(Rule::ROOT_TIMEOUT, '/')     => $end - $start
         ];
 
-        //Call global callbacks
-        foreach (static::$globalCallbacks as $globalCallback) {
-            call_user_func_array(
-                $globalCallback,
-                $callbackArguments
+        $test = new Pointer(json_encode($target));
+
+        foreach ($this->rules as $rule) {
+            $pointer = rtrim($rule->getPointer(), '/');
+
+            try {
+                $value = $test->get($pointer);
+            } catch (Pointer\NonexistentValueReferencedException $e) {
+                $reportStatus = $reportStatus && false;
+
+                $ruleReport[] = new RuleReport(
+                    $rule,
+                    false,
+                    new RuleException($e->getMessage(), $rule->getPointer())
+                );
+                continue;
+            }
+            $value = json_decode(json_encode($value)); //array to object
+
+            $validateResult = $rule->getSchema()->validate($value);
+
+            $reportStatus = $reportStatus && $validateResult->status;
+
+            $ruleReport[] = new RuleReport(
+                $rule,
+                $validateResult->status,
+                $validateResult->exception ?? null
             );
         }
 
@@ -339,23 +256,11 @@ class Testphase extends RawEndpoint
     }
 
     /**
-     * @param callable $callable
-     * @throws \Exception
-     */
-    public static function addGlobalCallback($callable) {
-        if (!is_callable($callable)) {
-            throw new \Exception('Not a callable');
-        }
-
-        static::$globalCallbacks[] = $callable;
-    }
-
-    /**
      * Set expected HTTP response Status Code
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      * @param  int|int[] $statusCode
      * @return $this
-     * @deprecated
+     * @deprecated 3.0.0
      */
     public function expectStatusCode($statusCode)
     {
@@ -364,36 +269,9 @@ class Testphase extends RawEndpoint
             $statusCode = [$statusCode];
         }
 
-        $this->ruleStatusCode = $statusCode;
-
-        return $this;
-    }
-
-    /**
-     * Add expected response header
-     * @param  array[]|object $ruleHeaders
-     * @return $this
-     * @throws \Exception When $ruleHeaders is not an array
-     * @deprecated
-     */
-    public function expectHeader($ruleHeaders)
-    {
-        if (is_object($ruleHeaders)) {
-            $ruleHeaders = (array) $ruleHeaders;
-        }
-
-        if (!is_array($ruleHeaders)) {
-            throw new \Exception(
-                'Expecting array at expectResponseHeader method'
-            );
-        }
-
-        $this->ruleHeaders = array_merge(
-            $this->ruleHeaders,
-            $ruleHeaders
+        return $this->expectRule(
+            StatusCodeRule::fromEnum($statusCode)
         );
-
-        return $this;
     }
 
     /**
@@ -406,19 +284,6 @@ class Testphase extends RawEndpoint
     public function expectJSON($flag = true)
     {
         $this->ruleJSON = $flag;
-
-        return $this;
-    }
-
-    /**
-     * Object validator, as an additional set of rules to validate the response.
-     * @param  BaseValidator $object Validator object
-     * @return $this
-     * @deprecated
-     */
-    public function expectObject($object)
-    {
-        $this->ruleObjects[] = $object;
 
         return $this;
     }
@@ -438,7 +303,7 @@ class Testphase extends RawEndpoint
      * @param Rule $rule
      * @return $this
      */
-    public function expectRule(Rule $rule)
+    public function expectRule(Rule $rule) : AbstractTestphase
     {
         $this->rules[] = $rule;
 

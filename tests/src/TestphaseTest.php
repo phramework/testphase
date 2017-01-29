@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2015 - 2016 Xenofon Spafaridis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,14 +19,17 @@ namespace Phramework\Testphase;
 use \Phramework\Phramework;
 use Phramework\Testphase\Report\TestphaseReport;
 use Phramework\Testphase\Rule\BodyRule;
+use Phramework\Testphase\Rule\HeaderRule;
+use Phramework\Testphase\Rule\Rule;
+use Phramework\Testphase\Rule\StatusCodeRule;
 use Phramework\Util\Util;
 use Phramework\Validate\ArrayValidator;
 use \Phramework\Validate\ObjectValidator;
 use \Phramework\Validate\StringValidator;
 use \Phramework\Validate\IntegerValidator;
+use Phramework\Validate\UnsignedIntegerValidator;
 
 /**
- * @todo Make $requestHeaders settings
  * @coversDefaultClass Phramework\Testphase\Testphase
  */
 class TestphaseTest extends \PHPUnit_Framework_TestCase
@@ -76,7 +79,6 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         $version = Testphase::getVersion();
 
         $this->assertInternalType('string', $version);
-
         /*$this->assertRegExp(
             '/^1\.[1-9]*[0-9]?\.[1-9]*[0-9]?(:?\-[a-zA-Z0-9]+)?$/',
             $version,
@@ -85,7 +87,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::run
+     * @covers ::handleResponse
      */
     public function testRunSuccess()
     {
@@ -94,9 +96,9 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             'GET',
             $this->requestHeaders
         ))
-        ->expectStatusCode(404)
-        ->expectJSON()
-        ->run();
+            ->expectStatusCode(404)
+            ->expectJSON()
+            ->run();
 
         $this->assertSame(
             TestphaseReport::STATUS_SUCCESS,
@@ -109,8 +111,8 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             $this->requestHeaders,
             '{}'
         ))
-        ->expectStatusCode(404)
-        ->run();
+            ->expectStatusCode(404)
+            ->run();
 
         $this->assertSame(
             TestphaseReport::STATUS_SUCCESS,
@@ -122,8 +124,8 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             'PATCH',
             $this->requestHeaders
         ))
-        ->expectStatusCode(404)
-        ->run();
+            ->expectStatusCode(404)
+            ->run();
 
         $this->assertSame(
             TestphaseReport::STATUS_SUCCESS,
@@ -135,8 +137,8 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             'PUT',
             $this->requestHeaders
         ))
-        ->expectStatusCode(404)
-        ->run();
+            ->expectStatusCode(404)
+            ->run();
 
         $this->assertSame(
             TestphaseReport::STATUS_SUCCESS,
@@ -148,8 +150,8 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
             'DELETE',
             $this->requestHeaders
         ))
-        ->expectStatusCode(404)
-        ->run();
+            ->expectStatusCode(404)
+            ->run();
 
         $this->assertSame(
             TestphaseReport::STATUS_SUCCESS,
@@ -158,7 +160,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::run
+     * @covers ::handleResponse
      */
     public function testRule()
     {
@@ -173,7 +175,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
                     new ObjectValidator()
                 )
             ))
-           ->expectRule(new BodyRule(
+            ->expectRule(new BodyRule(
                 '/0',
                 new ObjectValidator()
             ))
@@ -200,51 +202,27 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::expectHeader
+     * @covers ::handleResponse
      */
-    public function testExpectResponseHeader()
-    {
-        $this->object->expectHeader([
-            'Content-Type' => 'application/vnd.api+json;charset=utf-8'
-        ]);
-
-        $o = $this->object->expectHeader((object)[
-            'Content-Type' => 'application/vnd.api+json;charset=utf-8'
-        ]);
-
-        $this->assertInstanceOf(Testphase::class, $o);
-    }
-
-    /**
-     * @covers ::expectHeader
-     * @expectedException Exception
-     */
-    public function testExpectResponseHeaderFailure1()
-    {
-        $this->object->expectHeader(
-            'application/vnd.api+json;charset=utf-8'
-        );
-    }
-
-    /**
-     * @covers ::run
-     */
-    public function testRunFailure()
+    public function testResponseCodeFailure()
     {
         $test = (new Testphase(
             'book',
             'GET',
             $this->requestHeaders
         ))
-        ->expectStatusCode(440) //wrong
-        ->expectHeader([
-            'Content-Type' => 'application/vnd.api+json;charset=utf-8'
-        ])
-        ->expectJSON()
-        ->run();
+            ->expectRule(
+                StatusCodeRule::fromEnum([444]) //to produce failure
+            )
+            ->run();
+
+        $this->assertCount(
+            1,
+            $test->getRuleReport()
+        );
 
         $this->assertSame(
-            TestphaseReport::STATUS_SUCCESS,
+            TestphaseReport::STATUS_FAILURE,
             $test->getStatus()
         );
     }
@@ -274,7 +252,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::run
+     * @covers ::handleResponse
      */
     public function testExpectStatusCode()
     {
@@ -306,25 +284,37 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::run
+     * @covers ::handleResponse
      */
     public function testGetResponseStatusCode()
     {
-        $testphase = (new Testphase(
-            'posts/notFound',
+        $test = (new Testphase(
+            'posts/1',
             'GET'
-        ))->expectStatusCode(404);
+        ))
+            ->expectRule(
+                StatusCodeRule::fromEnum([200]) //to produce failure
+            )
+            ->run();
 
-        $test = $testphase->run();
+        $this->assertCount(
+            1,
+            $test->getRuleReport()
+        );
+
+        $this->assertSame(
+            TestphaseReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
 
         $statusCode = $test->getResponse()->getStatusCode();
 
         $this->assertInternalType('integer', $statusCode);
-        $this->assertSame(404, $statusCode);
+        $this->assertSame(200, $statusCode);
     }
 
     /**
-     * @covers ::run
+     * @covers ::handleResponse
      */
     public function testGetResponseBody()
     {
@@ -343,26 +333,129 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::run
+     * @covers ::handleResponse
      */
-    public function testGetResponseHeaders()
+    public function testHeaderRuleSuccess()
     {
-        $testphase = (new Testphase(
+        $test = (new Testphase(
             'posts/notFound',
             'GET'
-        ))->expectStatusCode(404);
+        ))
+            ->expectRule(
+                new HeaderRule(
+                    'Date/0',
+                    new StringValidator(1, 30),
+                    'Expect date header to be set'
+                )
+            )
+            ->run();
 
-        $test = $testphase->run();
+        $this->assertCount(
+            1,
+            $test->getRuleReport()
+        );
+
+        $this->assertSame(
+            TestphaseReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
 
         $responseHeaders = $test->getResponse()->getHeaders();
 
         $this->assertInternalType('array', $responseHeaders);
 
-        $this->assertArrayHasKey('Content-Type', $responseHeaders);
+        $this->assertArrayHasKey('Date', $responseHeaders);
 
-        $this->assertStringStartsWith(
-            'application/json',
-            $responseHeaders['Content-Type'][0]
+        $this->assertInternalType('string', $responseHeaders['Date'][0]);
+    }
+
+    /**
+     * @covers ::handleResponse
+     */
+    public function testHeaderRuleFailure()
+    {
+        $test = (new Testphase(
+            'posts/notFound',
+            'GET'
+        ))
+            ->expectRule(
+                new HeaderRule(
+                    'Date/0',
+                    (new StringValidator())//will cause failure
+                    ->setEnum(['unexpected'])
+                )
+            )
+            ->run();
+
+        $this->assertCount(
+            1,
+            $test->getRuleReport(),
+            'Expect only 1 rule to be executed'
+        );
+
+        $this->assertSame(
+            TestphaseReport::STATUS_FAILURE,
+            $test->getStatus(),
+            'Expect failure'
+        );
+    }
+
+    /**
+     * @covers ::handleResponse
+     */
+    public function testHeaderRuleUndefined()
+    {
+        $test = (new Testphase(
+            'posts/notFound',
+            'GET'
+        ))
+            ->expectRule(
+                new HeaderRule(
+                    'Unexpected',
+                    new StringValidator()
+                )
+            )
+            ->run();
+
+        $this->assertCount(
+            1,
+            $test->getRuleReport(),
+            'Expect only 1 rule to be executed'
+        );
+
+        $this->assertSame(
+            TestphaseReport::STATUS_FAILURE,
+            $test->getStatus(),
+            'Expect failure'
+        );
+    }
+
+    /**
+     * @covers ::handleResponse
+     */
+    public function testTimeoutRuleFailure()
+    {
+        $test = (new Testphase(
+            'posts',
+            'GET'
+        ))
+            ->expectRule(
+                new Rule(
+                    Rule::ROOT_TIMEOUT,
+                    (new UnsignedIntegerValidator())
+                        ->setEnum([9999999999])
+                )
+            )->run();
+
+        $this->assertCount(
+            1,
+            $test->getRuleReport()
+        );
+
+        $this->assertSame(
+            TestphaseReport::STATUS_FAILURE,
+            $test->getStatus(),
+            'Expect failure'
         );
     }
 }

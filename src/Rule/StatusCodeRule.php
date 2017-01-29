@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright 2015-2016 Xenofon Spafaridis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,31 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace Phramework\Testphase\Rule;
+
 use Phramework\Util\Util;
 use Phramework\Validate\BaseValidator;
+use Phramework\Validate\UnsignedIntegerValidator;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
- * @since 2.0.0
+ * @since 3.0.0
  */
-class HeaderRule extends Rule
+class StatusCodeRule extends \Phramework\Testphase\Rule\Rule
 {
     public function __construct(
-        string $pointer,
         BaseValidator $schema,
         string $message = null
     ) {
-        if (!Util::startsWith($pointer, static::ROOT_HEADER)) {
-            $pointer = str_replace(
-                '//',
-                '/',
-                static::ROOT_HEADER . '/' . $pointer
-            );
-        }
+        $pointer = static::ROOT_STATUS_CODE;
 
         parent::__construct($pointer, $schema, $message);
+    }
+
+    public static function fromEnum(array $statusCode, string $message = null)
+    {
+        return new StatusCodeRule(
+            (new UnsignedIntegerValidator())
+                ->setEnum($statusCode),
+            $message
+        );
     }
 }

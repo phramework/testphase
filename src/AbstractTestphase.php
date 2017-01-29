@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2015-2016 Xenofon Spafaridis
+/*
+ * Copyright 2015 - 2016 Xenofon Spafaridis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace Phramework\Testphase;
 
-namespace Phramework\Testphase\Rule;
-use Phramework\Util\Util;
-use Phramework\Validate\BaseValidator;
+use Phramework\Testphase\Report\RuleReport;
+use Phramework\Testphase\Report\TestphaseReport;
+use Phramework\Testphase\Rule\Rule;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
- * @since 2.0.0
+ * @version 3.0.0
  */
-class HeaderRule extends Rule
+abstract class AbstractTestphase extends RawEndpoint
 {
-    public function __construct(
-        string $pointer,
-        BaseValidator $schema,
-        string $message = null
-    ) {
-        if (!Util::startsWith($pointer, static::ROOT_HEADER)) {
-            $pointer = str_replace(
-                '//',
-                '/',
-                static::ROOT_HEADER . '/' . $pointer
-            );
-        }
+    abstract public function run() : TestphaseReport;
 
-        parent::__construct($pointer, $schema, $message);
-    }
+    abstract public function expectRule(Rule $rule) : AbstractTestphase;
 }

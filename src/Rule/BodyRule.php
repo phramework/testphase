@@ -22,19 +22,20 @@ use Phramework\Validate\BaseValidator;
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
+ * @since 2.0.0
  */
 class BodyRule extends Rule
 {
     public function __construct(
         string $pointer,
         BaseValidator $schema,
-        string $message = ''
+        string $message = null
     ) {
-        if (!Util::startsWith($pointer, '/body/')) {
+        if (!Util::startsWith($pointer, static::ROOT_BODY)) {
             $pointer = str_replace(
                 '//',
                 '/',
-                '/body/' . $pointer
+                static::ROOT_BODY . '/' . $pointer
             );
         }
 

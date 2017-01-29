@@ -89,7 +89,7 @@ class RuleReport implements \JsonSerializable
             'status' => $this->status
         ];
 
-        if (!empty($this->error) && $this->error) {
+        if ($this->error) {
             $vars['error'] = $this->error;
         }
 

@@ -16,16 +16,20 @@
  */
 namespace Phramework\Testphase\Exceptions;
 
-/***
+/**
  * @since 2.0.0
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
+ * @todo remove path ?
  */
 class RuleException extends \Exception
 {
+    /**
+     * @var string
+     */
     private $path;
 
-    public function __construct($message, $path)
+    public function __construct(string $message, string $path)
     {
         parent::__construct($message);
 
