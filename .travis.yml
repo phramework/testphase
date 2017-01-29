@@ -10,6 +10,6 @@ before_script:
  - mkdir -p build/
  - mkdir -p build/logs
 script:
- - composer test
+ - phpunit
 after_script:
  - php vendor/bin/coveralls -v
