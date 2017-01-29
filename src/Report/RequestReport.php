@@ -21,8 +21,9 @@ namespace Phramework\Testphase\Report;
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @todo add index ??
+ * @since 2.0.0
  */
-class Request implements \JsonSerializable
+class RequestReport implements \JsonSerializable
 {
     /**
      * @var string

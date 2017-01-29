@@ -17,7 +17,7 @@
 namespace Phramework\Testphase;
 
 use Phramework\Testphase\Exceptions\UnsetGlobalException;
-use Phramework\Testphase\Report\StatusReport;
+use Phramework\Testphase\Report\TestphaseReport;
 use Phramework\Testphase\Testphase;
 use Phramework\Testphase\TestParser;
 use Phramework\Exceptions\MissingParametersException;
@@ -165,7 +165,7 @@ class Binary
          */
         $executedTestparserFiles = [];
         /**
-         * @var StatusReport[]
+         * @var TestphaseReport[]
          */
         $executedTestphase = [];
 
@@ -259,13 +259,13 @@ class Binary
             foreach ($testphaseCollection as $testphase) {
                 try {
                     /**
-                     * @var StatusReport
+                     * @var TestphaseReport
                      */
                     $statusReport = $testphase->run();
 
                     $executedTestphase[] = $statusReport;
 
-                    if ($statusReport->getStatus() == StatusReport::STATUS_SUCCESS) {
+                    if ($statusReport->getStatus() == TestphaseReport::STATUS_SUCCESS) {
                         $stats->success += 1;
 
                         //Echo successful char
@@ -282,7 +282,7 @@ class Binary
                         } else {
                             echo '.';
                         }
-                    } elseif ($statusReport->getStatus() == StatusReport::STATUS_FAILURE) {
+                    } elseif ($statusReport->getStatus() == TestphaseReport::STATUS_FAILURE) {
                         $stats->failure += 1;
 
                         //Echo unsuccessful char
@@ -296,7 +296,7 @@ class Binary
                         }
                     }
                     
-                    $responseBody = $statusReport->getResponse()->getBody();
+                    $responseBody = $statusReport->getResponseReport()->getBody();
 
                     if ($testParser->getMeta()->JSONbody) {
                         //TODO only when is json

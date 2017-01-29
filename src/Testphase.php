@@ -20,10 +20,10 @@ use Phramework\JSONAPI\Client\Endpoint;
 use Phramework\JSONAPI\Client\Exceptions\ResponseException;
 use Phramework\Testphase\Exceptions\HeaderException;
 use Phramework\Testphase\Exceptions\RuleException;
-use Phramework\Testphase\Report\Request;
-use Phramework\Testphase\Report\Response;
+use Phramework\Testphase\Report\RequestReport;
+use Phramework\Testphase\Report\ResponseReport;
 use Phramework\Testphase\Report\RuleReport;
-use Phramework\Testphase\Report\StatusReport;
+use Phramework\Testphase\Report\TestphaseReport;
 use Phramework\Testphase\Rule\Rule;
 use Phramework\Util\Util;
 use Phramework\Validate\BaseValidator;
@@ -81,16 +81,23 @@ class Testphase extends RawEndpoint
     private $ruleJSON = false;
 
     /**
-     * @var \Phramework\Testphase\Response
+     * Request
+     * @var string
      */
-    private $response;
+    private $method;
+
+    /**
+     * Request
+     * @var null|string
+     */
+    private $body;
 
     /**
      * @param string      $url
      *     Request url, without the base part, (see setBase method)
      * @param string      $method       HTTP request method
      * @param array       $headers      HTTP request headers
-     * @param string|null $body         HTTP request body
+     * @param string      $body         HTTP request body
      * @param boolean     $ruleJSON     Response rule, expect JSON encoded response body
      * @throws \Phramework\Exceptions\IncorrectParametersException When method is not correct
      */
@@ -99,20 +106,13 @@ class Testphase extends RawEndpoint
         string $method = 'GET',
         array $headers = [],
         string $body = null,
-        $ruleJSON = true
+        bool $ruleJSON = true
     ) {
         //When url does not contain schema use base as prefix
         if (parse_url($url, PHP_URL_SCHEME) !== null) {
             $url = $this->url;
         } else {
             $url = static::$base . $url;
-        }
-
-        if (!is_string($method)) {
-            throw new \Phramework\Exceptions\IncorrectParametersException(
-                ['method'],
-                'Method must be a string'
-            );
         }
 
         $this->method = $method;
@@ -134,30 +134,25 @@ class Testphase extends RawEndpoint
     /**
      * Run testphase
      * Will execute the request and apply all defined rules to validate the response
-     * @param  callable|null $callback  Callback to execute after
      * completing the test rules
-     * @return StatusReport
-     * @uses self::$base When url does not contain schema use base as prefix.
+     * @return TestphaseReport
      * @throws \Exception
      */
-    public function run($callback = null) : StatusReport
+    public function run() : TestphaseReport
     {
         $start = time();
 
         try {
             //Get response
-            $response = $this->response = $this->raw(
+            $response = $this->raw(
                 $this->method,
                 $this->body
             );
         } catch (ResponseException $e) {
-            $response = $this->response = $e->getResponse();
-            /*$this->handleResponse(
-                $e->getResponse(),
-                $start,
-                time(),
-                $callback
-            );*/
+            /*
+             * Extract response from exception
+             */
+            $response = $e->getResponse();
         }
 
         $end = time();
@@ -165,24 +160,24 @@ class Testphase extends RawEndpoint
         return $this->handleResponse(
             $response,
             $start,
-            $end,
-            $callback
+            $end
         );
     }
 
     /**
      * Handle response, test response against provided rules
      * @throws \Exception
-     * @return StatusReport
+     * @return TestphaseReport
      */
     private function handleResponse(
-        \Phramework\Testphase\Response $response,
+        \Phramework\Testphase\HTTPResponse $response,
         int $start,
         int $end
-    ) : StatusReport {
+    ) : TestphaseReport {
         $headers = $response->getHeaders();
 
         if (!in_array($response->getStatusCode(), $this->ruleStatusCode, true)) {
+            //todo convert to header rule
             throw new \Exception(sprintf(
                 'Expected status code "%s" got "%s"',
                 implode(' or ', $this->ruleStatusCode),
@@ -231,7 +226,11 @@ class Testphase extends RawEndpoint
          */
         $ruleReport = [];
 
-        $success = true;
+        /**
+         * Report status
+         * @var bool
+         */
+        $reportStatus = true;
 
         $body = $response->getResponse()->getBody()->__toString();
 
@@ -280,7 +279,7 @@ class Testphase extends RawEndpoint
                 //if (is_subclass_of($rule->getSchema(), BaseValidator::class)) {
                     $validateResult = $rule->getSchema()->validate($value);
 
-                    $success = $success && $validateResult->status;
+                    $reportStatus = $reportStatus && $validateResult->status;
 
                     $ruleReport[] = new RuleReport(
                         $rule,
@@ -314,20 +313,21 @@ class Testphase extends RawEndpoint
             );
         }
 
-        return new Report\StatusReport(
+        return new TestphaseReport(
+            $response,
             (
-                $success === true
-                ? Report\StatusReport::STATUS_SUCCESS
-                : Report\StatusReport::STATUS_FAILURE
+                $reportStatus === true
+                ? Report\TestphaseReport::STATUS_SUCCESS
+                : Report\TestphaseReport::STATUS_FAILURE
             ),
-            new Request(
+            new RequestReport(
                 $this->url,
                 $this->method,
                 $this->headers,
                 $this->body,
                 $start
             ),
-            new Response(
+            new ResponseReport( //this class should parse from $response
                 $response->getStatusCode(),
                 $response->getHeaders(),
                 $body,
@@ -483,13 +483,5 @@ class Testphase extends RawEndpoint
         }*/
 
         return '3.0.0';
-    }
-
-    /**
-     * @return \Phramework\Testphase\Response
-     */
-    public function getResponse(): \Phramework\Testphase\Response
-    {
-        return $this->response;
     }
 }

@@ -19,9 +19,9 @@ namespace Phramework\Testphase\Report;
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
- * @deprecated 3.0.0
+ * @since 2.0.0
  */
-class Response implements \JsonSerializable
+class ResponseReport implements \JsonSerializable
 {
     /**
      * @var int

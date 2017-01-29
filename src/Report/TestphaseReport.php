@@ -16,12 +16,14 @@
  */
 namespace Phramework\Testphase\Report;
 
+use Phramework\Testphase\HTTPResponse;
+
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
  * @author Xenofon Spafaridis <nohponex@gmail.com>
  * @since 2.0.0
  */
-class StatusReport implements \JsonSerializable
+class TestphaseReport implements \JsonSerializable
 {
     const STATUS_SUCCESS    = 'success';
     const STATUS_ERROR      = 'error';
@@ -35,14 +37,14 @@ class StatusReport implements \JsonSerializable
     private $status;
 
     /**
-     * @var Response
+     * @var ResponseReport
      */
-    private $response;
+    private $responseReport;
 
     /**
-     * @var Request
+     * @var RequestReport
      */
-    private $request;
+    private $requestReport;
 
     /**
      * @var RuleReport[]
@@ -50,22 +52,31 @@ class StatusReport implements \JsonSerializable
     private $ruleReport;
 
     /**
+     * Raw Response
+     * @var HTTPResponse
+     */
+    private $response;
+
+    /**
      * StatusReport constructor.
-     * @param string $status
-     * @param Request $request
-     * @param Response $response
-     * @param array $ruleReport
+     * @param HTTPResponse   $response Raw response
+     * @param string         $status
+     * @param RequestReport  $requestReport
+     * @param ResponseReport $responseReport
+     * @param array          $ruleReport
      */
     public function __construct(
-        $status,
-        Request $request,
-        Response $response,
+        HTTPResponse $response,
+        string $status,
+        RequestReport $requestReport,
+        ResponseReport $responseReport,
         array $ruleReport = []
     ) {
-        $this->status     = $status;
-        $this->request    = $request;
-        $this->response   = $response;
-        $this->ruleReport = $ruleReport;
+        $this->response       = $response;
+        $this->status         = $status;
+        $this->responseReport = $requestReport;
+        $this->responseReport = $responseReport;
+        $this->ruleReport     = $ruleReport;
     }
 
     /**
@@ -77,19 +88,19 @@ class StatusReport implements \JsonSerializable
     }
 
     /**
-     * @return Response
+     * @return ResponseReport
      */
-    public function getResponse()
+    public function getResponseReport()
     {
-        return $this->response;
+        return $this->rrequestReport;
     }
 
     /**
-     * @return Request
+     * @return RequestReport
      */
-    public function getRequest()
+    public function getRequestReport()
     {
-        return $this->request;
+        return $this->requestReport;
     }
 
     /**
@@ -100,12 +111,21 @@ class StatusReport implements \JsonSerializable
         return $this->ruleReport;
     }
 
+    /**
+     * Get raw response
+     * @return HTTPResponse
+     */
+    public function getResponse(): HTTPResponse
+    {
+        return $this->response;
+    }
+
     public function jsonSerialize()
     {
         return [
             'status'     => $this->status,
-            'request'    => $this->request,
-            'response'   => $this->response,
+            'request'    => $this-$this->responseReport,
+            'response'   => $this->responseReport,
             'ruleReport' => $this->ruleReport
         ];
     }

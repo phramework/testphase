@@ -33,10 +33,10 @@ class RawEndpoint extends Endpoint
             $response = $client->send($request);
         } catch (BadResponseException $exception) {
             throw new ResponseException(
-                new \Phramework\Testphase\Response($exception->getResponse())
+                new \Phramework\Testphase\HTTPResponse($exception->getResponse())
             );
         }
 
-        return (new \Phramework\Testphase\Response(($response)));
+        return (new \Phramework\Testphase\HTTPResponse(($response)));
     }
 }
