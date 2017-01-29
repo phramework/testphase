@@ -16,10 +16,13 @@
  */
 namespace Phramework\Testphase;
 
+/**
+ * @coversDefaultClass Phramework\Testphase\Expression
+ */
 class ExpressionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Phramework\Testphase\Expression::getExpression
+     * @covers ::getExpression
      */
     public function testGetExpression()
     {
@@ -40,7 +43,7 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Expression::parse
+     * @covers ::parse
      * @dataProvider parseProvider
      */
     public function testParse($input, $expected)

@@ -48,11 +48,38 @@ class RuleReport implements \JsonSerializable
      * @param boolean $status
      * @param \Exception|null $error
      */
-    public function __construct(Rule $rule, $status, \Exception $error = null)
-    {
+    public function __construct(
+        Rule $rule,
+        bool $status,
+        \Exception $error = null
+    ) {
         $this->rule   = $rule;
         $this->status = $status;
         $this->error  = $error;
+    }
+
+    /**
+     * @return Rule
+     */
+    public function getRule(): Rule
+    {
+        return $this->rule;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getStatus(): bool
+    {
+        return $this->status;
+    }
+
+    /**
+     * @return \Exception|null
+     */
+    public function getError()
+    {
+        return $this->error;
     }
 
     public function jsonSerialize()

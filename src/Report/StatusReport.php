@@ -92,6 +92,14 @@ class StatusReport implements \JsonSerializable
         return $this->request;
     }
 
+    /**
+     * @return RuleReport[]
+     */
+    public function getRuleReport(): array
+    {
+        return $this->ruleReport;
+    }
+
     public function jsonSerialize()
     {
         return [

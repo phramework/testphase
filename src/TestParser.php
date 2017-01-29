@@ -136,7 +136,7 @@ class TestParser
         //Setup validator, to validate and parse the test file
 
         $requestValidator = new ObjectValidator(
-            [
+            (object) [
                 'url' => new StringValidator(1, 2048),
                 'method' => (new StringValidator())
                     ->setDefault('GET'),
@@ -168,7 +168,7 @@ class TestParser
         );
 
         $responseValidator = new ObjectValidator(
-            [
+            (object) [
                 'statusCode' => new AnyOf([
                     new UnsignedIntegerValidator(100, 999),
                     new ArrayValidator(
@@ -199,7 +199,7 @@ class TestParser
         $validator = new ObjectValidator(
             [
                 'meta' => (new ObjectValidator(
-                    [
+                    (object) [
                         'order' => (new IntegerValidator(-99999999, 99999999))
                             ->setDefault(0),
                         'ignore' => (new BooleanValidator())

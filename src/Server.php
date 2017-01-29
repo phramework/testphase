@@ -41,7 +41,7 @@ class Server
      * @param string $host
      * @param string $root
      */
-    public function __construct($host, $root = './public')
+    public function __construct(string $host, string $root = './public')
     {
         $this->host = $host;
         $this->root = $root;

@@ -17,7 +17,7 @@
 
 namespace Phramework\Testphase\Rule;
 use Phramework\Util\Util;
-
+use Phramework\Validate\BaseValidator;
 
 /**
  * @license https://www.apache.org/licenses/LICENSE-2.0 Apache-2.0
@@ -25,8 +25,11 @@ use Phramework\Util\Util;
  */
 class BodyRule extends Rule
 {
-    public function __construct($pointer, $schema, $message = '')
-    {
+    public function __construct(
+        string $pointer,
+        BaseValidator $schema,
+        string $message = ''
+    ) {
         if (!Util::startsWith($pointer, '/body/')) {
             $pointer = str_replace(
                 '//',

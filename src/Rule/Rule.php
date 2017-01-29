@@ -49,8 +49,11 @@ class Rule implements \JsonSerializable
      * @param string $message
      * @throws \Exception
      */
-    public function __construct($pointer, BaseValidator $schema, $message = '')
-    {
+    public function __construct(
+        string $pointer,
+        BaseValidator $schema,
+        string $message = ''
+    ) {
         $topMembers = ['header/', 'body/', 'statusCode/'];
 
         $found = false;

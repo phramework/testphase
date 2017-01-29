@@ -17,13 +17,17 @@
 namespace Phramework\Testphase;
 
 use \Phramework\Phramework;
+use Phramework\Testphase\Report\StatusReport;
+use Phramework\Testphase\Rule\BodyRule;
 use Phramework\Util\Util;
+use Phramework\Validate\ArrayValidator;
 use \Phramework\Validate\ObjectValidator;
 use \Phramework\Validate\StringValidator;
 use \Phramework\Validate\IntegerValidator;
 
 /**
  * @todo Make $requestHeaders settings
+ * @coversDefaultClass Phramework\Testphase\Testphase
  */
 class TestphaseTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,24 +69,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::__construct
-     */
-    public function testConstruct()
-    {
-        new Testphase('url', 'GET');
-    }
-
-    /**
-     * @covers Phramework\Testphase\Testphase::__construct
-     * @expectedException \Phramework\Exceptions\IncorrectParametersException
-     */
-    public function testConstructFailure1()
-    {
-        new Testphase('url', ['WhatsUp']);
-    }
-
-    /**
-     * @covers Phramework\Testphase\Testphase::getVersion
+     * @covers ::getVersion
      */
     public function testGetVersion()
     {
@@ -98,7 +85,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::run
+     * @covers ::run
      */
     public function testRunSuccess()
     {
@@ -111,6 +98,11 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         ->expectJSON()
         ->run();
 
+        $this->assertSame(
+            StatusReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
+
         $test = (new Testphase(
             'posts/notFound',
             'POST',
@@ -120,6 +112,11 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         ->expectStatusCode(404)
         ->run();
 
+        $this->assertSame(
+            StatusReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
+
         $test = (new Testphase(
             'posts/notFound',
             'PATCH',
@@ -128,6 +125,10 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         ->expectStatusCode(404)
         ->run();
 
+        $this->assertSame(
+            StatusReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
 
         $test = (new Testphase(
             'posts/notFound',
@@ -137,6 +138,11 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         ->expectStatusCode(404)
         ->run();
 
+        $this->assertSame(
+            StatusReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
+
         $test = (new Testphase(
             'posts/notFound',
             'DELETE',
@@ -144,10 +150,57 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         ))
         ->expectStatusCode(404)
         ->run();
+
+        $this->assertSame(
+            StatusReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::expectHeader
+     * @covers ::run
+     */
+    public function testRule()
+    {
+        $test = (new Testphase(
+            'posts'
+        ))
+            ->expectRule(new BodyRule(
+                '',
+                new ArrayValidator(
+                    0,
+                    null,
+                    new ObjectValidator()
+                )
+            ))
+           ->expectRule(new BodyRule(
+                '/0',
+                new ObjectValidator()
+            ))
+            ->expectRule(new BodyRule(
+                '/0/id',
+                (new IntegerValidator())
+                    ->setEnum([1])
+            ))
+            ->run();
+
+        $this->assertCount(
+            3,
+            $test->getRuleReport()
+        );
+
+        foreach ($test->getRuleReport() as $r) {
+            $this->assertTrue($r->getStatus());
+        }
+
+        $this->assertSame(
+            StatusReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
+    }
+
+    /**
+     * @covers ::expectHeader
      */
     public function testExpectResponseHeader()
     {
@@ -163,7 +216,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::expectHeader
+     * @covers ::expectHeader
      * @expectedException Exception
      */
     public function testExpectResponseHeaderFailure1()
@@ -174,7 +227,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::expectJSON
+     * @covers ::expectJSON
      */
     public function testExpectJSON()
     {
@@ -185,7 +238,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::expectObject
+     * @covers ::expectObject
      */
     public function testExpectObjectJSON()
     {
@@ -196,12 +249,10 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::run
-     * @expectedException Exception
+     * @covers ::run
      */
     public function testRunFailure()
     {
-        throw new \Exception('');
         $test = (new Testphase(
             'book',
             'GET',
@@ -213,10 +264,15 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
         ])
         ->expectJSON()
         ->run();
+
+        $this->assertSame(
+            StatusReport::STATUS_SUCCESS,
+            $test->getStatus()
+        );
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::setBase
+     * @covers ::setBase
      */
     public function testSetBase()
     {
@@ -228,7 +284,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::getBase
+     * @covers ::getBase
      * @depends testSetBase
      */
     public function testGetBase($base)
@@ -240,7 +296,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::expectStatusCode
+     * @covers ::getResponse
      */
     public function testExpectStatusCode()
     {
@@ -251,7 +307,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
         $testphase->run();
 
-        $statusCode = $testphase->getResponseStatusCode();
+        $statusCode = $testphase->getResponse()->getStatusCode();
 
         $this->assertInternalType('integer', $statusCode);
         $this->assertSame(404, $statusCode);
@@ -265,14 +321,14 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
         $testphase->run();
 
-        $statusCode = $testphase->getResponseStatusCode();
+        $statusCode = $testphase->getResponse()->getStatusCode();
 
         $this->assertInternalType('integer', $statusCode);
         $this->assertSame(404, $statusCode);
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::getResponseStatusCode
+     * @covers ::getResponse
      */
     public function testGetResponseStatusCode()
     {
@@ -283,14 +339,14 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
         $testphase->run();
 
-        $statusCode = $testphase->getResponseStatusCode();
+        $statusCode = $testphase->getResponse()->getStatusCode();
 
         $this->assertInternalType('integer', $statusCode);
         $this->assertSame(404, $statusCode);
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::getResponseBody
+     * @covers ::getResponse
      */
     public function testGetResponseBody()
     {
@@ -301,7 +357,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
         $testphase->run();
 
-        $responseBody = $testphase->getResponseBody();
+        $responseBody = $testphase->getResponse()->getResponse()->getBody()->__toString();
 
         $this->assertInternalType('string', $responseBody);
 
@@ -309,7 +365,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Phramework\Testphase\Testphase::getResponseHeaders
+     * @covers ::getResponse
      */
     public function testGetResponseHeaders()
     {
@@ -320,7 +376,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
         $testphase->run();
 
-        $responseHeaders = $testphase->getResponseHeaders();
+        $responseHeaders = $testphase->getResponse()->getHeaders();
 
         $this->assertInternalType('array', $responseHeaders);
 
@@ -328,7 +384,7 @@ class TestphaseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertStringStartsWith(
             'application/json',
-            $responseHeaders['Content-Type']
+            $responseHeaders['Content-Type'][0]
         );
     }
 }

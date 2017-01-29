@@ -29,7 +29,8 @@
       "/body/0/id" : 1
     },
     "export" : {
-      "postId" : "/1/id"
+      "postId"   : "/1/id",
+      "postType" : "/1/type"
     }
   }
 }
